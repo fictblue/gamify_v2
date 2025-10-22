@@ -1,0 +1,1553 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - GamifyLearn{% endblock %}
+
+{% block content %}
+<section class="social-profile-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-8 col-lg-9">
+                <!-- Social Media Profile Header -->
+                <div class="social-profile-header animate-fade-in-up">
+                    <!-- Cover Section with Animated Gradient -->
+                    <div class="profile-cover">
+                        <div class="cover-animated-bg"></div>
+                        <div class="cover-overlay"></div>
+                        <div class="cover-glow-effect"></div>
+                        <div class="cover-content">
+                            <h1 class="cover-title">{{ user.username }}</h1>
+                            <p class="cover-subtitle">
+                                {% if user.role == 'student' %}
+                                    <span class="role-badge">
+                                        <i class="fas fa-graduation-cap"></i>
+                                        Level {{ user.student_profile.level|title }} Student
+                                    </span>
+                                {% else %}
+                                    <span class="role-badge admin">
+                                        <i class="fas fa-crown"></i>
+                                        Platform Administrator
+                                    </span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="cover-particles">
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Avatar & Info -->
+                    <div class="profile-main-info">
+                        <div class="profile-avatar-container">
+                            <div class="avatar-glow-ring"></div>
+                            <div class="profile-avatar-social">
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="avatar-image">
+                                {% elif user.student_profile %}
+                                    <span class="avatar-text">{{ user.student_profile.level|first|upper }}</span>
+                                {% else %}
+                                    <i class="fas fa-user avatar-icon"></i>
+                                {% endif %}
+                                <div class="avatar-status">
+                                    <span class="status-dot {% if user.role == 'student' %}student{% else %}admin{% endif %}"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profile-details">
+                            <div class="profile-header-row">
+                                <div>
+                                    <h2 class="profile-name">{{ user.username }}</h2>
+                                    <p class="profile-role">
+                                        <i class="fas fa-{% if user.role == 'student' %}graduation-cap{% else %}crown{% endif %} me-2"></i>
+                                        {% if user.role == 'student' %}
+                                            Level {{ user.student_profile.level|title }} Student
+                                        {% else %}
+                                            Platform Administrator
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                {% if user.role == 'student' %}
+                                    <div class="profile-level-badge">
+                                        <i class="fas fa-star"></i>
+                                        <span>{{ user.student_profile.level|title }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Media Style Stats -->
+                {% if user.role == 'student' %}
+                    <div class="social-stats-section animate-fade-in-up" style="animation-delay: 0.2s;">
+                        <div class="stats-header">
+                            <h3 class="stats-title">
+                                <i class="fas fa-chart-bar me-2"></i>Statistics
+                            </h3>
+                            <div class="stats-subtitle">Your Learning Journey</div>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-card-social">
+                                <div class="stat-icon-wrapper coins">
+                                    <i class="fas fa-coins"></i>
+                                    <div class="icon-glow"></div>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-number" data-target="{{ user.student_profile.total_xp }}">0</div>
+                                    <div class="stat-label">Total XP</div>
+                                    <div class="stat-bar">
+                                        <div class="stat-bar-fill" style="width: 85%"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card-social">
+                                <div class="stat-icon-wrapper trophy">
+                                    <i class="fas fa-trophy"></i>
+                                    <div class="icon-glow"></div>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-number" data-target="{{ user.student_profile.points }}">0</div>
+                                    <div class="stat-label">Points</div>
+                                    <div class="stat-bar">
+                                        <div class="stat-bar-fill" style="width: 70%"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card-social">
+                                <div class="stat-icon-wrapper fire">
+                                    <i class="fas fa-fire"></i>
+                                    <div class="icon-glow"></div>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-number" data-target="{{ user.student_profile.streak_correct }}">0</div>
+                                    <div class="stat-label">Streak</div>
+                                    <div class="stat-bar">
+                                        <div class="stat-bar-fill" style="width: 60%"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card-social">
+                                <div class="stat-icon-wrapper chart">
+                                    <i class="fas fa-chart-line"></i>
+                                    <div class="icon-glow"></div>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-number" data-target="{{ user.student_profile.progress }}">0</div>
+                                    <div class="stat-label">Progress</div>
+                                    <div class="stat-bar">
+                                        <div class="stat-bar-fill" style="width: {{ user.student_profile.progress }}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Profile Information Display -->
+                <div class="social-form-section animate-fade-in-up" style="animation-delay: 0.4s;">
+                    <div class="form-card">
+                        <div class="card-header">
+                            <h3 class="form-title">
+                                <i class="fas fa-info-circle me-2"></i>Profile Information
+                            </h3>
+                            <div class="header-decoration"></div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row g-4">
+                                <!-- Read-only Information Display -->
+                                <div class="col-md-6">
+                                    <div class="info-display">
+                                        <div class="info-icon">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <div class="info-content">
+                                            <div class="info-label">Username</div>
+                                            <div class="info-value">{{ user.username }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="info-display">
+                                        <div class="info-icon">
+                                            <i class="fas fa-envelope"></i>
+                                        </div>
+                                        <div class="info-content">
+                                            <div class="info-label">Email Address</div>
+                                            <div class="info-value">{{ user.email }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {% if user.role == 'student' %}
+                                    <div class="col-12">
+                                        <div class="progress-card">
+                                            <div class="progress-header">
+                                                <div class="progress-title-group">
+                                                    <div class="progress-icon">
+                                                        <i class="fas fa-chart-line"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h5 class="progress-title">Learning Progress</h5>
+                                                        <p class="progress-desc">Keep going, you're doing great!</p>
+                                                    </div>
+                                                </div>
+                                                <span class="progress-percentage">{{ user.student_profile.progress }}%</span>
+                                            </div>
+                                            <div class="progress-track-wrapper">
+                                                <div class="progress-track">
+                                                    <div class="progress-bar" style="width: {{ user.student_profile.progress }}%">
+                                                        <div class="progress-shine"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="progress-markers">
+                                                    <span class="marker" style="left: 25%">25%</span>
+                                                    <span class="marker" style="left: 50%">50%</span>
+                                                    <span class="marker" style="left: 75%">75%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons Section -->
+                <div class="social-actions-section animate-fade-in-up" style="animation-delay: 0.3s;">
+                    <div class="action-buttons">
+                        <a href="{% url 'accounts:edit_profile' %}" class="btn action-btn-primary">
+                            <span class="btn-icon"><i class="fas fa-edit"></i></span>
+                            <span class="btn-text">Edit Profile</span>
+                            <span class="btn-glow"></span>
+                        </a>
+
+                        {% if user.role == 'student' %}
+                            <a href="{% url 'quizzes:student_quiz_list' %}" class="btn action-btn-secondary">
+                                <span class="btn-icon"><i class="fas fa-play"></i></span>
+                                <span class="btn-text">Start Quiz</span>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'quizzes:admin_quiz_list' %}" class="btn action-btn-secondary">
+                                <span class="btn-icon"><i class="fas fa-cog"></i></span>
+                                <span class="btn-text">Admin Panel</span>
+                            </a>
+                        {% endif %}
+
+                        <a href="{% url 'home' %}" class="btn action-btn-tertiary">
+                            <span class="btn-icon"><i class="fas fa-arrow-left"></i></span>
+                            <span class="btn-text">Back to Home</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    :root {
+        --neon-cyan: #00ffff;
+        --neon-magenta: #ff00ff;
+        --neon-blue: #0066ff;
+        --neon-purple: #9933ff;
+        --dark-bg-1: rgba(5, 15, 25, 0.95);
+        --dark-bg-2: rgba(8, 20, 35, 0.9);
+        --dark-bg-3: rgba(10, 25, 47, 0.95);
+        --glass-border: rgba(0, 255, 255, 0.2);
+        --glass-hover: rgba(0, 255, 255, 0.4);
+    }
+
+    /* Social Media Profile Layout */
+    .social-profile-section {
+        min-height: calc(100vh - 72px);
+        margin-top: 0;
+        position: relative;
+        overflow-x: hidden;
+        
+    }
+
+    .social-profile-section::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .container {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Profile Header with Cover - Enhanced Neon Matte */
+    .social-profile-header {
+        background: linear-gradient(135deg,
+            var(--dark-bg-1) 0%,
+            var(--dark-bg-2) 50%,
+            var(--dark-bg-1) 100%);
+        backdrop-filter: blur(20px);
+        border: 2px solid var(--glass-border);
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.4),
+            0 0 60px rgba(0, 255, 255, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        border-radius: 24px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .profile-cover {
+        height: 240px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cover-animated-bg {
+        position: absolute;
+        top: -50%; left: -50%;
+        width: 200%; height: 200%;
+        background: 
+            linear-gradient(45deg, 
+                transparent 30%, 
+                rgba(0, 255, 255, 0.1) 50%, 
+                transparent 70%),
+            linear-gradient(-45deg, 
+                transparent 30%, 
+                rgba(255, 0, 255, 0.1) 50%, 
+                transparent 70%);
+        animation: coverRotate 20s linear infinite;
+    }
+
+    @keyframes coverRotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .cover-overlay {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(135deg, 
+            rgba(0, 0, 0, 0.6) 0%, 
+            rgba(0, 0, 0, 0.3) 50%,
+            rgba(0, 0, 0, 0.6) 100%);
+    }
+
+    .cover-glow-effect {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle at 50% 50%, 
+            rgba(0, 255, 255, 0.15) 0%, 
+            transparent 70%);
+        animation: glowPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes glowPulse {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+    }
+
+    .cover-particles {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        overflow: hidden;
+    }
+
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: var(--neon-cyan);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--neon-cyan);
+        animation: particleFloat 8s ease-in-out infinite;
+    }
+
+    .particle:nth-child(1) { left: 20%; animation-delay: 0s; }
+    .particle:nth-child(2) { left: 40%; animation-delay: 1.5s; }
+    .particle:nth-child(3) { left: 60%; animation-delay: 3s; }
+    .particle:nth-child(4) { left: 80%; animation-delay: 4.5s; }
+    .particle:nth-child(5) { left: 50%; animation-delay: 6s; }
+
+    @keyframes particleFloat {
+        0%, 100% { 
+            transform: translateY(240px) scale(0);
+            opacity: 0;
+        }
+        10% {
+            opacity: 1;
+            transform: translateY(200px) scale(1);
+        }
+        90% {
+            opacity: 1;
+            transform: translateY(20px) scale(1);
+        }
+        100% {
+            transform: translateY(0) scale(0);
+            opacity: 0;
+        }
+    }
+
+    .cover-content {
+        position: absolute;
+        bottom: 2rem;
+        left: 2rem;
+        color: white;
+        z-index: 10;
+    }
+
+    .cover-title {
+        font-size: 3rem;
+        font-weight: 900;
+        margin-bottom: 0.75rem;
+        background: linear-gradient(135deg, #fff, var(--neon-cyan));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        animation: titleSlide 1s ease-out;
+        letter-spacing: -1px;
+    }
+
+    .role-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 255, 0.2), 
+            rgba(0, 150, 255, 0.2));
+        border: 1px solid var(--glass-border);
+        padding: 0.5rem 1.25rem;
+        border-radius: 30px;
+        font-size: 1rem;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2);
+        animation: subtitleSlide 1s ease-out 0.2s both;
+    }
+
+    .role-badge.admin {
+        background: linear-gradient(135deg, 
+            rgba(255, 150, 0, 0.2), 
+            rgba(255, 100, 0, 0.2));
+        border-color: rgba(255, 150, 0, 0.3);
+        box-shadow: 0 4px 15px rgba(255, 150, 0, 0.2);
+    }
+
+    .role-badge i {
+        font-size: 1.1rem;
+    }
+
+    /* Profile Avatar - Enhanced with Glow Ring */
+    .profile-main-info {
+        display: flex;
+        align-items: center;
+        gap: 2.5rem;
+        padding: 2.5rem;
+        margin-top: -5rem;
+        position: relative;
+        z-index: 10;
+    }
+
+    .profile-avatar-container {
+        position: relative;
+    }
+
+    .avatar-glow-ring {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: conic-gradient(
+            var(--neon-cyan),
+            var(--neon-magenta),
+            var(--neon-blue),
+            var(--neon-cyan)
+        );
+        animation: ringRotate 4s linear infinite;
+        opacity: 0.6;
+        filter: blur(8px);
+    }
+
+    @keyframes ringRotate {
+        0% { transform: translate(-50%, -50%) rotate(0deg); }
+        100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    .profile-avatar-social {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--dark-bg-3), var(--dark-bg-2));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 800;
+        font-size: 4.5rem;
+        box-shadow:
+            0 20px 50px rgba(0, 0, 0, 0.5),
+            0 0 0 6px rgba(255, 255, 255, 0.1),
+            inset 0 2px 4px rgba(255, 255, 255, 0.1);
+        position: relative;
+        z-index: 2;
+        transition: all 0.4s ease;
+        border: 4px solid rgba(0, 255, 255, 0.3);
+    }
+
+    .profile-avatar-social:hover {
+        transform: scale(1.05);
+        border-color: var(--glass-hover);
+        box-shadow:
+            0 25px 60px rgba(0, 255, 255, 0.3),
+            0 0 0 6px rgba(0, 255, 255, 0.2),
+            inset 0 2px 4px rgba(255, 255, 255, 0.2);
+    }
+
+    .avatar-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .avatar-text,
+    .avatar-icon {
+        font-size: 4.5rem;
+        text-shadow: 0 0 20px var(--neon-cyan);
+    }
+
+    .avatar-status {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        width: 44px;
+        height: 44px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        border: 3px solid var(--dark-bg-1);
+    }
+
+    .status-dot {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #10b981;
+        animation: statusPulse 2s ease-in-out infinite;
+        box-shadow: 0 0 10px currentColor;
+    }
+
+    .status-dot.student {
+        background: var(--neon-blue);
+    }
+
+    .status-dot.admin {
+        background: #f59e0b;
+    }
+
+    @keyframes statusPulse {
+        0%, 100% { 
+            opacity: 1; 
+            transform: scale(1); 
+        }
+        50% { 
+            opacity: 0.7; 
+            transform: scale(1.15); 
+        }
+    }
+
+    /* Profile Details */
+    .profile-details {
+        flex: 1;
+    }
+
+    .profile-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .profile-name {
+        font-size: 2.75rem;
+        font-weight: 900;
+        color: #ffffff;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+        letter-spacing: -0.5px;
+    }
+
+    .profile-role {
+        font-size: 1.25rem;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 500;
+        margin-bottom: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .profile-role i {
+        color: var(--neon-cyan);
+    }
+
+    .profile-level-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: linear-gradient(135deg, 
+            rgba(255, 215, 0, 0.2), 
+            rgba(255, 150, 0, 0.2));
+        border: 2px solid rgba(255, 215, 0, 0.4);
+        color: #ffd700;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.125rem;
+        box-shadow: 
+            0 4px 15px rgba(255, 215, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+    }
+
+    .profile-level-badge i {
+        font-size: 1.25rem;
+        animation: starSpin 3s linear infinite;
+    }
+
+    @keyframes starSpin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Stats Section - Enhanced Design */
+    .social-stats-section {
+        background: linear-gradient(135deg,
+            var(--dark-bg-1) 0%,
+            var(--dark-bg-2) 100%);
+        backdrop-filter: blur(20px);
+        border: 2px solid var(--glass-border);
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.4),
+            0 0 60px rgba(0, 255, 255, 0.05),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        border-radius: 24px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .social-stats-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(0, 255, 255, 0.05), 
+            transparent);
+        animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+
+    .stats-header {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .stats-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #ffffff;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    }
+
+    .stats-subtitle {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.6);
+        font-weight: 500;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .stat-card-social {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding: 2rem 1.5rem;
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.6) 0%,
+            rgba(0, 20, 40, 0.4) 100%);
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid var(--glass-border);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card-social::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, 
+            transparent, 
+            var(--neon-cyan), 
+            transparent);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .stat-card-social:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 12px 30px rgba(0, 255, 255, 0.2);
+        border-color: var(--glass-hover);
+    }
+
+    .stat-card-social:hover::before {
+        opacity: 1;
+    }
+
+    .stat-icon-wrapper {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        flex-shrink: 0;
+        position: relative;
+        transition: all 0.4s ease;
+    }
+
+    .stat-icon-wrapper.coins {
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        color: #000;
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+    }
+
+    .stat-icon-wrapper.trophy {
+        background: linear-gradient(135deg, #ff6b35, #f7931e);
+        color: #fff;
+        box-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
+    }
+
+    .stat-icon-wrapper.fire {
+        background: linear-gradient(135deg, #ff0080, #ff8c00);
+        color: #fff;
+        box-shadow: 0 0 30px rgba(255, 0, 128, 0.5);
+    }
+
+    .stat-icon-wrapper.chart {
+        background: linear-gradient(135deg, #00ff88, #00ccff);
+        color: #000;
+        box-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+    }
+
+    .stat-card-social:hover .stat-icon-wrapper {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .icon-glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: inherit;
+        filter: blur(15px);
+        opacity: 0.6;
+        z-index: -1;
+    }
+
+    .stat-info {
+        flex: 1;
+        text-align: center;
+        width: 100%;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: var(--neon-cyan);
+        line-height: 1;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.75rem;
+    }
+
+    .stat-bar {
+        width: 100%;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .stat-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+        border-radius: 3px;
+        transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        box-shadow: 0 0 10px currentColor;
+    }
+
+    .stat-bar-fill::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+        animation: barShine 2s ease-in-out infinite;
+    }
+
+    @keyframes barShine {
+        0% { left: -100%; }
+        100% { left: 200%; }
+    }
+
+    /* Form Section - Enhanced Design */
+    .social-form-section {
+        background: linear-gradient(135deg,
+            var(--dark-bg-1) 0%,
+            var(--dark-bg-2) 100%);
+        backdrop-filter: blur(20px);
+        border: 2px solid var(--glass-border);
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.4),
+            0 0 60px rgba(0, 255, 255, 0.05),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        border-radius: 24px;
+        overflow: hidden;
+    }
+
+    .form-card .card-header {
+        background: linear-gradient(135deg,
+            rgba(10, 25, 47, 0.95) 0%,
+            rgba(15, 35, 65, 0.9) 100%);
+        color: white;
+        padding: 2rem;
+        border-bottom: 1px solid var(--glass-border);
+        position: relative;
+    }
+
+    .form-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        margin-bottom: 0;
+        text-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        display: flex;
+        align-items: center;
+    }
+
+    .form-title i {
+        color: var(--neon-cyan);
+    }
+
+    .header-decoration {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, 
+            transparent,
+            var(--neon-cyan),
+            var(--neon-magenta),
+            transparent);
+    }
+
+    .form-card .card-body {
+        padding: 2.5rem;
+    }
+
+    /* Info Display - Enhanced Card Style */
+    .info-display {
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.6) 0%,
+            rgba(0, 20, 40, 0.4) 100%);
+        border-radius: 20px;
+        padding: 0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--glass-border);
+        transition: all 0.4s ease;
+        overflow: hidden;
+        display: flex;
+        align-items: stretch;
+    }
+
+    .info-display:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 255, 255, 0.15);
+        border-color: var(--glass-hover);
+    }
+
+    .info-icon {
+        width: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 255, 0.2), 
+            rgba(0, 150, 255, 0.2));
+        border-right: 1px solid var(--glass-border);
+        font-size: 1.75rem;
+        color: var(--neon-cyan);
+        flex-shrink: 0;
+    }
+
+    .info-content {
+        flex: 1;
+        padding: 1.5rem;
+    }
+
+    .info-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .info-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #ffffff;
+        word-break: break-all;
+    }
+
+    /* Progress Card - Enhanced Design */
+    .progress-card {
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.6) 0%,
+            rgba(0, 20, 40, 0.4) 100%);
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--glass-border);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .progress-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        background: radial-gradient(circle at top right, 
+            rgba(0, 255, 255, 0.05) 0%, 
+            transparent 70%);
+        pointer-events: none;
+    }
+
+    .progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .progress-title-group {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+    }
+
+    .progress-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, 
+            var(--neon-cyan), 
+            var(--neon-blue));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #000;
+        font-size: 1.75rem;
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        flex-shrink: 0;
+    }
+
+    .progress-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 0.25rem;
+    }
+
+    .progress-desc {
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 0;
+    }
+
+    .progress-percentage {
+        font-size: 2rem;
+        font-weight: 900;
+        color: var(--neon-cyan);
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 255, 0.15), 
+            rgba(255, 0, 255, 0.15));
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        border: 2px solid var(--glass-border);
+        text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+    }
+
+    .progress-track-wrapper {
+        position: relative;
+        z-index: 1;
+    }
+
+    .progress-track {
+        width: 100%;
+        height: 16px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, 
+            var(--neon-cyan), 
+            var(--neon-magenta));
+        border-radius: 8px;
+        transition: width 2s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 
+            0 0 20px rgba(0, 255, 255, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    .progress-shine {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(255,255,255,0.5), 
+            transparent);
+        animation: progressShine 2.5s ease-in-out infinite;
+    }
+
+    @keyframes progressShine {
+        0% { left: -100%; }
+        100% { left: 200%; }
+    }
+
+    .progress-markers {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 0.75rem;
+        padding: 0 0.25rem;
+    }
+
+    .marker {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.4);
+        font-weight: 600;
+        position: relative;
+    }
+
+    .marker::before {
+        content: '';
+        position: absolute;
+        top: -0.875rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 2px;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Action Buttons - Enhanced Design */
+    .social-actions-section {
+        background: linear-gradient(135deg,
+            var(--dark-bg-1) 0%,
+            var(--dark-bg-2) 100%);
+        backdrop-filter: blur(20px);
+        border: 2px solid var(--glass-border);
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.4),
+            0 0 60px rgba(0, 255, 255, 0.05),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        border-radius: 24px;
+        padding: 2.5rem;
+        margin-top: 2rem;
+        text-align: center;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1.25rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .action-btn-primary,
+    .action-btn-secondary,
+    .action-btn-tertiary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        text-decoration: none;
+        border: 2px solid transparent;
+    }
+
+    .action-btn-primary {
+        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+        color: #000;
+        box-shadow: 
+            0 4px 20px rgba(0, 255, 255, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    .action-btn-primary:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 
+            0 8px 30px rgba(0, 255, 255, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        color: #000;
+    }
+
+    .btn-glow {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(255,255,255,0.4), 
+            transparent);
+        transition: left 0.6s ease;
+    }
+
+    .action-btn-primary:hover .btn-glow {
+        left: 100%;
+    }
+
+    .action-btn-secondary {
+        background: transparent;
+        border: 2px solid var(--glass-border);
+        color: #ffffff;
+        backdrop-filter: blur(10px);
+    }
+
+    .action-btn-secondary:hover {
+        transform: translateY(-2px);
+        border-color: var(--neon-cyan);
+        background: rgba(0, 255, 255, 0.1);
+        box-shadow: 0 4px 20px rgba(0, 255, 255, 0.3);
+        color: var(--neon-cyan);
+    }
+
+    .action-btn-tertiary {
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+    }
+
+    .action-btn-tertiary:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: #ffffff;
+    }
+
+    .btn-icon {
+        font-size: 1.125rem;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from { 
+            opacity: 0; 
+            transform: translateY(30px); 
+        }
+        to { 
+            opacity: 1; 
+            transform: translateY(0); 
+        }
+    }
+
+    @keyframes titleSlide {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes subtitleSlide {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in-up {
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 992px) {
+        .profile-main-info {
+            flex-direction: column;
+            text-align: center;
+            gap: 2rem;
+            padding: 2rem;
+            margin-top: -4rem;
+        }
+
+        .profile-header-row {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .avatar-glow-ring {
+            width: 180px;
+            height: 180px;
+        }
+
+        .profile-avatar-social {
+            width: 150px;
+            height: 150px;
+            font-size: 3.5rem;
+        }
+
+        .avatar-text,
+        .avatar-icon {
+            font-size: 3.5rem;
+        }
+
+        .profile-name {
+            font-size: 2.25rem;
+        }
+
+        .cover-title {
+            font-size: 2.5rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .social-profile-section { 
+            padding: 1.5rem 0; 
+        }
+
+        .profile-cover {
+            height: 180px;
+        }
+
+        .cover-content {
+            left: 1.5rem;
+            bottom: 1.5rem;
+        }
+
+        .cover-title {
+            font-size: 2rem;
+        }
+
+        .role-badge {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .profile-main-info {
+            padding: 1.5rem;
+            margin-top: -3.5rem;
+        }
+
+        .avatar-glow-ring {
+            width: 150px;
+            height: 150px;
+        }
+
+        .profile-avatar-social {
+            width: 120px;
+            height: 120px;
+            font-size: 2.5rem;
+        }
+
+        .avatar-text,
+        .avatar-icon {
+            font-size: 2.5rem;
+        }
+
+        .profile-name {
+            font-size: 1.75rem;
+        }
+
+        .profile-role {
+            font-size: 1rem;
+        }
+
+        .stats-title {
+            font-size: 1.5rem;
+        }
+
+        .social-stats-section,
+        .social-actions-section,
+        .social-form-section {
+            padding: 2rem 1.5rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+        }
+
+        .stat-icon-wrapper {
+            width: 60px;
+            height: 60px;
+            font-size: 1.75rem;
+        }
+
+        .progress-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+        }
+
+        .progress-title {
+            font-size: 1.25rem;
+        }
+
+        .progress-percentage {
+            font-size: 1.5rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .action-btn-primary,
+        .action-btn-secondary,
+        .action-btn-tertiary {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .info-display {
+            flex-direction: column;
+        }
+
+        .info-icon {
+            width: 100%;
+            height: 60px;
+            border-right: none;
+            border-bottom: 1px solid var(--glass-border);
+        }
+    }
+
+    @media (max-width: 576px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .profile-main-info {
+            margin-top: -3rem;
+        }
+
+        .progress-header {
+            flex-direction: column;
+            gap: 1.5rem;
+            text-align: center;
+        }
+
+        .progress-title-group {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .form-card .card-body,
+        .social-stats-section,
+        .social-actions-section {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Staggered entrance animations
+        const animatedElements = document.querySelectorAll('.animate-fade-in-up');
+        animatedElements.forEach((element, index) => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(30px)';
+
+            setTimeout(() => {
+                element.style.transition = `opacity 0.8s ease-out ${index * 0.15}s, transform 0.8s ease-out ${index * 0.15}s`;
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
+            }, 100);
+        });
+
+        // Animated number counter for stats
+        const statNumbers = document.querySelectorAll('.stat-number[data-target]');
+        statNumbers.forEach(stat => {
+            const target = parseInt(stat.getAttribute('data-target'));
+            const duration = 2000;
+            const increment = target / (duration / 16);
+            let current = 0;
+
+            const updateCounter = () => {
+                current += increment;
+                if (current < target) {
+                    stat.textContent = Math.floor(current);
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    stat.textContent = target;
+                }
+            };
+
+            // Start animation after a delay
+            setTimeout(() => {
+                updateCounter();
+            }, 800);
+        });
+
+        // Animate stat cards with stagger
+        const statCards = document.querySelectorAll('.stat-card-social');
+        statCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px) scale(0.95)';
+
+            setTimeout(() => {
+                card.style.transition = `opacity 0.6s ease-out ${index * 0.1}s, transform 0.6s ease-out ${index * 0.1}s`;
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0) scale(1)';
+            }, 1000);
+        });
+
+        // Animate info displays
+        const infoDisplays = document.querySelectorAll('.info-display');
+        infoDisplays.forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(-20px)';
+
+            setTimeout(() => {
+                item.style.transition = `opacity 0.5s ease-out ${index * 0.1}s, transform 0.5s ease-out ${index * 0.1}s`;
+                item.style.opacity = '1';
+                item.style.transform = 'translateX(0)';
+            }, 1200);
+        });
+
+        // Animate progress bar
+        const progressBar = document.querySelector('.progress-bar');
+        if (progressBar) {
+            const targetWidth = progressBar.style.width;
+            progressBar.style.width = '0%';
+            
+            setTimeout(() => {
+                progressBar.style.width = targetWidth;
+            }, 1500);
+        }
+
+        // Add hover effect to profile avatar
+        const profileAvatar = document.querySelector('.profile-avatar-social');
+        if (profileAvatar) {
+            profileAvatar.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05) rotate(2deg)';
+            });
+            
+            profileAvatar.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) rotate(0deg)';
+            });
+        }
+    });
+</script>
+{% endblock %}

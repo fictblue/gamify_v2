@@ -1,0 +1,851 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - GamifyLearn{% endblock %}
+
+{% block meta_description %}Sign in to your GamifyLearn account and continue your personalized learning journey with AI-powered adaptive education.{% endblock %}
+
+{% block content %}
+<section class="auth-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-4 col-lg-5 col-md-6 col-sm-8">
+                <div class="auth-container">
+                    <div class="auth-header text-center mb-4">
+                        <div class="auth-icon mb-3">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h1 class="auth-title">Welcome Back</h1>
+                        <p class="auth-subtitle">Continue your learning adventure</p>
+                    </div>
+
+                    <div class="gamify-card auth-card animate-fade-in-up">
+                        <div class="card-body p-4 p-lg-5">
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert-enhanced {% if message.tags == 'error' %}error{% else %}{{ message.tags }}{% endif %} mb-4">
+                                        <div class="alert-icon">
+                                            <i class="fas fa-{% if message.tags == 'error' %}exclamation{% else %}check{% endif %}-circle"></i>
+                                        </div>
+                                        <div class="alert-content">
+                                            <div class="alert-message">{{ message }}</div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+
+                            <form method="post" id="loginForm" class="auth-form" novalidate>
+                                {% csrf_token %}
+
+                                <div class="form-floating mb-4">
+                                    <input type="text"
+                                           class="form-control auth-input"
+                                           id="id_username"
+                                           name="username"
+                                           placeholder=""
+                                           required
+                                           autocomplete="username">
+                                    <label for="id_username" class="auth-label">
+                                        <i class="fas fa-user me-2"></i>Username or Email
+                                    </label>
+                                    {% if form.username.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>{{ form.username.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-floating password-field-wrapper mb-4">
+                                    <input type="password"
+                                           class="form-control auth-input"
+                                           id="id_password"
+                                           name="password"
+                                           placeholder=""
+                                           required
+                                           autocomplete="current-password">
+                                    <label for="id_password" class="auth-label">
+                                        <i class="fas fa-lock me-2"></i>Password
+                                    </label>
+                                    <button type="button" class="password-toggle" id="passwordToggle" aria-label="Toggle password visibility">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    {% if form.password.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>{{ form.password.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="row mb-4 align-items-center">
+                                    <div class="col-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="remember_me" name="remember_me">
+                                            <label class="form-check-label small" for="remember_me">
+                                                Remember me
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-grid mb-4">
+                                    <button type="submit" class="btn btn-gamify btn-lg auth-btn" id="loginBtn">
+                                        <span class="btn-text">
+                                            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                                        </span>
+                                    </button>
+                                </div>
+
+                                <div class="auth-divider mb-4">
+                                    <span class="auth-divider-text">or</span>
+                                </div>
+
+                                <div class="text-center mb-4">
+                                    <button type="button" class="btn btn-outline-primary social-btn" disabled>
+                                        <i class="fab fa-google me-2"></i>Continue with Google
+                                    </button>
+                                </div>
+
+                                <div class="text-center">
+                                    <p class="auth-footer-text mb-2">
+                                        Don't have an account?
+                                        <a href="{% url 'accounts:register' %}" class="auth-link">
+                                            Create one here
+                                        </a>
+                                    </p>
+                                    <a href="{% url 'home' %}" class="back-home-link">
+                                        <i class="fas fa-arrow-left me-1"></i>Back to Home
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Authentication Section - Neon Matte Theme */
+    .auth-section {
+        min-height: calc(100vh - 72px);
+        display: flex;
+        align-items: center;
+
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    .auth-section::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        
+        pointer-events: none;
+    }
+
+    .auth-container {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+    }
+
+    /* Welcome Header - Neon Matte Style */
+    .auth-header { margin-bottom: 2rem; }
+
+    .auth-icon {
+        width: 80px; height: 80px;
+        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center; justify-content: center;
+        font-size: 2.5rem; color: #000000;
+        box-shadow:
+            0 10px 30px rgba(0, 255, 255, 0.4),
+            0 0 0 3px rgba(0, 255, 255, 0.2);
+        margin-bottom: 1.5rem;
+        border: 2px solid rgba(0, 255, 255, 0.3);
+        position: relative;
+    }
+
+    .auth-icon::before {
+        content: '';
+        position: absolute;
+        top: -2px; left: -2px; right: -2px; bottom: -2px;
+        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+        border-radius: 50%;
+        z-index: -1;
+        opacity: 0.3;
+        animation: iconPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes iconPulse {
+        0%, 100% {
+            opacity: 0.3;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.6;
+            transform: scale(1.05);
+        }
+    }
+
+    .auth-title {
+        font-size: 2.5rem; font-weight: 800;
+        color: #ffffff; margin-bottom: 0.5rem;
+        text-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+    }
+
+    .auth-subtitle {
+        font-size: 1.125rem; color: rgba(255, 255, 255, 0.7);
+        font-weight: 500;
+    }
+
+    /* Auth Card - Neon Matte Design */
+    .auth-card {
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.95) 0%,
+            rgba(0, 20, 40, 0.9) 100%);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(0, 255, 255, 0.3);
+        box-shadow:
+            0 20px 50px rgba(0, 0, 0, 0.4),
+            0 0 0 1px rgba(0, 255, 255, 0.2),
+            0 0 60px rgba(0, 255, 255, 0.1);
+        border-radius: 24px;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    .auth-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg,
+            transparent,
+            rgba(0, 255, 255, 0.05),
+            transparent);
+        animation: cardShimmer 4s infinite;
+        z-index: 1;
+    }
+
+    @keyframes cardShimmer {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+
+    .auth-card:hover {
+        transform: translateY(-8px);
+        box-shadow:
+            0 25px 60px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(0, 255, 255, 0.4),
+            0 0 80px rgba(0, 255, 255, 0.2);
+        border-color: rgba(0, 255, 255, 0.5);
+    }
+
+    .card-body {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Form Styling - Neon Matte Inputs */
+    .form-floating {
+        position: relative;
+    }
+
+    .auth-input {
+        height: 56px;
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 14px;
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.9) 0%,
+            rgba(0, 20, 40, 0.8) 100%);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 1rem 1.25rem;
+        position: relative;
+        font-size: 1rem;
+        font-weight: 400;
+        color: #ffffff;
+        box-shadow:
+            0 4px 15px rgba(0, 0, 0, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .auth-input:focus {
+        border-color: var(--neon-cyan);
+        background: linear-gradient(135deg,
+            rgba(0, 20, 40, 0.95) 0%,
+            rgba(0, 25, 50, 0.9) 100%);
+        box-shadow:
+            0 0 0 3px rgba(0, 255, 255, 0.15),
+            0 8px 25px rgba(0, 255, 255, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        outline: none;
+        transform: translateY(-2px) scale(1.02);
+    }
+
+    .auth-input:hover:not(:focus) {
+        border-color: rgba(0, 255, 255, 0.4);
+        background: linear-gradient(135deg,
+            rgba(0, 18, 35, 0.92) 0%,
+            rgba(0, 22, 45, 0.85) 100%);
+        box-shadow:
+            0 6px 20px rgba(0, 0, 0, 0.25),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        transform: translateY(-1px);
+    }
+
+    /* Enhanced floating animation for input fields */
+    .form-floating:hover .auth-input:not(:focus) {
+        animation: inputFloat 0.5s ease-out;
+    }
+
+    @keyframes inputFloat {
+        0% {
+            transform: translateY(0) scale(1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        50% {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+        100% {
+            transform: translateY(-1px) scale(1.005);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+    }
+
+    .auth-label {
+        position: absolute;
+        top: 0; left: 0;
+        height: 100%; width: 100%;
+        padding: 1rem 1.25rem;
+        pointer-events: none;
+        display: flex; align-items: center;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 1rem;
+        font-weight: 400;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1;
+        background: transparent;
+    }
+
+    .auth-label i {
+        margin-right: 0.75rem;
+        color: rgba(255, 255, 255, 0.4);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 1.1rem;
+    }
+
+    /* Enhanced Floating Label Logic */
+    .auth-input:focus + .auth-label,
+    .auth-input:not(:placeholder-shown) + .auth-label {
+        transform: translateY(-0.75rem) translateX(0.25rem) scale(0.85);
+        color: var(--neon-cyan);
+        font-weight: 600;
+        font-size: 0.875rem;
+        padding: 0.25rem 0.75rem;
+        height: auto; width: auto;
+        top: 0; left: 0.75rem;
+        background: linear-gradient(135deg,
+            rgba(0, 25, 50, 0.95) 0%,
+            rgba(0, 35, 70, 0.9) 100%);
+        backdrop-filter: blur(8px);
+        border-radius: 8px;
+        box-shadow:
+            0 4px 15px rgba(0, 0, 0, 0.3),
+            0 0 0 1px rgba(0, 255, 255, 0.2);
+        z-index: 10;
+        animation: labelFloat 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes labelFloat {
+        0% {
+            opacity: 0;
+            transform: translateY(-0.25rem) translateX(0.25rem) scale(0.9);
+            filter: blur(2px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(-0.75rem) translateX(0.25rem) scale(0.85);
+            filter: blur(0px);
+        }
+    }
+
+    .auth-input:focus + .auth-label i,
+    .auth-input:not(:placeholder-shown) + .auth-label i {
+        color: var(--neon-cyan);
+        transform: scale(1.15);
+        animation: iconFloat 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes iconFloat {
+        0% {
+            transform: scale(1);
+            opacity: 0.8;
+        }
+        50% {
+            transform: scale(1.25);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(1.15);
+            opacity: 1;
+        }
+    }
+
+    /* Password visibility toggle - Neon Matte Style */
+    .password-field-wrapper { position: relative; }
+    .password-toggle {
+        position: absolute;
+        top: 50%;
+        right: 1.25rem;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.7);
+        cursor: pointer;
+        padding: 0.5rem;
+        z-index: 15;
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        backdrop-filter: blur(10px);
+    }
+
+    .password-toggle:hover {
+        color: var(--neon-cyan);
+        background: rgba(0, 255, 255, 0.15);
+        border-color: rgba(0, 255, 255, 0.4);
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    }
+
+    .password-toggle:active {
+        transform: scale(0.95);
+    }
+
+    /* Ensure password toggle is always visible and positioned correctly */
+    .password-field-wrapper .password-toggle {
+        z-index: 15;
+        pointer-events: auto;
+        position: absolute;
+        top: 50%;
+        right: 1.25rem;
+        transform: translateY(-50%);
+    }
+
+    /* Ensure password toggle button positioning is absolutely stable */
+    .form-floating .password-toggle {
+        position: absolute !important;
+        top: 50% !important;
+        right: 1.25rem !important;
+        transform: translateY(-50%) !important;
+        z-index: 999 !important;
+    }
+
+    /* Prevent any transform overrides */
+    .form-floating:hover .password-toggle,
+    .form-floating:focus-within .password-toggle,
+    .auth-input:focus + .auth-label ~ .password-toggle {
+        transform: translateY(-50%) !important;
+        top: 50% !important;
+        right: 1.25rem !important;
+    }
+
+    @keyframes errorPulse {
+        0% {
+            transform: translateY(0) scale(1);
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3);
+        }
+        25% {
+            transform: translateY(-1px) scale(1.005);
+            box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.15);
+        }
+        50% {
+            transform: translateY(0) scale(1);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+        75% {
+            transform: translateY(1px) scale(0.995);
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
+        }
+        100% {
+            transform: translateY(0) scale(1);
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
+        }
+    }
+
+    .form-floating.input-error .auth-label {
+        color: #ef4444;
+    }
+
+    .form-floating.input-error .auth-label i {
+        color: #ef4444;
+        animation: errorIconShake 0.8s ease-in-out;
+    }
+
+    @keyframes errorIconShake {
+        0%, 100% { transform: scale(1.15) rotate(5deg); }
+        25% { transform: scale(1.25) rotate(-5deg); }
+        50% { transform: scale(1.35) rotate(10deg); }
+        75% { transform: scale(1.25) rotate(-2deg); }
+    }
+
+    .invalid-feedback {
+        font-weight: 500;
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        animation: errorMessageSlide 0.4s ease-out;
+    }
+
+    .invalid-feedback i {
+        margin-right: 0.5rem;
+        animation: errorIconBlink 1.5s ease-in-out infinite;
+    }
+
+    @keyframes errorMessageSlide {
+        0% {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes errorIconBlink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+    }
+
+    /* Checkbox & Links - Neon Matte Style */
+    .form-check-input:checked {
+        background-color: var(--neon-cyan);
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+    }
+
+    .form-check-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+    }
+
+    .auth-link, .back-home-link {
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .auth-link {
+        color: var(--neon-cyan);
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+    }
+
+    .auth-link:hover {
+        color: var(--neon-magenta);
+        text-shadow: 0 0 12px rgba(255, 0, 255, 0.4);
+    }
+
+    .back-home-link {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .back-home-link:hover {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Submit Button - Neon Matte Enhanced */
+    .auth-btn {
+        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+        border: none; border-radius: 12px;
+        font-weight: 700; font-size: 1.125rem;
+        padding: 1rem;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative; overflow: hidden;
+        cursor: pointer;
+        color: #000000;
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        box-shadow:
+            0 8px 25px rgba(0, 255, 255, 0.3),
+            0 0 0 1px rgba(0, 255, 255, 0.4);
+    }
+
+    .auth-btn:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow:
+            0 12px 35px rgba(0, 255, 255, 0.4),
+            0 0 0 1px rgba(0, 255, 255, 0.6),
+            0 0 40px rgba(0, 255, 255, 0.2);
+        filter: brightness(1.1);
+    }
+
+    .auth-btn:active {
+        transform: translateY(-1px) scale(0.98);
+    }
+
+    .auth-btn.loading > .btn-text {
+        visibility: hidden;
+    }
+
+    .auth-btn.loading::after {
+        content: '';
+        position: absolute;
+        width: 24px; height: 24px;
+        top: 50%; left: 50%;
+        margin-left: -12px; margin-top: -12px;
+        border: 3px solid rgba(0,0,0,.2);
+        border-radius: 50%;
+        border-top-color: #000000;
+        animation: spin 0.8s linear infinite;
+    }
+
+    /* Add subtle pulse animation to button when ready */
+    .auth-btn:not(:disabled):not(.loading) {
+        animation: buttonReady 2s ease-in-out infinite;
+    }
+
+    @keyframes buttonReady {
+        0%, 100% {
+            box-shadow:
+                0 8px 25px rgba(0, 255, 255, 0.3),
+                0 0 0 1px rgba(0, 255, 255, 0.4);
+        }
+        50% {
+            box-shadow:
+                0 10px 30px rgba(0, 255, 255, 0.4),
+                0 0 0 1px rgba(0, 255, 255, 0.5);
+        }
+    }
+
+    /* Divider & Social Button - Neon Matte */
+    .auth-divider {
+        position: relative; text-align: center;
+    }
+    .auth-divider::before {
+        content: ''; position: absolute;
+        top: 50%; left: 0; right: 0;
+        height: 1px; background: rgba(0, 255, 255, 0.2);
+    }
+    .auth-divider-text {
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.95) 0%,
+            rgba(0, 20, 40, 0.9) 100%);
+        color: rgba(255, 255, 255, 0.6);
+        padding: 0 1rem; font-size: 0.875rem;
+        position: relative; z-index: 2;
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 8px;
+    }
+
+    .social-btn {
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+    }
+
+    .social-btn:hover:not(:disabled) {
+        background: rgba(0, 255, 255, 0.1);
+        border-color: rgba(0, 255, 255, 0.4);
+        color: var(--neon-cyan);
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    }
+
+    /* Animations */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up {
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    /* Ripple animation for interactive elements */
+    @keyframes ripple {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .auth-section { padding: 2rem 0; }
+        .auth-title { font-size: 2rem; }
+        .auth-icon { width: 60px; height: 60px; font-size: 2rem; }
+        .auth-card { margin: 0 1rem; }
+    }
+    @media (max-width: 576px) {
+        .auth-card .card-body { padding: 2rem 1.5rem; }
+        .auth-title { font-size: 1.75rem; }
+    }
+
+    /* Neon Matte Variables */
+    :root {
+        --neon-cyan: #00ffff;
+        --neon-magenta: #ff00ff;
+        --neon-blue: #0066ff;
+        --neon-purple: #9933ff;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // --- Enhanced Password Visibility Toggle ---
+    const passwordInput = document.getElementById('id_password');
+    const passwordToggle = document.getElementById('passwordToggle');
+    if (passwordInput && passwordToggle) {
+        passwordToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const isPassword = passwordInput.getAttribute('type') === 'password';
+            passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+
+            const icon = this.querySelector('i');
+            if (icon) {
+                icon.classList.toggle('fa-eye', !isPassword);
+                icon.classList.toggle('fa-eye-slash', isPassword);
+            }
+
+            // Enhanced click animation with ripple effect
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+
+            ripple.style.cssText = `
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(99, 102, 241, 0.2);
+                transform: scale(0);
+                animation: ripple 0.6s ease-out;
+                width: ${size}px;
+                height: ${size}px;
+                left: ${x}px;
+                top: ${y}px;
+                pointer-events: none;
+                z-index: 1;
+            `;
+
+            this.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+
+            // Simple click feedback without position changes
+            this.style.opacity = '0.8';
+            setTimeout(() => {
+                this.style.opacity = '1';
+            }, 150);
+        });
+    }
+
+    // --- Advanced Real-time Form Validation ---
+    const formInputs = document.querySelectorAll('.auth-input');
+    formInputs.forEach(input => {
+        // Add input event for real-time feedback
+        input.addEventListener('input', function() {
+            const formGroup = this.closest('.form-floating');
+
+            // Remove error styling if input has content and passes basic validation
+            if (this.value.trim() && formGroup.classList.contains('input-error')) {
+                // Basic validation check
+                let isValid = true;
+                if (this.type === 'email' || this.name === 'username') {
+                    isValid = this.value.length >= 3;
+                } else if (this.type === 'password') {
+                    isValid = this.value.length >= 6;
+                }
+
+                if (isValid) {
+                    formGroup.classList.remove('input-error');
+                    formGroup.classList.add('input-valid');
+                }
+            }
+
+            // Enhanced visual feedback for filled inputs
+            if (this.value.trim()) {
+                this.style.background = 'linear-gradient(135deg, rgba(236, 254, 255, 0.8) 0%, rgba(219, 234, 254, 0.3) 100%)';
+                this.style.borderColor = 'rgba(59, 130, 246, 0.4)';
+            } else {
+                this.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%)';
+                this.style.borderColor = 'rgba(99, 102, 241, 0.2)';
+            }
+        });
+
+        // Enhanced focus effects
+        input.addEventListener('focus', function() {
+            this.style.transform = 'translateY(-1px) scale(1.01)';
+            this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        });
+
+        input.addEventListener('blur', function() {
+            if (!this.value.trim()) {
+                this.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%)';
+                this.style.borderColor = 'rgba(99, 102, 241, 0.2)';
+                this.style.transform = 'translateY(0) scale(1)';
+            }
+        });
+
+        // Add typing animation effect
+        input.addEventListener('keydown', function() {
+            this.style.transform = 'translateY(-1px) scale(1.005)';
+        });
+
+        input.addEventListener('keyup', function() {
+            this.style.transform = 'translateY(-1px) scale(1.01)';
+        });
+    });
+
+    // --- Auto-hide Django messages alerts ---
+    document.querySelectorAll('.alert-enhanced').forEach((alert, index) => {
+        setTimeout(() => {
+            alert.style.transition = 'opacity 0.5s ease, transform 0.5s ease, margin 0.5s ease';
+            alert.style.opacity = '0';
+            alert.style.transform = 'translateY(-20px)';
+            alert.style.marginTop = '0';
+            alert.style.marginBottom = '0';
+            alert.style.paddingTop = '0';
+            alert.style.paddingBottom = '0';
+            setTimeout(() => alert.remove(), 500);
+        }, 5000 + (index * 500));
+    });
+
+    // --- Staggered entrance animations for form elements ---
+    const animatedElements = document.querySelectorAll('.auth-header, .form-floating, .row.mb-4, .d-grid, .auth-divider, .text-center');
+    animatedElements.forEach((element, index) => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(20px)';
+        element.style.transition = `opacity 0.6s ease-out ${index * 0.05}s, transform 0.6s ease-out ${index * 0.05}s`;
+
+        // Use a small timeout to apply the 'in-view' state, triggering the transition
+        setTimeout(() => {
+            element.style.opacity = '1';
+            element.style.transform = 'translateY(0)';
+        }, 100);
+    });
+});
+</script>
+{% endblock %}

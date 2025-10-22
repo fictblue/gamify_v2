@@ -1,0 +1,4352 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - GamifyLearn{% endblock %}
+
+{% block content %}
+<!-- Enhanced Admin Dashboard Header -->
+<div class="admin-header-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="admin-welcome-section">
+                    <h1 class="admin-title">
+                        <i class="fas fa-crown text-warning me-3"></i>
+                        Admin Dashboard
+                    </h1>
+                    <p class="admin-subtitle">Real-time system monitoring and analytics</p>
+                    <div class="admin-breadcrumb">
+                        <span class="badge bg-primary me-2">Live Data</span>
+                        <span class="text-muted">Updated: <span id="lastUpdated">Just now</span></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <div class="admin-actions">
+                    <button class="btn btn-outline-primary me-2" onclick="location.reload()">
+                        <i class="fas fa-sync-alt me-2"></i>Refresh
+                    </button>
+                    <a href="#" class="btn btn-primary">
+                        <i class="fas fa-download me-2"></i>Export Data
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container admin-dashboard-container" style="background: none;">
+    <!-- Enhanced System Statistics -->
+    <div class="row mb-4 animate-fade-in-up">
+         <div class="col-md-3">
+            <div class="card stats-card primary enhanced-card">
+                <div class="stats-card-icon">
+                    <i class="fas fa-users fa-2x text-primary"></i>
+                </div>
+                <div class="card-body">
+                    <div class="stats-content">
+                        <h6 class="card-title">Total Students</h6>
+                        <h2 class="stats-number">{{ total_students }}</h2>
+                        {% if total_students > 0 %}
+                            <small class="text-muted">Registered users</small>
+                        {% else %}
+                            <small class="text-muted">No students yet</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 animate-fade-in-up" style="animation-delay: 0.1s;">
+            <div class="card stats-card success enhanced-card">
+                <div class="stats-card-icon">
+                    <i class="fas fa-user-check fa-2x text-success"></i>
+                </div>
+                <div class="card-body">
+                    <div class="stats-content">
+                        <h6 class="card-title">Active Profiles</h6>
+                        <h2 class="stats-number">{{ total_profiles }}</h2>
+                        {% if total_profiles > 0 %}
+                            <small class="text-muted">With complete profiles</small>
+                        {% else %}
+                            <small class="text-muted">No profiles yet</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Average Progress Card -->
+        <div class="col-md-3 animate-fade-in-up" style="animation-delay: 0.2s;">
+            <div class="card stats-card info enhanced-card">
+                <div class="stats-card-icon">
+                    <i class="fas fa-chart-line fa-2x text-info"></i>
+                </div>
+                <div class="card-body">
+                    <div class="stats-content">
+                        <h6 class="card-title">Avg Progress</h6>
+                        <h2 class="stats-number">{{ avg_progress|floatformat:1 }}%</h2>
+                        {% if avg_progress > 0 %}
+                            <small class="text-muted">Learning progress</small>
+                        {% else %}
+                            <small class="text-muted">No activity yet</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status Card -->
+        <div class="col-md-3 animate-fade-in-up" style="animation-delay: 0.3s;">
+            <div class="card stats-card warning enhanced-card">
+                <div class="stats-card-icon">
+                    <i class="fas fa-server fa-2x text-warning"></i>
+                </div>
+                <div class="card-body">
+                    <div class="stats-content">
+                        <h6 class="card-title">System Status</h6>
+                        <h2 class="stats-number text-success">
+                            <i class="fas fa-circle text-success me-2" style="font-size: 0.8em;"></i>
+                            Online
+                        </h2>
+                        <small class="text-muted">All systems operational</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Quiz Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stats-card enhanced-card" style="border-left-color: #6f42c1;">
+                <div class="stats-card-icon">
+                    <i class="fas fa-question-circle fa-2x" style="color: #6f42c1;"></i>
+                </div>
+                <div class="card-body">
+                    <div class="stats-content">
+                        <h6 class="card-title">Total Questions</h6>
+                        <h2 class="stats-number" style="color: #6f42c1;">{{ total_questions }}</h2>
+                        <small class="text-muted">Questions in database</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stats-card enhanced-card" style="border-left-color: #fd7e14;">
+                <div class="stats-card-icon">
+                    <i class="fas fa-play-circle fa-2x" style="color: #fd7e14;"></i>
+                </div>
+                <div class="card-body">
+                    <div class="stats-content">
+                        <h6 class="card-title">Quiz Attempts</h6>
+                        <h2 class="stats-number" style="color: #fd7e14;">{{ total_attempts }}</h2>
+                        {% if total_attempts > 0 %}
+                            <small class="text-muted">Total attempts made</small>
+                        {% else %}
+                            <small class="text-muted">No attempts yet</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stats-card enhanced-card" style="border-left-color: #20c997;">
+                <div class="stats-card-icon">
+                    <i class="fas fa-chart-pie fa-2x" style="color: #20c997;"></i>
+                </div>
+                <div class="card-body">
+                    <div class="stats-content">
+                        <h6 class="card-title">Success Rate</h6>
+                        <h2 class="stats-number" style="color: #20c997;">
+                            {% if success_rate %}{{ success_rate|floatformat:1 }}%{% else %}0%{% endif %}
+                        </h2>
+                        {% if total_attempts > 0 %}
+                            <small class="text-muted">Overall accuracy</small>
+                        {% else %}
+                            <small class="text-muted">No data yet</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stats-card enhanced-card" style="border-left-color: #dc3545;">
+                <div class="stats-card-icon">
+                    <i class="fas fa-chart-bar fa-2x text-danger"></i>
+                </div>
+                <div class="card-body">
+                    <div class="stats-content">
+                        <h6 class="card-title">Questions by Difficulty</h6>
+                        <div class="difficulty-badges mt-2">
+                            <span class="badge bg-success badge-enhanced">
+                                Easy: {{ questions_by_difficulty.easy|default:0 }}
+                            </span>
+                            <span class="badge bg-warning badge-enhanced">
+                                Medium: {{ questions_by_difficulty.medium|default:0 }}
+                            </span>
+                            <span class="badge bg-danger badge-enhanced">
+                                Hard: {{ questions_by_difficulty.hard|default:0 }}
+                            </span>
+                        </div>
+                        <small class="text-muted mt-2 d-block">Distribution across levels</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Analytics Dashboard -->
+    <div class="row mb-4">
+        <div class="col-md-12" style="margin-top: 2rem;">
+            <h4 class="section-title mb-4">
+                <i class="fas fa-chart-line me-2"></i>Analytics Dashboard
+            </h4>
+            <div class="row">
+                <!-- User Engagement -->
+                <div class="col-md-3 animate-slide-in-left">
+                    <div class="card bg-light analytics-card enhanced-analytics-card">
+                        <div class="card-body text-center">
+                            <div class="analytics-icon-wrapper">
+                                <i class="fas fa-users fa-2x text-primary mb-3"></i>
+                            </div>
+                            <h6 class="card-title">User Engagement</h6>
+                            <h3 class="analytics-number text-primary">
+                                {{ analytics.engagement.total_sessions|default:0 }}
+                            </h3>
+                            <small class="text-muted">Total Sessions</small>
+                            {% if analytics.engagement.total_sessions > 0 %}
+                                <div class="analytics-details mt-3">
+                                    <div class="detail-item">
+                                        <span class="detail-label">Avg Duration:</span>
+                                        <span class="detail-value">
+                                            {{ analytics.engagement.avg_session_duration|floatformat:0 }}s
+                                        </span>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Success Rate -->
+                <div class="col-md-3 animate-slide-in-left" style="animation-delay: 0.1s;">
+                    <div class="card bg-light analytics-card enhanced-analytics-card">
+                        <div class="card-body text-center">
+                            <div class="analytics-icon-wrapper">
+                                <i class="fas fa-trophy fa-2x text-success mb-3"></i>
+                            </div>
+                            <h6 class="card-title">Success Rate</h6>
+                            <h3 class="analytics-number text-success">
+                                {{ analytics.success.overall_accuracy|floatformat:1|default:"0.0" }}%
+                            </h3>
+                            <small class="text-muted">Overall Accuracy</small>
+                            {% if analytics.success.overall_accuracy > 0 %}
+                                <div class="analytics-details mt-3">
+                                    <div class="difficulty-breakdown">
+                                        {% if analytics.success.easy_accuracy %}
+                                            <div class="difficulty-item easy">
+                                                <span class="difficulty-dot"></span>
+                                                <span>Easy: {{ analytics.success.easy_accuracy|floatformat:1 }}%</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if analytics.success.medium_accuracy %}
+                                            <div class="difficulty-item medium">
+                                                <span class="difficulty-dot"></span>
+                                                <span>Medium: {{ analytics.success.medium_accuracy|floatformat:1 }}%</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if analytics.success.hard_accuracy %}
+                                            <div class="difficulty-item hard">
+                                                <span class="difficulty-dot"></span>
+                                                <span>Hard: {{ analytics.success.hard_accuracy|floatformat:1 }}%</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Level Transitions -->
+                <div class="col-md-3 animate-slide-in-left" style="animation-delay: 0.2s;">
+                    <div class="card bg-light analytics-card enhanced-analytics-card">
+                        <div class="card-body text-center">
+                            <div class="analytics-icon-wrapper">
+                                <i class="fas fa-exchange-alt fa-2x text-warning mb-3"></i>
+                            </div>
+                            <h6 class="card-title">Level Transitions</h6>
+                            <h3 class="analytics-number text-warning">
+                                {{ analytics.transitions.total_transitions|default:0 }}
+                            </h3>
+                            <small class="text-muted">Total Transitions</small>
+                            {% if analytics.transitions.total_transitions > 0 %}
+                                <div class="analytics-details mt-3">
+                                    <div class="transition-stats">
+                                        <div class="transition-item">
+                                            <i class="fas fa-arrow-up text-success"></i>
+                                            <span>Up: {{ analytics.transitions.level_up_count|default:0 }}</span>
+                                        </div>
+                                        <div class="transition-item">
+                                            <i class="fas fa-arrow-down text-danger"></i>
+                                            <span>Down: {{ analytics.transitions.level_down_count|default:0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q-Learning Performance -->
+                <div class="col-md-3 animate-slide-in-left" style="animation-delay: 0.3s;">
+                    <div class="card bg-light analytics-card enhanced-analytics-card">
+                        <div class="card-body text-center">
+                            <div class="analytics-icon-wrapper">
+                                <i class="fas fa-robot fa-2x text-info mb-3"></i>
+                            </div>
+                            <h6 class="card-title">Q-Learning</h6>
+                            <h3 class="analytics-number text-info">
+                                {% if analytics.qlearning.total_updates %}
+                                    {{ analytics.qlearning.total_updates }}
+                                {% else %}
+                                    0
+                                {% endif %}
+                            </h3>
+                            <small class="text-muted">Total Updates</small>
+                            {% if analytics.qlearning.total_updates > 0 %}
+                                <div class="analytics-details mt-3">
+                                    <div class="detail-item">
+                                        <span class="detail-label">Avg Q-Value:</span>
+                                        <span class="detail-value">
+                                            {{ analytics.qlearning.avg_q_value|floatformat:3|default:"0.000" }}
+                                        </span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Avg Reward:</span>
+                                        <span class="detail-value">
+                                            {{ analytics.qlearning.avg_reward|floatformat:2|default:"0.00" }}
+                                        </span>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Recent Activity & Management -->
+    <div class="row">
+        <div class="col-md-8"  style="margin-top: 2rem;">
+            <!-- Enhanced Recent Quiz Activity -->
+            <h4 class="section-title mb-3">
+                <i class="fas fa-history me-2"></i>Recent Quiz Activity
+                <span class="badge bg-info ms-2">{{ recent_attempts|length }} Activities</span>
+            </h4>
+
+            {% if recent_attempts %}
+                <div class="table-responsive">
+                    <table class="table table-enhanced activity-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <i class="fas fa-user me-2"></i>Student
+                                </th>
+                                <th>
+                                    <i class="fas fa-question me-2"></i>Question
+                                </th>
+                                <th>
+                                    <i class="fas fa-layer-group me-2"></i>Difficulty
+                                </th>
+                                <th>
+                                    <i class="fas fa-check-circle me-2"></i>Result
+                                </th>
+                                <th>
+                                    <i class="fas fa-clock me-2"></i>Time
+                                </th>
+                                <th>
+                                    <i class="fas fa-calendar me-2"></i>Date
+                                </th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for attempt in recent_attempts %}
+                                <tr class="activity-row" data-attempt-id="{{ attempt.id }}">
+                                    <td>
+                                        <div class="student-info">
+
+
+                                            <div class="student-details">
+                                                <div class="student-name">{{ attempt.user.username }}</div>
+                                                <div class="student-level">Level {{ attempt.user.profile.level }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="question-preview">
+                                            <div class="question-text">{{ attempt.question.text|truncatechars:35 }}</div>
+                                            <div class="question-topic">{{ attempt.question.topic }}</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="difficulty-badge difficulty-{{ attempt.get_difficulty_attempted_display|lower }}">
+                                            <i class="fas fa-circle me-1"></i>
+                                            {{ attempt.get_difficulty_attempted_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="result-badge {% if attempt.is_correct %}success{% else %}danger{% endif %}">
+                                            <i class="fas fa-{% if attempt.is_correct %}check{% else %}times{% endif %} me-1"></i>
+                                            {% if attempt.is_correct %}Correct{% else %}Incorrect{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="time-display">
+                                            <i class="fas fa-stopwatch me-1"></i>
+                                            {{ attempt.time_spent }}s
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="date-display">
+                                            <i class="fas fa-calendar-alt me-1"></i>
+                                            {{ attempt.created_at|date:"M d, H:i" }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-sm btn-outline-primary" data-attempt-id="{{ attempt.id }}"
+                                                    title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-inbox fa-3x text-muted"></i>
+                    </div>
+                    <h5 class="empty-title">No Quiz Activity Yet</h5>
+                    <p class="empty-message">Quiz attempts will appear here once students start taking quizzes.</p>
+                </div>
+            {% endif %}
+
+            <!-- Enhanced Recent Student Registrations Table -->
+            <h4 class="section-title mb-3 mt-4" >
+                <i class="fas fa-user-plus me-2"></i>Recent Student Registrations
+                <small class="text-muted ms-2">Showing the 5 most recently joined active students</small>
+            </h4>
+
+            {% if recent_registrations %}
+                <div class="table-responsive">
+                    <table class="table table-enhanced student-registrations-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <i class="fas fa-user me-2"></i>Student
+                                </th>
+                                <th>
+                                    <i class="fas fa-envelope me-2"></i>Email
+                                </th>
+                                <th>
+                                    <i class="fas fa-calendar me-2"></i>Join Date
+                                </th>
+                                <th>
+                                    <i class="fas fa-user-check me-2"></i>Status
+                                </th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in recent_registrations %}
+                                <tr class="student-row" data-user-id="{{ user.id }}">
+                                    <td>
+                                        <div class="student-info">
+                                            <div class="student-avatar">
+                                                {{ user.username|first|upper }}
+                                            </div>
+                                            <div class="student-details">
+                                                <div class="student-name">{{ user.username }}</div>
+                                                <div class="student-level">Level {{ user.profile.level|default:1 }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="email-display">
+                                            <i class="fas fa-at me-1"></i>
+                                            {{ user.email|default:"No email provided" }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="date-display">
+                                            <i class="fas fa-calendar-alt me-1"></i>
+                                            {{ user.date_joined|date:"M d, Y H:i" }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge {% if user.is_active %}active{% else %}pending{% endif %}">
+                                            <i class="fas fa-{% if user.is_active %}check{% else %}clock{% endif %} me-1"></i>
+                                            {% if user.is_active %}Active{% else %}Pending{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="viewUserProfile('{{ user.username }}')">
+                                                <i class="fas fa-eye me-1"></i>View
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-user-slash fa-3x text-muted"></i>
+                    </div>
+                    <h5 class="empty-title">No Recent Registrations</h5>
+                    <p class="empty-message">New student registrations will appear here.</p>
+                </div>
+            {% endif %}
+
+            <!-- Enhanced Detailed Analytics Tables -->
+            <h4 class="section-title mb-3 mt-4">
+                <i class="fas fa-table me-2"></i>Detailed Analytics
+            </h4>
+            <div class="card-header-actions mb-3">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-sm btn-outline-light active" data-table="engagement">
+                        <i class="fas fa-users me-1"></i>Engagement
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-light" data-table="success">
+                        <i class="fas fa-chart-line me-1"></i>Success
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-light" data-table="transitions">
+                        <i class="fas fa-exchange-alt me-1"></i>Transitions
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-light" data-table="qlearning">
+                        <i class="fas fa-robot me-1"></i>Q-Learning
+                    </button>
+                </div>
+            </div>
+
+            <!-- Enhanced Engagement Table -->
+            <div class="analytics-table-section" data-section="engagement">
+                <h6 class="table-section-title">
+                    <i class="fas fa-users me-2"></i>User Engagement Details
+                </h6>
+    {% if analytics.engagement.total_sessions > 0 %}
+        <div class="table-responsive">
+            <table class="table table-enhanced activity-table analytics-detail-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="metric-info">
+                                <div class="metric-name">Total Sessions</div>
+                                <div class="metric-desc">All learning sessions</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="metric-number">{{ analytics.engagement.total_sessions }}</div>
+                        </td>
+                        <td><span class="status-dot active"></span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="metric-info">
+                                <div class="metric-name">Average Session Duration</div>
+                                <div class="metric-desc">Time spent per session</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="metric-number">{{ analytics.engagement.avg_session_duration|floatformat:0 }}s</div>
+                        </td>
+                        <td><span class="status-dot success"></span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="metric-info">
+                                <div class="metric-name">Questions Attempted</div>
+                                <div class="metric-desc">Total questions answered</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="metric-number">{{ analytics.engagement.total_questions_attempted|default:0 }}</div>
+                        </td>
+                        <td><span class="status-dot success"></span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="metric-info">
+                                <div class="metric-name">Hints Used</div>
+                                <div class="metric-desc">Learning assistance utilized</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="metric-number">{{ analytics.engagement.total_hints_used|default:0 }}</div>
+                        </td>
+                        <td><span class="status-dot warning"></span></td>
+                    </tr>
+                    {% if analytics.engagement.session_types %}
+                        <tr>
+                            <td>
+                                <div class="metric-info">
+                                    <div class="metric-name">Session Types</div>
+                                    <div class="metric-desc">Distribution of activities</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="metric-value">
+                                    {% for type, count in analytics.engagement.session_types.items %}
+                                        <span class="metric-badge bg-primary">{{ type }}: {{ count }}</span>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td><span class="status-dot active"></span></td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-chart-line fa-3x text-muted"></i>
+            </div>
+            <h5 class="empty-title">No Engagement Data Yet</h5>
+            <p class="empty-message">Engagement metrics will appear here once students start using the platform.</p>
+        </div>
+    {% endif %}
+</div>
+
+            <!-- Enhanced Success Rate Table -->
+            <div class="analytics-table-section d-none" data-section="success">
+    <h6 class="table-section-title">
+        <i class="fas fa-chart-line me-2"></i>Success Rate by Difficulty
+    </h6>
+    {% if analytics.success.overall_accuracy > 0 %}
+        <div class="table-responsive">
+            <table class="table table-enhanced activity-table analytics-detail-table">
+                <thead>
+                    <tr>
+                        <th>Difficulty</th>
+                        <th>Accuracy</th>
+                        <th>Sample Size</th>
+                        <th>Performance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if analytics.success.difficulty_breakdown.easy.count > 0 %}
+                        <tr>
+                            <td>
+                                <div class="difficulty-cell">
+                                    <span class="difficulty-badge difficulty-easy">
+                                        <i class="fas fa-circle me-1"></i>Easy
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="accuracy-display">
+                                    <div class="accuracy-number">{{ analytics.success.easy_accuracy|floatformat:1 }}%</div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: {{ analytics.success.easy_accuracy }}%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ analytics.success.difficulty_breakdown.easy.count }} attempts</td>
+                            <td>
+                                {% if analytics.success.easy_accuracy >= 80 %}
+                                    <span class="performance-badge excellent">Excellent</span>
+                                {% elif analytics.success.easy_accuracy >= 60 %}
+                                    <span class="performance-badge good">Good</span>
+                                {% else %}
+                                    <span class="performance-badge needs-improvement">Needs Work</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endif %}
+                    
+                    {% if analytics.success.difficulty_breakdown.medium.count > 0 %}
+                        <tr>
+                            <td>
+                                <div class="difficulty-cell">
+                                    <span class="difficulty-badge difficulty-medium">
+                                        <i class="fas fa-circle me-1"></i>Medium
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="accuracy-display">
+                                    <div class="accuracy-number">{{ analytics.success.medium_accuracy|floatformat:1 }}%</div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: {{ analytics.success.medium_accuracy }}%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ analytics.success.difficulty_breakdown.medium.count }} attempts</td>
+                            <td>
+                                {% if analytics.success.medium_accuracy >= 70 %}
+                                    <span class="performance-badge excellent">Excellent</span>
+                                {% elif analytics.success.medium_accuracy >= 50 %}
+                                    <span class="performance-badge good">Good</span>
+                                {% else %}
+                                    <span class="performance-badge needs-improvement">Needs Work</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endif %}
+                    
+                    {% if analytics.success.difficulty_breakdown.hard.count > 0 %}
+                        <tr>
+                            <td>
+                                <div class="difficulty-cell">
+                                    <span class="difficulty-badge difficulty-hard">
+                                        <i class="fas fa-circle me-1"></i>Hard
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="accuracy-display">
+                                    <div class="accuracy-number">{{ analytics.success.hard_accuracy|floatformat:1 }}%</div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: {{ analytics.success.hard_accuracy }}%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ analytics.success.difficulty_breakdown.hard.count }} attempts</td>
+                            <td>
+                                {% if analytics.success.hard_accuracy >= 60 %}
+                                    <span class="performance-badge excellent">Excellent</span>
+                                {% elif analytics.success.hard_accuracy >= 40 %}
+                                    <span class="performance-badge good">Good</span>
+                                {% else %}
+                                    <span class="performance-badge needs-improvement">Needs Work</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-chart-pie fa-3x text-muted"></i>
+            </div>
+            <h5 class="empty-title">No Success Data Yet</h5>
+            <p class="empty-message">Success rate metrics will appear here once students complete quizzes.</p>
+        </div>
+    {% endif %}
+</div>
+
+            <!-- Enhanced Level Transitions Table -->
+            <div class="analytics-table-section d-none" data-section="transitions">
+    <h6 class="table-section-title">
+        <i class="fas fa-exchange-alt me-2"></i>Level Transition Patterns
+    </h6>
+    {% if analytics.transitions.total_transitions > 0 %}
+        <div class="table-responsive">
+            <table class="table table-enhanced activity-table analytics-detail-table">
+                <thead>
+                    <tr>
+                        <th>Transition Type</th>
+                        <th>Count</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transition, count in analytics.transitions.transition_types.items %}
+                        <tr>
+                            <td>
+                                <div class="transition-info">
+                                    <span class="transition-label">{{ transition }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="count-display">{{ count }}</div>
+                            </td>
+                            <td>
+                                <div class="percentage-display">
+                                    {% widthratio count analytics.transitions.total_transitions 100 %}%
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">
+                                <i class="fas fa-info-circle me-2"></i>No transition data available
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    {% if analytics.transitions.transition_types %}
+                        <tr class="table-summary">
+                            <td><strong>Total Transitions</strong></td>
+                            <td><strong>{{ analytics.transitions.total_transitions }}</strong></td>
+                            <td><strong>100%</strong></td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-exchange-alt fa-3x text-muted"></i>
+            </div>
+            <h5 class="empty-title">No Level Transitions Yet</h5>
+            <p class="empty-message">Level transition data will appear here as students progress through levels.</p>
+        </div>
+    {% endif %}
+</div>
+
+            <!-- Enhanced Q-Learning Table -->
+            <div class="analytics-table-section d-none" data-section="qlearning">
+    <h6 class="table-section-title">
+        <i class="fas fa-robot me-2"></i>Q-Learning Performance
+    </h6>
+    {% if analytics.qlearning.total_updates > 0 %}
+        <div class="table-responsive">
+            <table class="table table-enhanced activity-table analytics-detail-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if analytics.qlearning.action_distribution %}
+                        <tr>
+                            <td>
+                                <div class="metric-info">
+                                    <div class="metric-name">Action Distribution</div>
+                                    <div class="metric-desc">AI decision patterns</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="action-distribution">
+                                    {% for action, count in analytics.qlearning.action_distribution.items %}
+                                        <span class="action-badge">{{ action }}: {{ count }}</span>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td><span class="status-dot active"></span></td>
+                        </tr>
+                    {% endif %}
+                    
+                    <tr>
+                        <td>
+                            <div class="metric-info">
+                                <div class="metric-name">Average Q-Value</div>
+                                <div class="metric-desc">Quality of state-action values</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="q-value-display">
+                                {{ analytics.qlearning.avg_q_value|floatformat:3|default:"0.000" }}
+                            </div>
+                        </td>
+                        <td><span class="status-dot success"></span></td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="metric-info">
+                                <div class="metric-name">Average Reward</div>
+                                <div class="metric-desc">Learning signal strength</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="reward-display">
+                                {{ analytics.qlearning.avg_reward|floatformat:3|default:"0.000" }}
+                            </div>
+                        </td>
+                        <td><span class="status-dot success"></span></td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="metric-info">
+                                <div class="metric-name">Total Updates</div>
+                                <div class="metric-desc">Learning iterations</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="update-count">{{ analytics.qlearning.total_updates }}</div>
+                        </td>
+                        <td><span class="status-dot active"></span></td>
+                    </tr>
+                </tbody>
+            </table>
+            {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-robot fa-3x text-muted"></i>
+            </div>
+            <h5 class="empty-title">No Q-Learning Data Yet</h5>
+                        <p class="empty-message">Q-Learning performance metrics will appear here as the AI learns from student interactions.</p>
+        </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-md-4" style="margin-top: 2rem;">
+            <h4 class="section-title mb-3">
+                <i class="fas fa-cogs me-2"></i>Analytics Management
+            </h4>
+            <div class="d-grid gap-2">
+                <a href="{% url 'admin:qlearning_userengagementlog_changelist' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-users"></i> User Engagement Logs
+                </a>
+                <a href="{% url 'admin:qlearning_successratelog_changelist' %}" class="btn btn-outline-success">
+                    <i class="fas fa-chart-line"></i> Success Rate Logs
+                </a>
+                <a href="{% url 'admin:qlearning_leveltransitionlog_changelist' %}" class="btn btn-outline-warning">
+                    <i class="fas fa-exchange-alt"></i> Level Transitions
+                </a>
+                <a href="{% url 'admin:qlearning_rewardincentiveslog_changelist' %}" class="btn btn-outline-info">
+                    <i class="fas fa-gift"></i> Reward Logs
+                </a>
+                <a href="{% url 'admin:qlearning_qlearningperformancelog_changelist' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-robot"></i> Q-Learning Performance
+                </a>
+                <a href="{% url 'admin:qlearning_globalsystemlog_changelist' %}" class="btn btn-outline-dark">
+                    <i class="fas fa-database"></i> Global System Logs
+                </a>
+            </div>
+
+            <h4 class="section-title mb-3 mt-4">
+                <i class="fas fa-download me-2"></i>Export Data
+            </h4>
+            <div class="d-grid gap-2">
+                <button type="button" class="btn btn-outline-primary" onclick="exportLogs('engagement')">
+                    <i class="fas fa-file-csv"></i> Export Engagement
+                </button>
+                <button type="button" class="btn btn-outline-success" onclick="exportLogs('success')">
+                    <i class="fas fa-file-csv"></i> Export Success Rates
+                </button>
+                <button type="button" class="btn btn-outline-warning" onclick="exportLogs('transitions')">
+                    <i class="fas fa-file-csv"></i> Export Transitions
+                </button>
+                <button type="button" class="btn btn-outline-info" onclick="exportLogs('rewards')">
+                    <i class="fas fa-file-csv"></i> Export Rewards
+                </button>
+                <button type="button" class="btn btn-outline-secondary" onclick="exportLogs('qlearning')">
+                    <i class="fas fa-file-csv"></i> Export Q-Learning
+                </button>
+                <button type="button" class="btn btn-outline-dark" onclick="exportLogs('global')">
+                    <i class="fas fa-file-csv"></i> Export Global
+                </button>
+            </div>
+
+            <h4 class="section-title mb-3 mt-4">
+                <i class="fas fa-info-circle me-2"></i>System Info
+            </h4>
+            <div class="system-info-container">
+                <ul class="list-unstyled system-info-list">
+                    <li class="system-info-item">
+                        <div class="info-label">
+                            <i class="fas fa-code-branch me-2"></i>Environment:
+                        </div>
+                        <div class="info-value development">Development</div>
+                    </li>
+                    <li class="system-info-item">
+                        <div class="info-label">
+                            <i class="fas fa-database me-2"></i>Database:
+                        </div>
+                        <div class="info-value database">SQLite</div>
+                    </li>
+                    <li class="system-info-item">
+                        <div class="info-label">
+                            <i class="fab fa-python me-2"></i>Python:
+                        </div>
+                        <div class="info-value python">3.11+</div>
+                    </li>
+                    <li class="system-info-item">
+                        <div class="info-label">
+                            <i class="fas fa-code me-2"></i>Django:
+                        </div>
+                        <div class="info-value django">4.2.24</div>
+                    </li>
+                    <li class="system-info-item">
+                        <div class="info-label">
+                            <i class="fas fa-question-circle me-2"></i>Questions:
+                        </div>
+                        <div class="info-value questions">{{ total_questions }}</div>
+                    </li>
+                    <li class="system-info-item">
+                        <div class="info-label">
+                            <i class="fas fa-percentage me-2"></i>Success Rate:
+                        </div>
+                        <div class="info-value success-rate">{{ success_rate }}%</div>
+                    </li>
+                    <!-- Debug Information -->
+                    <li class="system-info-item debug-info">
+                        <div class="info-label">
+                            <i class="fas fa-bug me-2"></i>Note:
+                        </div>
+                        <div class="info-value">Card shows active students, table shows recent 5 registrations</div>
+                    </li>
+                    <li class="system-info-item debug-info">
+                        <div class="info-label">
+                            <i class="fas fa-chart-bar me-2"></i>Debug - Total Students (Card):
+                        </div>
+                        <div class="info-value">{{ debug_info.total_students_displayed }}</div>
+                    </li>
+                    <li class="system-info-item debug-info">
+                        <div class="info-label">
+                            <i class="fas fa-user-check me-2"></i>Debug - Active Students:
+                        </div>
+                        <div class="info-value">{{ debug_info.active_students_count }}</div>
+                    </li>
+                    <li class="system-info-item debug-info">
+                        <div class="info-label">
+                            <i class="fas fa-user-clock me-2"></i>Debug - Inactive Students:
+                        </div>
+                        <div class="info-value">{{ debug_info.inactive_students_count }}</div>
+                    </li>
+                    <li class="system-info-item debug-info">
+                        <div class="info-label">
+                            <i class="fas fa-user-plus me-2"></i>Debug - Recent Registrations (Table):
+                        </div>
+                        <div class="info-value">{{ debug_info.recent_registrations_count }}</div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Quick Actions & System Overview -->
+            <h4 class="section-title mb-3 mt-4">
+                <i class="fas fa-bolt me-2"></i>Quick Actions & Overview
+            </h4>
+            <div class="row">
+                <!-- Quick Actions Panel -->
+                <div class="col-md-6">
+                    <div class="system-info-container">
+                        <h6 class="mb-3 text-white">
+                            <i class="fas fa-rocket me-2"></i>Quick Actions
+                        </h6>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="syncUserData()">
+                                <i class="fas fa-sync-alt me-2"></i>Sync User Data
+                            </button>
+                            <button type="button" class="btn btn-outline-success btn-sm" onclick="backupDatabase()">
+                                <i class="fas fa-database me-2"></i>Backup Database
+                            </button>
+                            <button type="button" class="btn btn-outline-warning btn-sm" onclick="clearCache()">
+                                <i class="fas fa-broom me-2"></i>Clear Cache
+                            </button>
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="generateReport()">
+                                <i class="fas fa-chart-bar me-2"></i>Generate Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Status Panel -->
+                <div class="col-md-6">
+                    <div class="system-info-container">
+                        <h6 class="mb-3 text-white">
+                            <i class="fas fa-heartbeat me-2"></i>System Status
+                        </h6>
+                        <ul class="list-unstyled system-status-list">
+                            <li class="system-status-item">
+                                <div class="status-indicator online">
+                                    <i class="fas fa-circle me-2"></i>Database
+                                </div>
+                                <span class="status-text" data-status="Online">Online</span>
+                            </li>
+                            <li class="system-status-item">
+                                <div class="status-indicator online">
+                                    <i class="fas fa-circle me-2"></i>API Services
+                                </div>
+                                <span class="status-text" data-status="Online">Online</span>
+                            </li>
+                            <li class="system-status-item">
+                                <div class="status-indicator warning">
+                                    <i class="fas fa-circle me-2"></i>Cache Server
+                                </div>
+                                <span class="status-text" data-status="Warning">Warning</span>
+                            </li>
+                            <li class="system-status-item">
+                                <div class="status-indicator online">
+                                    <i class="fas fa-circle me-2"></i>Email Service
+                                </div>
+                                <span class="status-text" data-status="Online">Online</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent System Events -->
+            <h4 class="section-title mb-3 mt-4">
+                <i class="fas fa-history me-2"></i>Recent System Events
+            </h4>
+            <div class="system-info-container">
+                <div class="system-events-timeline">
+                    <div class="event-item">
+                        <div class="event-icon success">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="event-content">
+                            <div class="event-title">New User Registration</div>
+                            <div class="event-time">2 minutes ago</div>
+                        </div>
+                    </div>
+                    <div class="event-item">
+                        <div class="event-icon info">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="event-content">
+                            <div class="event-title">Database Backup Completed</div>
+                            <div class="event-time">15 minutes ago</div>
+                        </div>
+                    </div>
+                    <div class="event-item">
+                        <div class="event-icon warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="event-content">
+                            <div class="event-title">High Memory Usage Detected</div>
+                            <div class="event-time">1 hour ago</div>
+                        </div>
+                    </div>
+                    <div class="event-item">
+                        <div class="event-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="event-content">
+                            <div class="event-title">System Health Check Passed</div>
+                            <div class="event-time">2 hours ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Admin Dashboard Styles - Performance Optimized */
+    .admin-dashboard-container {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: calc(100vh - 72px);
+        padding: 2rem 0;
+        
+        /* Performance optimizations */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        will-change: auto;
+    }
+
+    .admin-dashboard-container::before {
+        content: '';
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background:
+            radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.02) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.02) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: -1;
+        /* Optimize background performance */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+    }
+
+    /* Enhanced Stats Cards - Performance Optimized */
+    .stats-card {
+        background: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+        box-shadow:
+            0 8px 25px rgba(0, 0, 0, 0.08),
+            0 0 0 1px rgba(255, 255, 255, 0.6);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        border-left: 5px solid;
+        /* Performance optimizations */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        will-change: transform, box-shadow;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .stats-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.01) 100%);
+        pointer-events: none;
+        /* Optimize pseudo-element performance */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+    }
+
+    .stats-card:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow:
+            0 16px 32px rgba(0, 0, 0, 0.12),
+            0 0 0 1px rgba(255, 255, 255, 0.8);
+        /* Performance optimizations */
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .stats-card.primary {
+        border-left-color: #6366f1;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(255, 255, 255, 0.98) 100%);
+    }
+
+    .stats-card.success {
+        border-left-color: #10b981;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.02) 0%, rgba(255, 255, 255, 0.98) 100%);
+    }
+
+    .stats-card.info {
+        border-left-color: #06b6d4;
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.02) 0%, rgba(255, 255, 255, 0.98) 100%);
+    }
+
+    .stats-card.warning {
+        border-left-color: #f59e0b;
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.02) 0%, rgba(255, 255, 255, 0.98) 100%);
+    }
+
+    .stats-card .card-body {
+        padding: 2rem 1.5rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .stats-card .card-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .stats-card h3 {
+        font-size: 2.25rem;
+        font-weight: 800;
+        margin-bottom: 0.25rem;
+        color: #1f2937;
+    }
+
+    .stats-card .text-primary { color: #6366f1 !important; }
+    .stats-card .text-success { color: #10b981 !important; }
+    .stats-card .text-info { color: #06b6d4 !important; }
+    .stats-card .text-warning { color: #f59e0b !important; }
+
+    /* Enhanced Main Cards - Performance Optimized */
+    .card {
+        background: rgba(211, 211, 211, 0.98);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Performance optimizations */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        will-change: transform, box-shadow;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+        /* Performance optimizations */
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 1.5rem 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-header::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.08)"/><circle cx="80" cy="80" r="1.5" fill="rgba(255,255,255,0.06)"/><circle cx="60" cy="30" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+        background-size: 150px 150px;
+        animation: cardHeaderFloat 8s ease-in-out infinite;
+        pointer-events: none;
+        /* Optimize animation performance */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+    }
+
+    @keyframes cardHeaderFloat {
+        0%, 100% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-2px) scale(1.005); }
+    }
+
+    .card-header h5 {
+        position: relative;
+        z-index: 2;
+        margin-bottom: 0;
+        font-weight: 700;
+        font-size: 1.25rem;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    /* Analytics Cards - Performance Optimized */
+    .analytics-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+        border: 1px solid rgba(99, 102, 241, 0.08);
+        border-radius: 16px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        /* Performance optimizations */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        will-change: transform, box-shadow;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .analytics-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.12);
+        border-color: rgba(99, 102, 241, 0.15);
+        /* Performance optimizations */
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .analytics-card .card-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #6b7280;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .analytics-card h4 {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+    }
+
+    .analytics-card .text-primary { color: #6366f1 !important; }
+    .analytics-card .text-success { color: #10b981 !important; }
+    .analytics-card .text-warning { color: #f59e0b !important; }
+    .analytics-card .text-info { color: #06b6d4 !important; }
+
+    /* Enhanced Tables - Performance Optimized */
+    .table {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        /* Performance optimizations */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+    }
+
+    .table th {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.06) 0%, rgba(139, 92, 246, 0.06) 100%);
+        border-color: rgba(99, 102, 241, 0.15);
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 1rem 0.75rem;
+    }
+
+    .table td {
+        border-color: rgba(99, 102, 241, 0.08);
+        color: #4b5563;
+        padding: 0.875rem 0.75rem;
+        vertical-align: middle;
+    }
+
+    .table-hover tbody tr {
+        transition: background-color 0.2s ease, transform 0.2s ease;
+        /* Performance optimizations */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .table-hover tbody tr:hover {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(139, 92, 246, 0.02) 100%);
+        transform: scale(1.005);
+        /* Performance optimizations */
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    /* Enhanced Badges - Performance Optimized */
+    .badge {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.375rem 0.75rem;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .badge.bg-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    }
+
+    .badge.bg-warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+    }
+
+    .badge.bg-danger {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    }
+
+    .badge.bg-info {
+        background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(6, 182, 212, 0.25);
+    }
+
+    .badge.bg-secondary {
+        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(107, 114, 128, 0.25);
+    }
+
+    /* Management Buttons - Performance Optimized */
+    .btn {
+        border-radius: 12px;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        border: none;
+        /* Performance optimizations */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        will-change: transform, box-shadow;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+        transition: left 0.5s ease;
+        /* Performance optimizations */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+    }
+
+    .btn:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+    }
+
+    .btn-info {
+        background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(6, 182, 212, 0.25);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(107, 114, 128, 0.25);
+    }
+
+    .btn-dark {
+        background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(55, 65, 81, 0.25);
+    }
+
+    .btn-outline-primary {
+        border: 2px solid #6366f1;
+        color: #6366f1;
+        background: rgba(99, 102, 241, 0.03);
+    }
+
+    .btn-outline-primary:hover {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        border-color: #6366f1;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25);
+        /* Performance optimizations */
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .btn-outline-success:hover {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
+        /* Performance optimizations */
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .btn-outline-warning:hover {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
+        /* Performance optimizations */
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .btn-outline-info:hover {
+        background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(6, 182, 212, 0.25);
+        /* Performance optimizations */
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .btn-outline-secondary:hover {
+        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(107, 114, 128, 0.25);
+        /* Performance optimizations */
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .btn-outline-dark:hover {
+        background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(55, 65, 81, 0.25);
+        /* Performance optimizations */
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    /* System Info Styling - Performance Optimized */
+    .system-info-card {
+        background: linear-gradient(135deg, rgba(55, 65, 81, 0.02) 0%, rgba(75, 85, 99, 0.02) 100%);
+        border: 1px solid rgba(55, 65, 81, 0.08);
+    }
+
+    .system-info-card ul li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(55, 65, 81, 0.08);
+        transition: all 0.2s ease;
+    }
+
+    .system-info-card ul li:hover {
+        background: rgba(55, 65, 81, 0.03);
+        padding-left: 0.75rem;
+    }
+
+    .system-info-card ul li:last-child {
+        border-bottom: none;
+    }
+
+    /* Animations - Performance Optimized */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .animate-fade-in-up {
+        animation: fadeInUp 0.6s ease-out forwards;
+        /* Performance optimizations */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .animate-slide-in-left {
+        animation: slideInLeft 0.6s ease-out forwards;
+        /* Performance optimizations */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    /* Responsive Enhancements - Neon Matte */
+    @media (max-width: 768px) {
+        .admin-title {
+            font-size: 2rem;
+        }
+
+        .admin-subtitle {
+            font-size: 1rem;
+        }
+
+        .admin-actions {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .admin-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .stats-card-icon {
+            position: relative;
+            top: auto;
+            right: auto;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .stats-content {
+            padding-right: 0;
+            text-align: center;
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+        }
+
+        .stats-progress {
+            position: relative;
+            bottom: auto;
+            right: auto;
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        .enhanced-card {
+            margin-bottom: 1.5rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .stats-card {
+            margin-bottom: 1rem;
+        }
+
+        .stats-card .card-body {
+            padding: 1.25rem 0.75rem;
+        }
+
+        .analytics-card h4 {
+            font-size: 1.5rem;
+        }
+    }
+
+    /* Enhanced Admin Dashboard Styles */
+
+    /* Admin Header Section - Neon Matte Design */
+    .admin-header-section {
+        margin-top: 0%;
+        backdrop-filter: blur(20px);
+        border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+        color: #ffffff;
+        padding: 2.5rem 0;
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+    }
+
+    .admin-header-section::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    .admin-header-section::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(0,255,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        opacity: 0.3;
+        pointer-events: none;
+    }
+
+    .admin-title {
+        font-size: 2.75rem;
+        font-weight: 800;
+        margin-bottom: 0.75rem;
+        background: linear-gradient(135deg, #00ffff 0%, #ffffff 50%, #ff00ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        position: relative;
+        z-index: 2;
+    }
+
+    .admin-title i {
+        color: #00ffff;
+        text-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+        margin-right: 0.5rem;
+    }
+
+    .admin-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 1.25rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 400;
+        position: relative;
+        z-index: 2;
+    }
+
+    .admin-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        position: relative;
+        z-index: 2;
+        left: 20%;
+    }
+
+    .admin-breadcrumb .badge {
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
+        border: 1px solid rgba(0, 255, 255, 0.4);
+        color: #00ffff;
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        text-align: center;
+    }
+
+    .admin-breadcrumb .text-muted {
+        color: rgba(255, 255, 255, 0.7) !important;
+        font-size: 0.9rem;
+    }
+
+    .admin-actions {
+        display: flex;
+        gap: 1rem;
+        position: relative;
+        z-index: 2;
+        text-align: center;
+    }
+
+    .admin-actions .btn {
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+        border: 2px solid rgba(0, 255, 255, 0.3);
+        color: #ffffff;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+        left: 30%;
+    }
+
+    .admin-actions .btn:hover {
+        transform: translateY(-3px);
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(255, 0, 255, 0.3));
+        border-color: rgba(0, 255, 255, 0.6);
+        box-shadow: 0 8px 25px rgba(0, 255, 255, 0.4);
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+    }
+
+    .admin-actions .btn i {
+        margin-right: 0.5rem;
+    }
+
+    /* Enhanced Stats Cards - Neon Matte Design */
+    .enhanced-card {
+        position: relative;
+        background: linear-gradient(135deg,
+            rgba(10, 25, 47, 0.95) 0%,
+            rgba(15, 35, 65, 0.9) 50%,
+            rgba(10, 25, 47, 0.95) 100%);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(0, 255, 255, 0.2);
+        border-radius: 20px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+    }
+
+    .enhanced-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle at 30% 30%, rgba(0, 255, 255, 0.05) 0%, transparent 50%),
+                    radial-gradient(circle at 70% 70%, rgba(255, 0, 255, 0.05) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    .enhanced-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        border-color: rgba(0, 255, 255, 0.5);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4),
+                    0 0 40px rgba(0, 255, 255, 0.2);
+    }
+
+    .stats-card-icon {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        z-index: 2;
+        color: #00ffff;
+        text-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+    }
+
+    .stats-card-icon i {
+        font-size: 2.5rem;
+        filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
+    }
+
+    .stats-pulse-effect {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 80px;
+        height: 80px;
+        background: radial-gradient(circle, rgba(0, 255, 255, 0.1) 0%, transparent 70%);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        animation: neonPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes neonPulse {
+        0%, 100% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 0.3;
+        }
+        50% {
+            transform: translate(-50%, -50%) scale(1.2);
+            opacity: 0.1;
+        }
+    }
+
+    .stats-content {
+        padding-right: 5rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .stats-number {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 0.75rem;
+        background: linear-gradient(135deg, #00ffff 0%, #ffffff 50%, #ff00ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        line-height: 1;
+    }
+
+    .card-title {
+        color: rgba(255, 255, 255, 0.9) !important;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stats-trend {
+        margin-bottom: 1rem;
+    }
+
+    .trend-indicator {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.875rem;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+        color: #00ffff;
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+    }
+
+    .trend-indicator i {
+        margin-right: 0.5rem;
+    }
+
+    .stats-progress {
+        position: absolute;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        z-index: 2;
+    }
+
+    .progress-circle {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Progress Circle Colors - Neon Matte */
+    .progress-circle[data-percent="85"] .progress-ring {
+        stroke: #00ffff;
+    }
+
+    .progress-circle[data-percent="92"] .progress-ring {
+        stroke: #00ff88;
+    }
+
+    .progress-circle[data-percent="99"] .progress-ring {
+        stroke: #ffff00;
+    }
+
+    .progress-circle[data-percent="78"] .progress-ring {
+        stroke: #ff00ff;
+    }
+
+    .progress-circle[data-percent="65"] .progress-ring {
+        stroke: #ff8800;
+    }
+
+    .progress-circle[data-percent="88"] .progress-ring {
+        stroke: #88ff00;
+    }
+
+    /* Dynamic progress colors based on percentage */
+    .progress-ring {
+        stroke: #00ffff; /* Default neon cyan */
+    }
+
+    .progress-circle[data-percent*="8"] .progress-ring,
+    .progress-circle[data-percent*="9"] .progress-ring {
+        stroke: #00ff88; /* Green for high percentages */
+    }
+
+    .progress-circle[data-percent*="6"] .progress-ring,
+    .progress-circle[data-percent*="7"] .progress-ring {
+        stroke: #ffff00; /* Yellow for medium percentages */
+    }
+
+    .progress-circle[data-percent*="4"] .progress-ring,
+    .progress-circle[data-percent*="5"] .progress-ring {
+        stroke: #ff8800; /* Orange for lower percentages */
+    }
+
+    .progress-circle[data-percent*="2"] .progress-ring,
+    .progress-circle[data-percent*="3"] .progress-ring {
+        stroke: #ff4444; /* Red for very low percentages */
+    }
+
+    .progress-text {
+        position: absolute;
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: #00ffff;
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+    }
+
+    /* Card Body Styling */
+    .card-body {
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.8) 0%,
+            rgba(0, 20, 40, 0.6) 100%);
+        border-radius: 0 0 18px 18px;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Enhanced Badges */
+    .badge-enhanced {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 12px;
+        margin: 0.125rem;
+        display: inline-block;
+    }
+
+    /* Difficulty Badges Styling */
+    .difficulty-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Enhanced Card Headers */
+    .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        border: none !important;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-header::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+        pointer-events: none;
+    }
+
+    .card-header h5 {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Enhanced Tables */
+    .table-enhanced {
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .table-enhanced thead th {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border: none;
+        font-weight: 600;
+        color: #475569;
+        padding: 1rem;
+    }
+
+    .table-enhanced tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .table-enhanced tbody tr:hover {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.02), rgba(139, 92, 246, 0.01));
+        transform: translateX(2px);
+    }
+
+    .table-enhanced tbody td {
+        border: none;
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .status-badge.active {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    .status-badge.pending {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    }
+
+    /* Action Buttons Enhancement */
+    .btn-enhanced {
+        border-radius: 12px;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-enhanced::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .btn-enhanced:hover::before {
+        opacity: 1;
+    }
+
+    .btn-enhanced:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Loading Animation */
+    .loading-shimmer {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    /* Responsive Enhancements */
+    @media (max-width: 768px) {
+        .admin-title {
+            font-size: 2rem;
+        }
+
+        .stats-card-icon {
+            position: relative;
+            top: auto;
+            right: auto;
+            margin-bottom: 1rem;
+        }
+
+        .stats-content {
+            padding-right: 0;
+            text-align: center;
+        }
+
+        .stats-progress {
+            position: relative;
+            bottom: auto;
+            right: auto;
+            margin-top: 1rem;
+        }
+
+        .difficulty-badges {
+            justify-content: center;
+        }
+    }
+
+    /* Enhanced Progress Bars */
+    .progress-bar {
+        width: 100%;
+        height: 6px;
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+        margin-top: 0.5rem;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(135deg, #10b981, #059669);
+        border-radius: 3px;
+        transition: width 0.5s ease-in-out;
+        width: var(--progress-width, 0%);
+    }
+
+    .progress-fill[style*="--progress-width: 0%"] {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+
+    /* Enhanced Analytics Cards - Neon Matte Design */
+    .enhanced-analytics-card {
+        position: relative;
+        background: linear-gradient(135deg,
+            rgba(10, 25, 47, 0.95) 0%,
+            rgba(15, 35, 65, 0.9) 50%,
+            rgba(10, 25, 47, 0.95) 100%);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(0, 255, 255, 0.2);
+        border-radius: 20px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+    }
+
+    .enhanced-analytics-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle at 30% 30%, rgba(0, 255, 255, 0.05) 0%, transparent 50%),
+                    radial-gradient(circle at 70% 70%, rgba(255, 0, 255, 0.05) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    .enhanced-analytics-card:hover {
+        transform: translateY(-6px) scale(1.02);
+        border-color: rgba(0, 255, 255, 0.5);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4),
+                    0 0 40px rgba(0, 255, 255, 0.2);
+    }
+
+    .analytics-icon-wrapper {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+        margin-bottom: 1.5rem;
+        border: 2px solid rgba(0, 255, 255, 0.3);
+    }
+
+    .analytics-icon-wrapper i {
+        color: #00ffff;
+        text-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+        filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
+    }
+
+    .pulse-ring {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border: 2px solid rgba(0, 255, 255, 0.3);
+        border-radius: 50%;
+        animation: neonPulseRing 3s ease-in-out infinite;
+    }
+
+    @keyframes neonPulseRing {
+        0%, 100% {
+            transform: scale(1);
+            opacity: 0.5;
+        }
+        50% {
+            transform: scale(1.2);
+            opacity: 0.2;
+        }
+    }
+
+    .analytics-number {
+        font-size: 2.75rem;
+        font-weight: 800;
+        margin-bottom: 0.75rem;
+        background: linear-gradient(135deg, #00ffff 0%, #ffffff 50%, #ff00ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        line-height: 1;
+    }
+
+    /* Section Titles - Neon Matte Design */
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .section-title i {
+        color: #00ffff;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+        font-size: 1.75rem;
+    }
+
+    /* System Info - Technical Dashboard Design */
+    .system-info-container {
+        background: linear-gradient(135deg,
+            rgba(15, 23, 42, 0.95) 0%,
+            rgba(30, 41, 59, 0.9) 100%);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(59, 130, 246, 0.3);
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .system-info-container::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    .system-info-list {
+        margin: 0;
+        padding: 0;
+    }
+
+    .system-info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .system-info-item:last-child {
+        border-bottom: none;
+    }
+
+    .system-info-item:hover {
+        background: rgba(59, 130, 246, 0.05);
+        padding-left: 0.5rem;
+        border-left: 3px solid rgba(59, 130, 246, 0.4);
+    }
+
+    .info-label {
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.875rem;
+        min-width: 120px;
+    }
+
+    .info-label i {
+        color: #3b82f6;
+        text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+        width: 16px;
+        text-align: center;
+    }
+
+    .info-value {
+        font-weight: 600;
+        text-align: right;
+        font-family: 'Courier New', monospace;
+        font-size: 0.875rem;
+    }
+
+    .info-value.development {
+        color: #fbbf24;
+        text-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
+    }
+
+    .info-value.database {
+        color: #10b981;
+        text-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+    }
+
+    .info-value.python {
+        color: #06b6d4;
+        text-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
+    }
+
+    .info-value.django {
+        color: #8b5cf6;
+        text-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
+    }
+
+    .info-value.questions {
+        color: #f59e0b;
+        text-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+    }
+
+    .info-value.success-rate {
+        color: #10b981;
+        text-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+    }
+
+    .system-info-item.debug-info {
+        background: rgba(239, 68, 68, 0.05);
+        border-left: 3px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .system-info-item.debug-info .info-label i {
+        color: #ef4444;
+    }
+
+    .system-status-list {
+        margin: 0;
+        padding: 0;
+    }
+
+    .system-status-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+    }
+
+    .system-status-item:last-child {
+        border-bottom: none;
+    }
+
+    .status-indicator {
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .status-indicator.online {
+        color: #10b981;
+    }
+
+    .status-indicator.warning {
+        color: #f59e0b;
+    }
+
+    .status-indicator.offline {
+        color: #ef4444;
+    }
+
+    .status-text {
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .status-text[data-status="Online"] {
+        color: #10b981;
+    }
+
+    .status-text[data-status="Warning"] {
+        color: #f59e0b;
+    }
+
+    .status-text[data-status="Offline"] {
+        color: #ef4444;
+    }
+
+    .system-events-timeline {
+        margin: 0;
+        padding: 0;
+    }
+
+    .event-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+    }
+
+    .event-item:last-child {
+        border-bottom: none;
+    }
+
+    .event-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .event-icon.success {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05));
+        color: #10b981;
+        border: 2px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .event-icon.info {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(29, 78, 216, 0.05));
+        color: #3b82f6;
+        border: 2px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .event-icon.warning {
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.05));
+        color: #f59e0b;
+        border: 2px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .event-content {
+        flex: 1;
+    }
+
+    .event-title {
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 0.25rem;
+        font-size: 0.875rem;
+    }
+
+    .event-time {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .analytics-details {
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.8) 0%,
+            rgba(0, 20, 40, 0.6) 100%);
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin-bottom: 1.25rem;
+        border: 1px solid rgba(0, 255, 255, 0.2);
+    }
+
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .detail-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .detail-label {
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 500;
+    }
+
+    .detail-value {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #00ffff;
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+    }
+
+    .difficulty-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .difficulty-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .difficulty-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        box-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+    }
+
+    .difficulty-item.easy .difficulty-dot { background: #00ff88; }
+    .difficulty-item.medium .difficulty-dot { background: #ffff00; }
+    .difficulty-item.hard .difficulty-dot { background: #ff4444; }
+
+    .transition-stats {
+        display: flex;
+        gap: 1.25rem;
+    }
+
+    .transition-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .transition-item i {
+        font-size: 1.1rem;
+    }
+
+    .analytics-trend {
+        margin-top: 1.25rem;
+    }
+
+    .trend-badge {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.875rem;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+        color: #00ffff;
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+    }
+
+    .trend-badge.trend-up {
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 136, 0.05));
+        color: #00ff88;
+        border-color: rgba(0, 255, 136, 0.3);
+    }
+
+    .trend-badge.trend-neutral {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Enhanced Activity Card & Table - Neon Matte Design */
+    .activity-card {
+        background: linear-gradient(135deg,
+            rgba(10, 25, 47, 0.95) 0%,
+            rgba(15, 35, 65, 0.9) 50%,
+            rgba(10, 25, 47, 0.95) 100%);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(0, 255, 255, 0.2);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+    }
+
+    .activity-card .card-header {
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.9) 0%,
+            rgba(0, 20, 40, 0.8) 100%);
+        border: none;
+        border-bottom: 2px solid rgba(0, 255, 255, 0.2);
+        padding: 1.5rem 2rem;
+    }
+
+    .activity-card .card-header h5 {
+        color: #ffffff;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .activity-card .card-header h5 i {
+        color: #00ffff;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+        margin-right: 0.75rem;
+    }
+
+    .card-header-badge {
+        margin-left: auto;
+    }
+
+    .card-header-badge .badge {
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
+        border: 1px solid rgba(0, 255, 255, 0.4);
+        color: #00ffff;
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    }
+
+    .activity-table {
+        background: linear-gradient(135deg,
+            rgba(5, 15, 25, 0.95) 0%,
+            rgba(8, 20, 35, 0.9) 100%);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+    }
+
+    .activity-table thead th {
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.9) 0%,
+            rgba(0, 20, 40, 0.8) 100%);
+        border: none;
+        font-weight: 600;
+        color: #ffffff;
+        padding: 1.5rem 1rem;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+    }
+
+    .activity-table thead th::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 255, 0.5) 50%, transparent 100%);
+    }
+
+    .activity-table thead th i {
+        color: #00ffff;
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+        margin-right: 0.5rem;
+    }
+
+    .activity-table tbody tr {
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .activity-table tbody tr:hover {
+        background: linear-gradient(135deg,
+            rgba(0, 255, 255, 0.05) 0%,
+            rgba(255, 0, 255, 0.03) 100%);
+        transform: translateX(4px);
+        box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1);
+    }
+
+    .student-registrations-table {
+        background: linear-gradient(135deg,
+            rgba(5, 15, 25, 0.95) 0%,
+            rgba(8, 20, 35, 0.9) 100%);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+    }
+
+    .student-registrations-table thead th {
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.9) 0%,
+            rgba(0, 20, 40, 0.8) 100%);
+        border: none;
+        font-weight: 600;
+        color: #ffffff;
+        padding: 1.5rem 1rem;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+    }
+
+    .student-registrations-table thead th::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 255, 0.5) 50%, transparent 100%);
+    }
+
+    .student-registrations-table thead th i {
+        color: #00ffff;
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+        margin-right: 0.5rem;
+    }
+
+    .student-registrations-table tbody tr {
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .student-registrations-table tbody tr:hover {
+        background: linear-gradient(135deg,
+            rgba(0, 255, 255, 0.05) 0%,
+            rgba(255, 0, 255, 0.03) 100%);
+        transform: translateX(4px);
+        box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1);
+    }
+
+    .student-registrations-table tbody td {
+        border: none;
+        padding: 1.25rem 1rem;
+        vertical-align: middle;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .student-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .student-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #00ffff, #ff00ff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #000000;
+        font-weight: 600;
+        font-size: 1rem;
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+        border: 2px solid rgba(0, 255, 255, 0.3);
+    }
+
+    .email-display, .date-display {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .email-display i, .date-display i {
+        color: #00ffff;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: 1px solid;
+    }
+
+    .status-badge.active {
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 136, 0.05));
+        color: #00ff88;
+        border-color: rgba(0, 255, 136, 0.3);
+    }
+
+    .status-badge.pending {
+        background: linear-gradient(135deg, rgba(255, 255, 0, 0.1), rgba(255, 255, 0, 0.05));
+        color: #ffff00;
+        border-color: rgba(255, 255, 0, 0.3);
+    }
+
+    .student-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .student-name {
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 0.25rem;
+    }
+
+    .student-level {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .question-preview {
+        max-width: 250px;
+    }
+
+    .question-text {
+        font-weight: 500;
+        color: #ffffff;
+        margin-bottom: 0.25rem;
+        line-height: 1.4;
+    }
+
+    .question-topic {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .difficulty-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: 1px solid;
+    }
+
+    .difficulty-badge.difficulty-easy {
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 136, 0.05));
+        color: #00ff88;
+        border-color: rgba(0, 255, 136, 0.3);
+    }
+
+    .difficulty-badge.difficulty-medium {
+        background: linear-gradient(135deg, rgba(255, 255, 0, 0.1), rgba(255, 255, 0, 0.05));
+        color: #ffff00;
+        border-color: rgba(255, 255, 0, 0.3);
+    }
+
+    .difficulty-badge.difficulty-hard {
+        background: linear-gradient(135deg, rgba(255, 68, 68, 0.1), rgba(255, 68, 68, 0.05));
+        color: #ff4444;
+        border-color: rgba(255, 68, 68, 0.3);
+    }
+
+    .result-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: 1px solid;
+    }
+
+    .result-badge.success {
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 136, 0.05));
+        color: #00ff88;
+        border-color: rgba(0, 255, 136, 0.3);
+    }
+
+    .result-badge.danger {
+        background: linear-gradient(135deg, rgba(255, 68, 68, 0.1), rgba(255, 68, 68, 0.05));
+        color: #ff4444;
+        border-color: rgba(255, 68, 68, 0.3);
+    }
+
+    .time-display, .date-display {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .time-display i, .date-display i {
+        color: #00ffff;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .action-buttons .btn {
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+        border: 2px solid rgba(0, 255, 255, 0.3);
+        color: #ffffff;
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .action-buttons .btn:hover {
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(255, 0, 255, 0.3));
+        border-color: rgba(0, 255, 255, 0.6);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
+    }
+
+    /* Empty States - Neon Matte Design */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: linear-gradient(135deg,
+            rgba(10, 25, 47, 0.8) 0%,
+            rgba(15, 35, 65, 0.6) 100%);
+        border-radius: 20px;
+        border: 2px solid rgba(0, 255, 255, 0.2);
+    }
+
+    .empty-icon {
+        margin-bottom: 1.5rem;
+        opacity: 0.7;
+    }
+
+    .empty-icon i {
+        font-size: 4rem;
+        color: #00ffff;
+        text-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+    }
+
+    .empty-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 0.75rem;
+    }
+
+    .empty-message {
+        color: rgba(255, 255, 255, 0.7);
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    /* Enhanced Analytics Tables - Neon Matte Design - Now using activity-table styling */
+    .analytics-detail-table {
+        /* Inherit activity-table styling for consistency */
+        background: linear-gradient(135deg,
+            rgba(5, 15, 25, 0.95) 0%,
+            rgba(8, 20, 35, 0.9) 100%);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+    }
+
+    .analytics-detail-table thead th {
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.9) 0%,
+            rgba(0, 20, 40, 0.8) 100%);
+        border: none;
+        font-weight: 600;
+        color: #ffffff;
+        padding: 1.5rem 1rem;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+    }
+
+    .analytics-detail-table thead th::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 255, 0.5) 50%, transparent 100%);
+    }
+
+    .analytics-detail-table tbody tr {
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .analytics-detail-table tbody tr:hover {
+        background: linear-gradient(135deg,
+            rgba(0, 255, 255, 0.05) 0%,
+            rgba(255, 0, 255, 0.03) 100%);
+        transform: translateX(4px);
+        box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1);
+    }
+
+    .analytics-detail-table tbody td {
+        border: none;
+        padding: 1.25rem 1rem;
+        vertical-align: middle;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .metric-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .metric-name {
+        font-weight: 600;
+        color: #ffffff;
+        font-size: 1rem;
+    }
+
+    .metric-desc {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .metric-value {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .metric-badge {
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+        color: #00ffff;
+        padding: 0.375rem 0.75rem;
+        border-radius: 16px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        text-shadow: 0 0 5px rgba(0, 255, 255, 0.4);
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+    }
+
+    .metric-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #00ffff;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+
+    .accuracy-display {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .accuracy-number {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #00ffff;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.1); /* Changed for dark theme */
+        border-radius: 4px;
+        overflow: hidden;
+        border: 1px solid rgba(0, 255, 255, 0.2);
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(135deg, #00ffff, #ff00ff); /* Cyan to magenta gradient */
+        border-radius: 4px;
+        transition: width 0.8s ease-in-out;
+        width: var(--progress-width, 0%);
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+    }
+
+    .transition-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .transition-label {
+        font-weight: 500;
+        color: #ffffff;
+    }
+
+    .count-display {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #00ffff;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+
+    .percentage-display {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #00ffff;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+
+    .table-summary {
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.8) 0%,
+            rgba(0, 20, 40, 0.6) 100%);
+        font-weight: 600;
+        color: #ffffff;
+    }
+
+    .performance-badge {
+        padding: 0.375rem 1rem;
+        border-radius: 16px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: 1px solid;
+    }
+
+    .performance-badge.excellent {
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 136, 0.05));
+        color: #00ff88;
+        border-color: rgba(0, 255, 136, 0.3);
+    }
+
+    .performance-badge.good {
+        background: linear-gradient(135deg, rgba(255, 255, 0, 0.1), rgba(255, 255, 0, 0.05));
+        color: #ffff00;
+        border-color: rgba(255, 255, 0, 0.3);
+    }
+
+    .performance-badge.needs-improvement {
+        background: linear-gradient(135deg, rgba(255, 68, 68, 0.1), rgba(255, 68, 68, 0.05));
+        color: #ff4444;
+        border-color: rgba(255, 68, 68, 0.3);
+    }
+
+    .table-section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .table-section-title i {
+        color: #00ffff;
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+    }
+
+    /* Registration Cards */
+    .registrations-grid {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .registration-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 12px;
+        border: 1px solid rgba(99, 102, 241, 0.1);
+        transition: all 0.2s ease;
+    }
+
+    .registration-item:hover {
+        background: rgba(255, 255, 255, 0.95);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+    }
+
+    .registration-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .registration-info {
+        flex: 1;
+    }
+
+    .registration-name {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+    }
+
+    .registration-email {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 0.25rem;
+    }
+
+    .registration-date {
+        font-size: 0.75rem;
+        color: #9ca3af;
+    }
+
+    .registration-status {
+        flex-shrink: 0;
+    }
+
+    .registration-actions {
+        flex-shrink: 0;
+    }
+
+    /* Table Section Tabs */
+    .analytics-table-section {
+        margin-bottom: 2rem;
+    }
+
+    .table-section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Enhanced Analytics Tables - Neon Matte Design - Now using activity-table styling */
+    .analytics-detail-table {
+        /* Inherit activity-table styling for consistency */
+        background: linear-gradient(135deg,
+            rgba(5, 15, 25, 0.95) 0%,
+            rgba(8, 20, 35, 0.9) 100%);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+    }
+
+    .analytics-detail-table thead th {
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.9) 0%,
+            rgba(0, 20, 40, 0.8) 100%);
+        border: none;
+        font-weight: 600;
+        color: #ffffff;
+        padding: 1.5rem 1rem;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+    }
+
+    .analytics-detail-table thead th::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 255, 0.5) 50%, transparent 100%);
+    }
+
+    .analytics-detail-table tbody tr {
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .analytics-detail-table tbody tr:hover {
+        background: linear-gradient(135deg,
+            rgba(0, 255, 255, 0.05) 0%,
+            rgba(255, 0, 255, 0.03) 100%);
+        transform: translateX(4px);
+        box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1);
+    }
+
+    .analytics-detail-table tbody td {
+        border: none;
+        padding: 1.25rem 1rem;
+        vertical-align: middle;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .metric-name {
+        font-weight: 600;
+        color: #ffffff; /* Changed from dark to white for dark theme */
+    }
+
+    .metric-desc {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.7); /* Changed from dark gray to light gray */
+    }
+
+    .metric-value {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .metric-badge {
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+        color: #00ffff;
+        padding: 0.375rem 0.75rem;
+        border-radius: 16px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        text-shadow: 0 0 5px rgba(0, 255, 255, 0.4);
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+    }
+
+    .metric-number {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #00ffff; /* Changed from dark to cyan for consistency */
+        text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+    }
+
+    .accuracy-display {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .accuracy-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #00ffff; /* Changed from dark to cyan for consistency */
+        text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+    }
+
+    .transition-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .transition-label {
+        font-weight: 500;
+        color: #ffffff; /* Changed from dark to white for dark theme */
+    }
+
+    .count-display {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #00ffff; /* Changed from dark to cyan for consistency */
+        text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+    }
+
+    .percentage-display {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #00ffff; /* Changed from dark to cyan for consistency */
+        text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+    }
+
+    .table-summary {
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.8) 0%,
+            rgba(0, 20, 40, 0.6) 100%); /* Changed from light to dark theme */
+        font-weight: 600;
+        color: #ffffff;
+    }
+
+    .performance-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border: 1px solid; /* Added border for better visibility */
+    }
+
+    .performance-badge.excellent {
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 136, 0.05));
+        color: #00ff88; /* Changed to green for consistency */
+        border-color: rgba(0, 255, 136, 0.3);
+    }
+
+    .performance-badge.good {
+        background: linear-gradient(135deg, rgba(255, 255, 0, 0.1), rgba(255, 255, 0, 0.05));
+        color: #ffff00; /* Changed to yellow for consistency */
+        border-color: rgba(255, 255, 0, 0.3);
+    }
+
+    .performance-badge.needs-improvement {
+        background: linear-gradient(135deg, rgba(255, 68, 68, 0.1), rgba(255, 68, 68, 0.05));
+        color: #ff4444; /* Changed to red for consistency */
+        border-color: rgba(255, 68, 68, 0.3);
+    }
+
+    .action-badge {
+        background: rgba(0, 255, 255, 0.1); /* Changed to cyan theme */
+        color: #00ffff; /* Changed to cyan for consistency */
+        padding: 0.25rem 0.5rem;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        border: 1px solid rgba(0, 255, 255, 0.3); /* Added border */
+        text-shadow: 0 0 3px rgba(0, 255, 255, 0.4);
+    }
+
+    .q-value-display, .reward-display, .update-count {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #00ffff; /* Changed from dark to cyan for consistency */
+        text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+    }
+
+    /* Enhanced Card Headers with Actions */
+    .card-header-actions {
+        margin-left: auto;
+    }
+
+    .card-header-actions .btn-group .btn {
+        border-radius: 8px !important;
+        padding: 0.375rem 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    .card-header-actions .btn-group .btn.active {
+        background: rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
+    }
+
+    .card-header-badge {
+        margin-left: 1rem;
+    }
+
+    /* Clean and Simple Modal Design - Like System Info */
+    .detail-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease-out;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+    }
+
+    .detail-modal.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .modal-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+    }
+
+    .modal-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.95) 0%,
+            rgba(0, 20, 40, 0.9) 100%);
+        border-radius: 20px;
+        border: 2px solid rgba(0, 255, 255, 0.3);
+        box-shadow:
+            0 10px 40px rgba(0, 0, 0, 0.4),
+            0 0 0 1px rgba(0, 255, 255, 0.2);
+        width: 90%;
+        max-width: 600px;
+        max-height: 85vh;
+        overflow: hidden;
+    }
+
+    .detail-modal.show .modal-container {
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    .modal-header {
+        padding: 1.5rem 2rem;
+        background: linear-gradient(135deg,
+            rgba(0, 25, 50, 0.9) 0%,
+            rgba(0, 35, 70, 0.8) 100%);
+        border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+    }
+
+    .modal-title {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ffffff;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(0, 255, 255, 0.5);
+        transform: scale(1.1);
+    }
+
+    .modal-body {
+        padding: 2rem;
+        max-height: 60vh;
+        overflow-y: auto;
+        color: #ffffff;
+    }
+
+    .modal-body::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .modal-body::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 3px;
+    }
+
+    .modal-body::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+        border-radius: 3px;
+    }
+
+    .modal-footer {
+        padding: 1.5rem 2rem;
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.8) 0%,
+            rgba(0, 20, 40, 0.6) 100%);
+        border-top: 1px solid rgba(0, 255, 255, 0.2);
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+
+    /* Simple Content Layout - Like System Info */
+    .modal-info-container {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid rgba(0, 255, 255, 0.1);
+    }
+
+    .modal-info-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 1rem;
+    }
+
+    .modal-info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .modal-info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-value {
+        font-weight: 700;
+        color: var(--neon-cyan);
+        background: linear-gradient(135deg,
+            rgba(0, 255, 255, 0.15),
+            rgba(255, 0, 255, 0.1));
+        padding: 0.25rem 0.75rem;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        font-size: 0.85rem;
+        text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+    }
+
+    .info-value.success {
+        color: #10b981;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.15));
+        border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    .info-value.error {
+        color: #ef4444;
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.15));
+        border-color: rgba(239, 68, 68, 0.4);
+    }
+
+    .info-value.warning {
+        color: #f59e0b;
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.15));
+        border-color: rgba(245, 158, 11, 0.4);
+    }
+
+    .info-section {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .info-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+    .info-section h4 {
+        margin: 0 0 1rem 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+    }
+
+    .info-section h4::before {
+        content: '';
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--neon-cyan);
+        box-shadow: 0 0 10px var(--neon-cyan);
+    }
+
+    .question-text {
+        color: rgba(255, 255, 255, 0.9);
+        line-height: 1.5;
+        margin-top: 0.5rem;
+        font-style: italic;
+    }
+
+    .explanation {
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.5;
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .answer-key {
+        color: rgba(255, 255, 255, 0.9);
+        line-height: 1.5;
+        margin-top: 0.5rem;
+        font-family: 'Courier New', monospace;
+        background: rgba(255, 255, 255, 0.03);
+        padding: 0.75rem;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .options-list {
+        margin-top: 0.5rem;
+        display: grid;
+        gap: 0.5rem;
+    }
+
+    .option-item {
+        padding: 0.5rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.8);
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+    }
+
+</style>
+
+<script>
+    // Enhanced Admin Dashboard JavaScript
+    function refreshDashboard() {
+        const lastUpdated = document.getElementById('lastUpdated');
+        if (lastUpdated) {
+            lastUpdated.textContent = new Date().toLocaleString();
+        }
+
+        // Add loading animation to stats cards
+        const statsCards = document.querySelectorAll('.stats-card');
+        statsCards.forEach(card => {
+            card.classList.add('loading-shimmer');
+            setTimeout(() => {
+                card.classList.remove('loading-shimmer');
+            }, 1000);
+        });
+
+        // Show success message
+        showToast('Dashboard refreshed successfully!', 'success');
+    }
+
+    function exportFullReport() {
+        showToast('Exporting comprehensive report...', 'info');
+
+        // Simulate export process
+        setTimeout(() => {
+            showToast('Report exported successfully!', 'success');
+        }, 2000);
+    }
+
+    function showToast(message, type = 'info') {
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+            <div class="toast-icon">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+            </div>
+            <div class="toast-content">
+                <div class="toast-message">${message}</div>
+            </div>
+        `;
+
+        // Add to page
+        document.body.appendChild(toast);
+
+        // Show toast
+        setTimeout(() => toast.classList.add('show'), 100);
+
+        // Hide and remove toast
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => document.body.removeChild(toast), 300);
+        }, 3000);
+    }
+
+    // Initialize dashboard enhancements
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate progress circles
+        const progressCircles = document.querySelectorAll('.progress-circle');
+        progressCircles.forEach(circle => {
+            const percent = circle.dataset.percent;
+            const svg = circle.querySelector('.progress-ring');
+            if (svg) {
+                const radius = 25;
+                const circumference = 2 * Math.PI * radius;
+                const offset = circumference - (circumference * percent / 100);
+
+                svg.style.strokeDasharray = circumference;
+                svg.style.strokeDashoffset = offset;
+            }
+        });
+
+        // Update timestamp
+        function updateTimestamp() {
+        const lastUpdated = document.getElementById('lastUpdated');
+        if (lastUpdated) {
+            const now = new Date();
+            lastUpdated.textContent = now.toLocaleTimeString();
+        }
+    }
+
+    // Update timestamp every second
+    setInterval(updateTimestamp, 1000);
+    updateTimestamp();
+
+        // Initialize table section switching
+        initializeTableSections();
+
+        // Initialize action buttons
+        initializeActionButtons();
+
+        // Initialize real-time trends
+        initializeRealTimeTrends();
+    });
+
+    // Table section switching functionality
+    function initializeTableSections() {
+        const tableButtons = document.querySelectorAll('[data-table]');
+        const tableSections = document.querySelectorAll('.analytics-table-section');
+
+        tableButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const sectionId = this.getAttribute('data-table');
+
+                // Update button states
+                tableButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+
+                // Show/hide table sections
+                tableSections.forEach(section => {
+                    if (section.getAttribute('data-section') === sectionId) {
+                        section.classList.remove('d-none');
+                    } else {
+                        section.classList.add('d-none');
+                    }
+                });
+
+                // Show success message
+                showToast(`Switched to ${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)} analytics`, 'info');
+            });
+        });
+    }
+
+    // Action buttons functionality
+    function initializeActionButtons() {
+        // View attempt detail buttons
+        const viewButtons = document.querySelectorAll('[data-attempt-id]');
+        viewButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const attemptId = this.getAttribute('data-attempt-id');
+                viewAttemptDetail(attemptId);
+            });
+        });
+
+        // View student profile buttons
+        const profileButtons = document.querySelectorAll('[data-username]');
+        profileButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const username = this.getAttribute('data-username');
+                viewStudentProfile(username);
+            });
+        });
+
+        // View user profile buttons (for registrations)
+        const userProfileButtons = document.querySelectorAll('[onclick*="viewUserProfile"]');
+        userProfileButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const username = this.getAttribute('onclick').match(/'([^']+)'/)[1];
+                viewUserProfile(username);
+            });
+        });
+    }
+
+    // Real-time trend updates
+    function initializeRealTimeTrends() {
+        // Update trends every 30 seconds
+        setInterval(updateRealTimeTrends, 30000);
+
+        // Initial update
+        updateRealTimeTrends();
+    }
+
+    function updateRealTimeTrends() {
+        // Simulate real-time trend updates
+        const trendElements = document.querySelectorAll('.trend-indicator');
+
+        trendElements.forEach(element => {
+            // Randomly update some trends (simulated real-time data)
+            if (Math.random() > 0.7) {
+                const currentText = element.textContent.trim();
+                const isPositive = currentText.includes('+');
+
+                if (isPositive) {
+                    // Slightly adjust positive trends
+                    const newValue = Math.floor(Math.random() * 20) + 1;
+                    element.innerHTML = `<i class="fas fa-arrow-up me-1"></i>+${newValue}%`;
+                } else {
+                    // Keep neutral trends as they are
+                    // Could implement logic for negative trends if needed
+                }
+            }
+        });
+
+        // Update last updated timestamp
+        const lastUpdated = document.getElementById('lastUpdated');
+        if (lastUpdated) {
+            lastUpdated.textContent = new Date().toLocaleString();
+        }
+    }
+
+    // Action handler functions
+    function viewAttemptDetail(attemptId) {
+        // Fetch real-time data from backend
+        fetch(`/dashboard/admin/ajax/?action=get_attempt_detail&attempt_id=${attemptId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const question = data.question_details;
+                    const attempt = data.attempt_results;
+
+                    // Format options for display
+                    let optionsHtml = '';
+                    if (question.options && Object.keys(question.options).length > 0) {
+                        optionsHtml = Object.entries(question.options).map(([key, value]) =>
+                            `<div class="option-item"><strong>${key}:</strong> ${value}</div>`
+                        ).join('');
+                    }
+
+                    // Format answer key
+                    let answerKeyHtml = '';
+                    if (question.format === 'Multiple Choice (Single Answer)' || question.format === 'Multiple Choice (Multiple Answers)') {
+                        if (typeof question.answer_key === 'string') {
+                            try {
+                                const answerObj = JSON.parse(question.answer_key);
+                                if (typeof answerObj === 'object') {
+                                    answerKeyHtml = Object.entries(answerObj).map(([key, value]) =>
+                                        `<div class="option-item"><strong>${key}:</strong> ${value}</div>`
+                                    ).join('');
+                                } else {
+                                    answerKeyHtml = `<div class="option-item">${answerObj}</div>`;
+                                }
+                            } catch (e) {
+                                answerKeyHtml = `<div class="option-item">${question.answer_key}</div>`;
+                            }
+                        } else {
+                            answerKeyHtml = `<div class="option-item">${question.answer_key}</div>`;
+                        }
+                    } else {
+                        answerKeyHtml = `<div class="option-item">${question.answer_key}</div>`;
+                    }
+
+                    const content = `
+                        <div class="modal-info-container">
+                            <div class="info-section">
+                                <h4><i class="fas fa-question-circle"></i> Question Details</h4>
+                                <ul class="modal-info-list">
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Question:</span>
+                                        <span class="info-value">${question.text}</span>
+                                    </li>
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Topic:</span>
+                                        <span class="info-value">${question.topic}</span>
+                                    </li>
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Difficulty:</span>
+                                        <span class="info-value">${question.difficulty}</span>
+                                    </li>
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Format:</span>
+                                        <span class="info-value">${question.format}</span>
+                                    </li>
+                                    ${optionsHtml ? `<li class="modal-info-item">
+                                        <span class="info-label">Options:</span>
+                                        <div class="info-value">
+                                            <div class="options-list">${optionsHtml}</div>
+                                        </div>
+                                    </li>` : ''}
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Correct Answer:</span>
+                                        <span class="info-value">${answerKeyHtml}</span>
+                                    </li>
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Explanation:</span>
+                                        <span class="info-value">${question.explanation}</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="info-section">
+                                <h4><i class="fas fa-check-circle"></i> Attempt Results</h4>
+                                <ul class="modal-info-list">
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Result:</span>
+                                        <span class="info-value ${attempt.result_status === 'Correct' ? 'success' : 'error'}">${attempt.result_status}</span>
+                                    </li>
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Time Spent:</span>
+                                        <span class="info-value">${attempt.time_spent}s</span>
+                                    </li>
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Selected Answer:</span>
+                                        <span class="info-value">${attempt.selected_answer}</span>
+                                    </li>
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Score:</span>
+                                        <span class="info-value">${attempt.score}</span>
+                                    </li>
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Hints Used:</span>
+                                        <span class="info-value">${attempt.hints_used}</span>
+                                    </li>
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Timestamp:</span>
+                                        <span class="info-value">${attempt.timestamp}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+
+                    showDetailModal('Attempt Details', content);
+                } else {
+                    showToast(`Error: ${data.error}`, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching attempt details:', error);
+                showToast('Failed to load attempt details', 'error');
+            });
+    }
+
+    function viewUserProfile(username) {
+        // Call the actual function (viewStudentProfile handles button state internally)
+        viewStudentProfile(username);
+    }
+
+    function viewStudentProfile(username, onComplete) {
+        // Get buttons that need state restoration
+        const buttons = document.querySelectorAll(`[onclick="viewUserProfile('${username}')"]`);
+        let originalTexts = new Map();
+
+        buttons.forEach(button => {
+            originalTexts.set(button, button.innerHTML);
+        });
+
+        // Fetch real-time data from backend
+        fetch(`/dashboard/admin/ajax/?action=get_user_profile&username=${encodeURIComponent(username)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const student = data.student_information;
+                    const system = data.system_performance;
+
+                    const content = `
+                        <div class="modal-info-container">
+                            <div class="info-section">
+                                <h4><i class="fas fa-user"></i> Student Information</h4>
+                                <ul class="modal-info-list">
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Username:</span>
+                                        <span class="info-value">${student.username}</span>
+                                    </li>
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Level:</span>
+                                        <span class="info-value">${student.level}</span>
+                                    </li>
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Email:</span>
+                                        <span class="info-value">${student.email}</span>
+                                    </li>
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Join Date:</span>
+                                        <span class="info-value">${student.join_date}</span>
+                                    </li>
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Total Attempts:</span>
+                                        <span class="info-value">${student.total_attempts}</span>
+                                    </li>
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Average Score:</span>
+                                        <span class="info-value">${student.average_score}</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="info-section">
+                                <h4><i class="fas fa-server"></i> System Performance</h4>
+                                <ul class="modal-info-list">
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Response Time:</span>
+                                        <span class="info-value">${system.response_time}</span>
+                                    </li>
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Server Location:</span>
+                                        <span class="info-value">${system.server_location}</span>
+                                    </li>
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Cache Status:</span>
+                                        <span class="info-value status-${system.cache_status.toLowerCase()}">${system.cache_status}</span>
+                                    </li>
+                                    <li class="modal-info-item">
+                                        <span class="info-label">AI Confidence:</span>
+                                        <span class="info-value">${system.ai_confidence}</span>
+                                    </li>
+                                    <li class="modal-info-item">
+                                        <span class="info-label">Real-time Status:</span>
+                                        <span class="info-value status-${system.real_time_status.toLowerCase().replace(' ', '-')}">${system.real_time_status}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+
+                    // Show content modal with callback to restore button state
+                    showDetailModal('Student Profile', content, () => {
+                        // Restore button states when modal is closed
+                        buttons.forEach(button => {
+                            const originalText = originalTexts.get(button);
+                            if (originalText) {
+                                button.innerHTML = originalText;
+                                button.disabled = false;
+                            }
+                        });
+                        // Call the original callback if provided
+                        if (onComplete) onComplete();
+                    });
+                } else {
+                    showToast(`Error: ${data.error}`, 'error');
+                    // Call callback on error to restore button state
+                    if (onComplete) onComplete();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching user profile:', error);
+                showToast('Failed to load user profile. Please try again.', 'error');
+
+                // Call completion callback if provided
+                if (onComplete) onComplete();
+            });
+    }
+
+    // Enhanced dashboard functions
+    function refreshDashboard() {
+        const lastUpdated = document.getElementById('lastUpdated');
+        if (lastUpdated) {
+            lastUpdated.textContent = new Date().toLocaleString();
+        }
+
+        // Add loading animation to stats cards
+        const statsCards = document.querySelectorAll('.stats-card');
+        statsCards.forEach(card => {
+            card.classList.add('loading-shimmer');
+            setTimeout(() => {
+                card.classList.remove('loading-shimmer');
+            }, 1000);
+        });
+
+        // Show success message
+        showToast('Dashboard refreshed successfully!', 'success');
+    }
+
+    function exportFullReport() {
+        showToast('Exporting comprehensive report...', 'info');
+
+        // Simulate export process
+        setTimeout(() => {
+            showToast('Report exported successfully!', 'success');
+        }, 2000);
+    }
+
+    function exportLogs(type) {
+        showToast(`Exporting ${type} logs...`, 'info');
+
+        // Simulate export process
+        setTimeout(() => {
+            showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} logs exported successfully!`, 'success');
+        }, 1500);
+    }
+
+    function showToast(message, type = 'info') {
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+            <div class="toast-icon">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+            </div>
+            <div class="toast-content">
+                <div class="toast-message">${message}</div>
+            </div>
+        `;
+
+        // Add to page
+        document.body.appendChild(toast);
+
+        // Show toast
+        setTimeout(() => toast.classList.add('show'), 100);
+
+        // Hide and remove toast
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => document.body.removeChild(toast), 300);
+        }, 3000);
+    }
+
+    function showDetailModal(title, content, onClose) {
+        // Remove any existing modal first
+        const existingModal = document.querySelector('.detail-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        // Create modal element
+        const modal = document.createElement('div');
+        modal.className = 'detail-modal';
+        modal.innerHTML = `
+            <div class="modal-overlay" onclick="closeDetailModal()">
+                <div class="modal-container" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h3 class="modal-title">${title}</h3>
+                        <button class="modal-close" onclick="closeDetailModal()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        ${content}
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="closeDetailModal()">Close</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Add to page
+        document.body.appendChild(modal);
+
+        // Show modal with animation
+        setTimeout(() => modal.classList.add('show'), 100);
+
+        // Close on escape key
+        const escapeHandler = (e) => {
+            if (e.key === 'Escape') {
+                closeDetailModal();
+                if (onClose) onClose();
+            }
+        };
+        document.addEventListener('keydown', escapeHandler);
+
+        // Store callback for when modal is closed
+        modal._onClose = onClose;
+        modal._escapeHandler = escapeHandler;
+    }
+
+    function closeDetailModal() {
+        const modal = document.querySelector('.detail-modal');
+        if (modal) {
+            // Remove all event listeners first
+            const closeButtons = modal.querySelectorAll('.modal-close');
+            closeButtons.forEach(button => {
+                button.removeEventListener('click', closeDetailModal);
+            });
+
+            // Remove escape key listener
+            if (modal._escapeHandler) {
+                document.removeEventListener('keydown', modal._escapeHandler);
+            }
+
+            // Call callback before closing if provided
+            if (modal._onClose) {
+                modal._onClose();
+            }
+
+            // Hide modal with animation
+            modal.classList.remove('show');
+
+            // Remove from DOM after animation
+            setTimeout(() => {
+                if (modal.parentNode) {
+                    modal.parentNode.removeChild(modal);
+                }
+            }, 300);
+        }
+    }
+
+</script>
+{% endblock %}

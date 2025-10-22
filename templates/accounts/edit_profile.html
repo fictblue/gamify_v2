@@ -1,0 +1,2073 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - GamifyLearn{% endblock %}
+
+{% block content %}
+<section class="edit-profile-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-8 col-lg-9">
+                <!-- Edit Profile Header -->
+                <div class="edit-profile-header animate-fade-in-up">
+                    <!-- Cover Section with Enhanced Animation -->
+                    <div class="edit-cover">
+                        <div class="edit-cover-animated-bg"></div>
+                        <div class="edit-cover-overlay"></div>
+                        <div class="edit-cover-glow"></div>
+                        <div class="edit-cover-content">
+                            <h1 class="edit-cover-title">Edit Your Profile</h1>
+                            <p class="edit-cover-subtitle">
+                                <span class="subtitle-badge">
+                                    <i class="fas fa-edit"></i>
+                                    Update your information and preferences
+                                </span>
+                            </p>
+                        </div>
+                        <div class="cover-particles">
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Profile Avatar & Info -->
+                    <div class="edit-profile-main-info">
+                        <div class="profile-avatar-container">
+                            <div class="avatar-glow-ring"></div>
+                            <div class="profile-avatar-social">
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="avatar-image">
+                                {% elif user.student_profile %}
+                                    <span class="avatar-text">{{ user.student_profile.level|first|upper }}</span>
+                                {% else %}
+                                    <i class="fas fa-user avatar-icon"></i>
+                                {% endif %}
+                                <div class="avatar-status">
+                                    <span class="status-dot {% if user.role == 'student' %}student{% else %}admin{% endif %}"></span>
+                                </div>
+                            </div>
+                            <div class="profile-social-links">
+                                <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" class="social-link facebook">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer" class="social-link twitter">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" class="social-link instagram">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="edit-profile-details">
+                            <div class="profile-header-row">
+                                <div>
+                                    <h2 class="edit-profile-name">{{ user.username }}</h2>
+                                    <p class="edit-profile-role">
+                                        <i class="fas fa-{% if user.role == 'student' %}graduation-cap{% else %}crown{% endif %} me-2"></i>
+                                        {% if user.role == 'student' %}
+                                            Level {{ user.student_profile.level|title }} Student
+                                        {% else %}
+                                            Platform Administrator
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                {% if user.role == 'student' %}
+                                    <div class="edit-profile-level-badge">
+                                        <i class="fas fa-star"></i>
+                                        <span>{{ user.student_profile.level|title }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Profile Form Section -->
+                <div class="edit-form-section animate-fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="edit-form-card">
+                        <div class="edit-card-header">
+                            <h3 class="edit-form-title">
+                                <i class="fas fa-edit me-2"></i>Edit Profile Information
+                            </h3>
+                            <div class="header-decoration"></div>
+                        </div>
+
+                        <div class="edit-card-body">
+                            <form method="post" enctype="multipart/form-data" id="editProfileForm" class="edit-profile-form" novalidate>
+                                {% csrf_token %}
+
+                                <!-- Avatar Upload Field -->
+                                <div class="col-12 mb-4">
+                                    <div class="avatar-upload-section">
+                                        <div class="avatar-upload-header">
+                                            <div class="upload-icon-wrapper">
+                                                <i class="fas fa-camera"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="avatar-upload-title">Profile Picture</h5>
+                                                <p class="avatar-upload-subtitle">Upload a new profile picture (JPG, PNG, max 5MB)</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="avatar-upload-area">
+                                            <div class="avatar-upload-input-wrapper">
+                                                <input type="file"
+                                                       class="avatar-upload-input"
+                                                       id="avatarUpload"
+                                                       name="avatar"
+                                                       accept="image/jpeg,image/png,image/jpg"
+                                                       onchange="previewAvatar(this)">
+                                                <div class="avatar-upload-placeholder">
+                                                    <div class="upload-icon-circle">
+                                                        <i class="fas fa-cloud-upload-alt"></i>
+                                                    </div>
+                                                    <p class="upload-text">Click to upload or drag and drop</p>
+                                                    <small class="upload-hint">JPG, PNG up to 5MB</small>
+                                                </div>
+                                            </div>
+
+                                            <div class="avatar-preview-section">
+                                                <div class="current-avatar-preview">
+                                                    <div class="preview-label">
+                                                        <i class="fas fa-image me-1"></i>Current
+                                                    </div>
+                                                    <div class="preview-avatar">
+                                                        {% if user.avatar %}
+                                                            <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="preview-avatar-img">
+                                                        {% elif user.student_profile %}
+                                                            <span class="preview-avatar-text">{{ user.student_profile.level|first|upper }}</span>
+                                                        {% else %}
+                                                            <i class="fas fa-user preview-avatar-icon"></i>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+
+                                                <div class="new-avatar-preview" id="newAvatarPreview" style="display: none;">
+                                                    <div class="preview-label">
+                                                        <i class="fas fa-sparkles me-1"></i>New
+                                                    </div>
+                                                    <div class="preview-avatar">
+                                                        <img id="previewImage" src="" alt="New Avatar Preview" style="display: none;">
+                                                        <canvas id="previewCanvas" width="120" height="120" style="display: none;"></canvas>
+                                                    </div>
+                                                    <button type="button" class="btn btn-sm remove-preview-btn" onclick="removePreview()">
+                                                        <i class="fas fa-times me-1"></i>Remove
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row g-4">
+                                    <!-- Username Field -->
+                                    <div class="col-md-6">
+                                        <div class="form-floating neon-form-group">
+                                            <input type="text"
+                                                   class="form-control edit-input"
+                                                   id="id_username"
+                                                   name="username"
+                                                   value="{{ user.username }}"
+                                                   placeholder=" "
+                                                   required
+                                                   autocomplete="username">
+                                            <label for="id_username" class="edit-label">
+                                                <i class="fas fa-user me-2"></i>Username
+                                            </label>
+                                            <div class="input-glow"></div>
+                                            {% if user_form.username.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    <i class="fas fa-exclamation-triangle me-1"></i>{{ user_form.username.errors|join:", " }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <!-- Email Field -->
+                                    <div class="col-md-6">
+                                        <div class="form-floating neon-form-group">
+                                            <input type="email"
+                                                   class="form-control edit-input"
+                                                   id="id_email"
+                                                   name="email"
+                                                   value="{{ user.email }}"
+                                                   placeholder=" "
+                                                   required
+                                                   autocomplete="email">
+                                            <label for="id_email" class="edit-label">
+                                                <i class="fas fa-envelope me-2"></i>Email Address
+                                            </label>
+                                            <div class="input-glow"></div>
+                                            {% if user_form.email.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    <i class="fas fa-exclamation-triangle me-1"></i>{{ user_form.email.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    {% if user.role == 'student' %}
+                                        <!-- Student Progress -->
+                                        <div class="col-12">
+                                            <div class="edit-progress-card">
+                                                <div class="edit-progress-header">
+                                                    <div class="progress-title-group">
+                                                        <div class="progress-icon">
+                                                            <i class="fas fa-chart-line"></i>
+                                                        </div>
+                                                        <div>
+                                                            <h5 class="edit-progress-title">Learning Progress</h5>
+                                                            <p class="progress-desc">Your journey continues!</p>
+                                                        </div>
+                                                    </div>
+                                                    <span class="edit-progress-percentage">{{ user.student_profile.progress }}%</span>
+                                                </div>
+                                                <div class="edit-progress-track-wrapper">
+                                                    <div class="edit-progress-track">
+                                                        <div class="edit-progress-bar" style="width: {{ user.student_profile.progress }}%">
+                                                            <div class="progress-shine"></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="progress-markers">
+                                                        <span class="marker" style="left: 25%">25%</span>
+                                                        <span class="marker" style="left: 50%">50%</span>
+                                                        <span class="marker" style="left: 75%">75%</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Student Stats -->
+                                        <div class="col-12">
+                                            <div class="edit-stats-grid">
+                                                <div class="edit-stat-item">
+                                                    <div class="edit-stat-icon coins">
+                                                        <i class="fas fa-coins"></i>
+                                                        <div class="icon-glow"></div>
+                                                    </div>
+                                                    <div class="edit-stat-content">
+                                                        <div class="edit-stat-value">{{ user.student_profile.total_xp }}</div>
+                                                        <div class="edit-stat-label">Total XP</div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="edit-stat-item">
+                                                    <div class="edit-stat-icon trophy">
+                                                        <i class="fas fa-trophy"></i>
+                                                        <div class="icon-glow"></div>
+                                                    </div>
+                                                    <div class="edit-stat-content">
+                                                        <div class="edit-stat-value">{{ user.student_profile.points }}</div>
+                                                        <div class="edit-stat-label">Points</div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="edit-stat-item">
+                                                    <div class="edit-stat-icon fire">
+                                                        <i class="fas fa-fire"></i>
+                                                        <div class="icon-glow"></div>
+                                                    </div>
+                                                    <div class="edit-stat-content">
+                                                        <div class="edit-stat-value">{{ user.student_profile.streak_correct }}</div>
+                                                        <div class="edit-stat-label">Streak</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+
+                                    <!-- Action Buttons -->
+                                    <div class="col-12">
+                                        <div class="edit-actions">
+                                            <button type="submit" class="btn edit-save-btn" id="saveBtn">
+                                                <span class="btn-icon"><i class="fas fa-save"></i></span>
+                                                <span class="btn-text">Save Changes</span>
+                                                <span class="btn-glow"></span>
+                                            </button>
+
+                                            <a href="{% url 'accounts:profile' %}" class="btn edit-cancel-btn">
+                                                <span class="btn-icon"><i class="fas fa-arrow-left"></i></span>
+                                                <span class="btn-text">Back to Profile</span>
+                                            </a>
+
+                                            {% if user.role == 'student' %}
+                                                <a href="{% url 'quizzes:student_quiz_list' %}" class="btn edit-quiz-btn">
+                                                    <span class="btn-icon"><i class="fas fa-play"></i></span>
+                                                    <span class="btn-text">Start Quiz</span>
+                                                </a>
+                                            {% else %}
+                                                <a href="{% url 'quizzes:admin_quiz_list' %}" class="btn edit-admin-btn">
+                                                    <span class="btn-icon"><i class="fas fa-cog"></i></span>
+                                                    <span class="btn-text">Admin Panel</span>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    :root {
+        --neon-cyan: #00ffff;
+        --neon-magenta: #ff00ff;
+        --neon-blue: #0066ff;
+        --neon-purple: #9933ff;
+        --dark-bg-1: rgba(5, 15, 25, 0.95);
+        --dark-bg-2: rgba(8, 20, 35, 0.9);
+        --dark-bg-3: rgba(10, 25, 47, 0.95);
+        --glass-border: rgba(0, 255, 255, 0.2);
+        --glass-hover: rgba(0, 255, 255, 0.4);
+    }
+
+    /* Edit Profile Section */
+    .edit-profile-section {
+        min-height: calc(100vh - 72px);
+        margin-top: 0;
+        position: relative;
+        overflow-x: hidden;
+        background: linear-gradient(180deg, 
+            rgba(0, 0, 0, 0.95) 0%, 
+            rgba(5, 10, 20, 0.98) 50%, 
+            rgba(0, 0, 0, 0.95) 100%);
+    }
+
+    .edit-profile-section::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 20%, rgba(0, 255, 255, 0.03) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.03) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .container {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Edit Profile Header */
+    .edit-profile-header {
+        background: linear-gradient(135deg,
+            var(--dark-bg-1) 0%,
+            var(--dark-bg-2) 50%,
+            var(--dark-bg-1) 100%);
+        backdrop-filter: blur(20px);
+        border: 2px solid var(--glass-border);
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.4),
+            0 0 60px rgba(0, 255, 255, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        border-radius: 24px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .edit-cover {
+        height: 200px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .edit-cover-animated-bg {
+        position: absolute;
+        top: -50%; left: -50%;
+        width: 200%; height: 200%;
+        background: 
+            linear-gradient(45deg, 
+                transparent 30%, 
+                rgba(0, 255, 255, 0.15) 50%, 
+                transparent 70%),
+            linear-gradient(-45deg, 
+                transparent 30%, 
+                rgba(255, 0, 255, 0.15) 50%, 
+                transparent 70%);
+        animation: coverRotate 20s linear infinite;
+    }
+
+    @keyframes coverRotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .edit-cover-overlay {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(135deg, 
+            rgba(0, 0, 0, 0.6) 0%, 
+            rgba(0, 0, 0, 0.3) 50%,
+            rgba(0, 0, 0, 0.6) 100%);
+    }
+
+    .edit-cover-glow {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle at 50% 50%, 
+            rgba(0, 255, 255, 0.15) 0%, 
+            transparent 70%);
+        animation: glowPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes glowPulse {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+    }
+
+    .cover-particles {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        overflow: hidden;
+    }
+
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: var(--neon-cyan);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--neon-cyan);
+        animation: particleFloat 8s ease-in-out infinite;
+    }
+
+    .particle:nth-child(1) { left: 30%; animation-delay: 0s; }
+    .particle:nth-child(2) { left: 60%; animation-delay: 2s; }
+    .particle:nth-child(3) { left: 80%; animation-delay: 4s; }
+
+    @keyframes particleFloat {
+        0%, 100% { 
+            transform: translateY(200px) scale(0);
+            opacity: 0;
+        }
+        10% {
+            opacity: 1;
+            transform: translateY(180px) scale(1);
+        }
+        90% {
+            opacity: 1;
+            transform: translateY(20px) scale(1);
+        }
+        100% {
+            transform: translateY(0) scale(0);
+            opacity: 0;
+        }
+    }
+
+    .edit-cover-content {
+        position: absolute;
+        bottom: 2rem;
+        left: 2rem;
+        color: white;
+        z-index: 10;
+    }
+
+    .edit-cover-title {
+        font-size: 2.5rem;
+        font-weight: 900;
+        margin-bottom: 0.75rem;
+        background: linear-gradient(135deg, #fff, var(--neon-cyan));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        animation: titleSlide 1s ease-out;
+        letter-spacing: -1px;
+    }
+
+    .subtitle-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 255, 0.2), 
+            rgba(0, 150, 255, 0.2));
+        border: 1px solid var(--glass-border);
+        padding: 0.5rem 1.25rem;
+        border-radius: 30px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2);
+        animation: subtitleSlide 1s ease-out 0.2s both;
+    }
+
+    @keyframes titleSlide {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes subtitleSlide {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Profile Main Info */
+    .edit-profile-main-info {
+        display: flex;
+        align-items: center;
+        gap: 2.5rem;
+        padding: 2.5rem;
+        margin-top: -4.5rem;
+        position: relative;
+        z-index: 10;
+    }
+
+    .profile-avatar-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .avatar-glow-ring {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 190px;
+        height: 190px;
+        border-radius: 50%;
+        background: conic-gradient(
+            var(--neon-cyan),
+            var(--neon-magenta),
+            var(--neon-blue),
+            var(--neon-cyan)
+        );
+        animation: ringRotate 4s linear infinite;
+        opacity: 0.6;
+        filter: blur(8px);
+        margin-bottom: 1rem;
+    }
+
+    @keyframes ringRotate {
+        0% { transform: translate(-50%, -50%) rotate(0deg); }
+        100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    .profile-avatar-social {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--dark-bg-3), var(--dark-bg-2));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 800;
+        font-size: 4rem;
+        box-shadow:
+            0 20px 50px rgba(0, 0, 0, 0.5),
+            0 0 0 6px rgba(255, 255, 255, 0.1),
+            inset 0 2px 4px rgba(255, 255, 255, 0.1);
+        position: relative;
+        z-index: 2;
+        transition: all 0.4s ease;
+        border: 4px solid rgba(0, 255, 255, 0.3);
+    }
+
+    .profile-avatar-social:hover {
+        transform: scale(1.05);
+        border-color: var(--glass-hover);
+        box-shadow:
+            0 25px 60px rgba(0, 255, 255, 0.3),
+            0 0 0 6px rgba(0, 255, 255, 0.2),
+            inset 0 2px 4px rgba(255, 255, 255, 0.2);
+    }
+
+    .avatar-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .avatar-text,
+    .avatar-icon {
+        font-size: 4rem;
+        text-shadow: 0 0 20px var(--neon-cyan);
+    }
+
+    .avatar-status {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        border: 3px solid var(--dark-bg-1);
+    }
+
+    .status-dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #10b981;
+        animation: statusPulse 2s ease-in-out infinite;
+        box-shadow: 0 0 10px currentColor;
+    }
+
+    .status-dot.student {
+        background: var(--neon-blue);
+    }
+
+    .status-dot.admin {
+        background: #f59e0b;
+    }
+
+    @keyframes statusPulse {
+        0%, 100% { 
+            opacity: 1; 
+            transform: scale(1); 
+        }
+        50% { 
+            opacity: 0.7; 
+            transform: scale(1.15); 
+        }
+    }
+
+    .profile-social-links {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+    }
+
+    .social-link {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .social-link::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        transform: translate(-50%, -50%);
+        transition: width 0.3s ease, height 0.3s ease;
+    }
+
+    .social-link:hover::before {
+        width: 100%;
+        height: 100%;
+    }
+
+    .social-link.facebook {
+        background: linear-gradient(135deg, #1877f2, #0d5cb8);
+        color: white;
+    }
+
+    .social-link.twitter {
+        background: linear-gradient(135deg, #1da1f2, #0d8bd9);
+        color: white;
+    }
+
+    .social-link.instagram {
+        background: linear-gradient(135deg, #e1306c, #fd1d1d, #fcaf45);
+        color: white;
+    }
+
+    .social-link:hover {
+        transform: translateY(-3px) scale(1.1);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .social-link i {
+        font-size: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Profile Details */
+    .edit-profile-details {
+        flex: 1;
+    }
+
+    .profile-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .edit-profile-name {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #ffffff;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+        letter-spacing: -0.5px;
+    }
+
+    .edit-profile-role {
+        font-size: 1.125rem;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 500;
+        margin-bottom: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .edit-profile-role i {
+        color: var(--neon-cyan);
+    }
+
+    .edit-profile-level-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: linear-gradient(135deg, 
+            rgba(255, 215, 0, 0.2), 
+            rgba(255, 150, 0, 0.2));
+        border: 2px solid rgba(255, 215, 0, 0.4);
+        color: #ffd700;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.125rem;
+        box-shadow: 
+            0 4px 15px rgba(255, 215, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+    }
+
+    .edit-profile-level-badge i {
+        font-size: 1.25rem;
+        animation: starSpin 3s linear infinite;
+    }
+
+    @keyframes starSpin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Edit Form Section */
+    .edit-form-section {
+        background: linear-gradient(135deg,
+            var(--dark-bg-1) 0%,
+            var(--dark-bg-2) 100%);
+        backdrop-filter: blur(20px);
+        border: 2px solid var(--glass-border);
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.4),
+            0 0 60px rgba(0, 255, 255, 0.05),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        border-radius: 24px;
+        overflow: hidden;
+    }
+
+    .edit-form-card .edit-card-header {
+        background: linear-gradient(135deg,
+            rgba(10, 25, 47, 0.95) 0%,
+            rgba(15, 35, 65, 0.9) 100%);
+        color: white;
+        padding: 2rem;
+        border-bottom: 1px solid var(--glass-border);
+        position: relative;
+    }
+
+    .edit-form-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        margin-bottom: 0;
+        text-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        display: flex;
+        align-items: center;
+    }
+
+    .edit-form-title i {
+        color: var(--neon-cyan);
+    }
+
+    .header-decoration {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, 
+            transparent,
+            var(--neon-cyan),
+            var(--neon-magenta),
+            transparent);
+    }
+
+    .edit-form-card .edit-card-body {
+        padding: 2.5rem;
+    }
+
+    /* Avatar Upload Section */
+    .avatar-upload-section {
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.6) 0%,
+            rgba(0, 20, 40, 0.4) 100%);
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--glass-border);
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .avatar-upload-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(0, 255, 255, 0.05), 
+            transparent);
+        animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+
+    .avatar-upload-header {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .upload-icon-wrapper {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #000;
+        font-size: 1.75rem;
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        flex-shrink: 0;
+    }
+
+    .avatar-upload-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 0.25rem;
+    }
+
+    .avatar-upload-subtitle {
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 0;
+    }
+
+    .avatar-upload-area {
+        display: flex;
+        gap: 2rem;
+        align-items: flex-start;
+        position: relative;
+        z-index: 1;
+    }
+
+    .avatar-upload-input-wrapper {
+        flex: 1;
+        position: relative;
+    }
+
+    .avatar-upload-input {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+    .avatar-upload-placeholder {
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 255, 0.05) 0%, 
+            rgba(0, 150, 255, 0.05) 100%);
+        border: 2px dashed var(--glass-border);
+        border-radius: 16px;
+        padding: 3rem 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .avatar-upload-placeholder:hover {
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 255, 0.1) 0%, 
+            rgba(0, 150, 255, 0.1) 100%);
+        border-color: var(--glass-hover);
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 255, 255, 0.2);
+    }
+
+    .upload-icon-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 255, 0.15), 
+            rgba(0, 150, 255, 0.15));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        border: 2px solid var(--glass-border);
+        transition: all 0.3s ease;
+    }
+
+    .avatar-upload-placeholder:hover .upload-icon-circle {
+        transform: scale(1.1) rotate(5deg);
+        border-color: var(--glass-hover);
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+    }
+
+    .upload-icon-circle i {
+        color: var(--neon-cyan);
+        font-size: 2.5rem;
+    }
+
+    .upload-text {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.9);
+        margin: 0 0 0.5rem;
+    }
+
+    .upload-hint {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.875rem;
+    }
+
+    .avatar-preview-section {
+        display: flex;
+        gap: 1.5rem;
+        align-items: flex-start;
+    }
+
+    .current-avatar-preview,
+    .new-avatar-preview {
+        text-align: center;
+    }
+
+    .preview-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .preview-label i {
+        color: var(--neon-cyan);
+    }
+
+    .preview-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #000;
+        font-weight: 800;
+        font-size: 2.5rem;
+        box-shadow: 0 8px 25px rgba(0, 255, 255, 0.4);
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 3px solid rgba(0, 255, 255, 0.3);
+    }
+
+    .preview-avatar:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 35px rgba(0, 255, 255, 0.5);
+        border-color: var(--glass-hover);
+    }
+
+    .preview-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .preview-avatar-text,
+    .preview-avatar-icon {
+        font-size: 2.5rem;
+        text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .remove-preview-btn {
+        margin-top: 0.75rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        background: linear-gradient(135deg, 
+            rgba(255, 0, 80, 0.2), 
+            rgba(255, 0, 0, 0.2));
+        border: 1px solid rgba(255, 0, 80, 0.4);
+        color: #ff0050;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+
+    .remove-preview-btn:hover {
+        background: linear-gradient(135deg, 
+            rgba(255, 0, 80, 0.3), 
+            rgba(255, 0, 0, 0.3));
+        border-color: rgba(255, 0, 80, 0.6);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(255, 0, 80, 0.3);
+    }
+
+    /* Enhanced Form Input Styling */
+    .neon-form-group {
+        position: relative;
+    }
+
+    .edit-input {
+        height: 60px;
+        border: 2px solid var(--glass-border);
+        border-radius: 16px;
+        background: linear-gradient(135deg, 
+            rgba(0, 15, 30, 0.6) 0%, 
+            rgba(0, 20, 40, 0.4) 100%);
+        backdrop-filter: blur(10px);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #ffffff;
+        box-shadow: 
+            0 4px 15px rgba(0, 0, 0, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .edit-input::placeholder {
+        color: transparent;
+    }
+
+    .edit-input:focus {
+        border-color: var(--neon-cyan);
+        background: linear-gradient(135deg, 
+            rgba(0, 20, 40, 0.7) 0%, 
+            rgba(0, 25, 50, 0.5) 100%);
+        box-shadow: 
+            0 0 0 3px rgba(0, 255, 255, 0.15),
+            0 8px 25px rgba(0, 255, 255, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        outline: none;
+        transform: translateY(-2px);
+    }
+
+    .edit-input:hover:not(:focus) {
+        border-color: rgba(0, 255, 255, 0.3);
+        transform: translateY(-1px);
+    }
+
+    .input-glow {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, 
+            transparent, 
+            var(--neon-cyan), 
+            transparent);
+        transition: width 0.4s ease;
+        border-radius: 2px;
+    }
+
+    .edit-input:focus ~ .input-glow {
+        width: 100%;
+    }
+
+    .edit-label {
+        position: absolute;
+        top: 50%;
+        left: 1.5rem;
+        transform: translateY(-50%);
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 1rem;
+        font-weight: 500;
+        pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        background: transparent;
+        padding: 0;
+    }
+
+    .edit-label i {
+        color: var(--neon-cyan);
+        opacity: 0.6;
+        transition: all 0.3s ease;
+        margin-right: 0.5rem;
+    }
+
+    .edit-input:focus + .edit-label,
+    .edit-input:not(:placeholder-shown) + .edit-label {
+        top: -12px;
+        left: 1rem;
+        transform: translateY(0) scale(0.85);
+        color: var(--neon-cyan);
+        font-weight: 600;
+        font-size: 0.875rem;
+        background: linear-gradient(135deg,
+            var(--dark-bg-1) 0%,
+            var(--dark-bg-2) 100%);
+        padding: 0.25rem 0.75rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .edit-input:focus + .edit-label i,
+    .edit-input:not(:placeholder-shown) + .edit-label i {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    /* Progress Card */
+    .edit-progress-card {
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.6) 0%,
+            rgba(0, 20, 40, 0.4) 100%);
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--glass-border);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .edit-progress-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        background: radial-gradient(circle at top right, 
+            rgba(0, 255, 255, 0.05) 0%, 
+            transparent 70%);
+        pointer-events: none;
+    }
+
+    .edit-progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .progress-title-group {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+    }
+
+    .progress-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, 
+            var(--neon-cyan), 
+            var(--neon-blue));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #000;
+        font-size: 1.75rem;
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        flex-shrink: 0;
+    }
+
+    .edit-progress-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 0.25rem;
+    }
+
+    .progress-desc {
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 0;
+    }
+
+    .edit-progress-percentage {
+        font-size: 2rem;
+        font-weight: 900;
+        color: var(--neon-cyan);
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 255, 0.15), 
+            rgba(255, 0, 255, 0.15));
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        border: 2px solid var(--glass-border);
+        text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+    }
+
+    .edit-progress-track-wrapper {
+        position: relative;
+        z-index: 1;
+    }
+
+    .edit-progress-track {
+        width: 100%;
+        height: 16px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .edit-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, 
+            var(--neon-cyan), 
+            var(--neon-magenta));
+        border-radius: 8px;
+        transition: width 2s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 
+            0 0 20px rgba(0, 255, 255, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    .progress-shine {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(255,255,255,0.5), 
+            transparent);
+        animation: progressShine 2.5s ease-in-out infinite;
+    }
+
+    @keyframes progressShine {
+        0% { left: -100%; }
+        100% { left: 200%; }
+    }
+
+    .progress-markers {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 0.75rem;
+        padding: 0 0.25rem;
+    }
+
+    .marker {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.4);
+        font-weight: 600;
+        position: relative;
+    }
+
+    .marker::before {
+        content: '';
+        position: absolute;
+        top: -0.875rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 2px;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Stats Grid */
+    .edit-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .edit-stat-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.6) 0%,
+            rgba(0, 20, 40, 0.4) 100%);
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        border: 1px solid var(--glass-border);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .edit-stat-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, 
+            transparent, 
+            var(--neon-cyan), 
+            transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .edit-stat-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 255, 255, 0.2);
+        border-color: var(--glass-hover);
+    }
+
+    .edit-stat-item:hover::before {
+        opacity: 1;
+    }
+
+    .edit-stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        flex-shrink: 0;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .edit-stat-icon.coins {
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        color: #000;
+        box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+    }
+
+    .edit-stat-icon.trophy {
+        background: linear-gradient(135deg, #ff6b35, #f7931e);
+        color: #fff;
+        box-shadow: 0 0 25px rgba(255, 107, 53, 0.5);
+    }
+
+    .edit-stat-icon.fire {
+        background: linear-gradient(135deg, #ff0080, #ff8c00);
+        color: #fff;
+        box-shadow: 0 0 25px rgba(255, 0, 128, 0.5);
+    }
+
+    .edit-stat-item:hover .edit-stat-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .icon-glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: inherit;
+        filter: blur(15px);
+        opacity: 0.6;
+        z-index: -1;
+    }
+
+    .edit-stat-content {
+        flex: 1;
+    }
+
+    .edit-stat-value {
+        font-size: 2rem;
+        font-weight: 900;
+        color: var(--neon-cyan);
+        line-height: 1;
+        margin-bottom: 0.25rem;
+        text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    }
+
+    .edit-stat-label {
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    /* Action Buttons */
+    .edit-actions {
+        display: flex;
+        gap: 1.25rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding-top: 1rem;
+    }
+
+    .edit-save-btn,
+    .edit-cancel-btn,
+    .edit-quiz-btn,
+    .edit-admin-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        text-decoration: none;
+        border: 2px solid transparent;
+    }
+
+    .edit-save-btn {
+        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+        color: #000;
+        box-shadow: 
+            0 4px 20px rgba(0, 255, 255, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        min-width: 200px;
+    }
+
+    .edit-save-btn:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 
+            0 8px 30px rgba(0, 255, 255, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        color: #000;
+    }
+
+    .btn-glow {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(255,255,255,0.4), 
+            transparent);
+        transition: left 0.6s ease;
+    }
+
+    .edit-save-btn:hover .btn-glow {
+        left: 100%;
+    }
+
+    .edit-save-btn.loading > .btn-text {
+        visibility: hidden;
+    }
+
+    .edit-save-btn.loading::after {
+        content: '';
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        top: 50%;
+        left: 50%;
+        margin-left: -12px;
+        margin-top: -12px;
+        border: 3px solid rgba(0, 0, 0, 0.3);
+        border-radius: 50%;
+        border-top-color: #000;
+        animation: spin 0.8s linear infinite;
+    }
+
+    .edit-cancel-btn,
+    .edit-quiz-btn,
+    .edit-admin-btn {
+        background: transparent;
+        border: 2px solid var(--glass-border);
+        color: #ffffff;
+        backdrop-filter: blur(10px);
+    }
+
+    .edit-cancel-btn:hover,
+    .edit-quiz-btn:hover,
+    .edit-admin-btn:hover {
+        transform: translateY(-2px);
+        border-color: var(--neon-cyan);
+        background: rgba(0, 255, 255, 0.1);
+        box-shadow: 0 4px 20px rgba(0, 255, 255, 0.3);
+        color: var(--neon-cyan);
+    }
+
+    .btn-icon {
+        font-size: 1.125rem;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Animations */
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeInUp {
+        from { 
+            opacity: 0; 
+            transform: translateY(30px); 
+        }
+        to { 
+            opacity: 1; 
+            transform: translateY(0); 
+        }
+    }
+
+    .animate-fade-in-up {
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 992px) {
+        .edit-profile-main-info {
+            flex-direction: column;
+            text-align: center;
+            gap: 2rem;
+            padding: 2rem;
+            margin-top: -4rem;
+        }
+
+        .profile-header-row {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .avatar-glow-ring {
+            width: 160px;
+            height: 160px;
+        }
+
+        .profile-avatar-social {
+            width: 130px;
+            height: 130px;
+            font-size: 3.5rem;
+        }
+
+        .avatar-text,
+        .avatar-icon {
+            font-size: 3.5rem;
+        }
+
+        .edit-profile-name {
+            font-size: 2.25rem;
+        }
+
+        .edit-cover-title {
+            font-size: 2rem;
+        }
+
+        .edit-stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .edit-profile-section {
+            padding: 1.5rem 0;
+        }
+
+        .edit-cover {
+            height: 160px;
+        }
+
+        .edit-cover-content {
+            left: 1.5rem;
+            bottom: 1.5rem;
+        }
+
+        .edit-cover-title {
+            font-size: 1.75rem;
+        }
+
+        .subtitle-badge {
+            font-size: 0.85rem;
+            padding: 0.4rem 1rem;
+        }
+
+        .edit-profile-main-info {
+            padding: 1.5rem;
+            margin-top: -3.5rem;
+        }
+
+        .avatar-glow-ring {
+            width: 140px;
+            height: 140px;
+        }
+
+        .profile-avatar-social {
+            width: 110px;
+            height: 110px;
+            font-size: 2.75rem;
+        }
+
+        .avatar-text,
+        .avatar-icon {
+            font-size: 2.75rem;
+        }
+
+        .edit-profile-name {
+            font-size: 1.75rem;
+        }
+
+        .edit-profile-role {
+            font-size: 1rem;
+        }
+
+        .social-link {
+            width: 36px;
+            height: 36px;
+        }
+
+        .social-link i {
+            font-size: 0.875rem;
+        }
+
+        .edit-form-card .edit-card-body {
+            padding: 2rem 1.5rem;
+        }
+
+        .avatar-upload-section {
+            padding: 2rem 1.5rem;
+        }
+
+        .avatar-upload-area {
+            flex-direction: column;
+        }
+
+        .avatar-preview-section {
+            justify-content: center;
+        }
+
+        .edit-stat-value {
+            font-size: 1.75rem;
+        }
+
+        .edit-stat-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+        }
+
+        .progress-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+        }
+
+        .edit-progress-title {
+            font-size: 1.25rem;
+        }
+
+        .edit-progress-percentage {
+            font-size: 1.5rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .edit-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .edit-save-btn,
+        .edit-cancel-btn,
+        .edit-quiz-btn,
+        .edit-admin-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .edit-stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .edit-profile-main-info {
+            margin-top: -3rem;
+        }
+
+        .progress-header {
+            flex-direction: column;
+            gap: 1.5rem;
+            text-align: center;
+        }
+
+        .progress-title-group {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .avatar-upload-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .upload-icon-wrapper {
+            margin: 0 auto;
+        }
+
+        .avatar-preview-section {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .social-link {
+            width: 32px;
+            height: 32px;
+        }
+
+        .social-link i {
+            font-size: 0.75rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Avatar Upload and Preview Functionality
+    function previewAvatar(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        // Validate file size (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File size must be less than 5MB');
+            input.value = '';
+            return;
+        }
+
+        // Validate file type
+        if (!file.type.match('image/(jpeg|jpg|png)')) {
+            alert('Please select a valid image file (JPG, PNG)');
+            input.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const previewImg = document.getElementById('previewImage');
+            const previewCanvas = document.getElementById('previewCanvas');
+            const newPreview = document.getElementById('newAvatarPreview');
+
+            // Show new preview section
+            newPreview.style.display = 'block';
+
+            // Set image source
+            previewImg.src = e.target.result;
+            previewImg.style.display = 'block';
+            previewCanvas.style.display = 'none';
+
+            // Add entrance animation
+            newPreview.style.opacity = '0';
+            newPreview.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                newPreview.style.transition = 'all 0.4s ease';
+                newPreview.style.opacity = '1';
+                newPreview.style.transform = 'scale(1)';
+            }, 50);
+        };
+
+        reader.readAsDataURL(file);
+    }
+
+    function removePreview() {
+        const newPreview = document.getElementById('newAvatarPreview');
+        const previewImg = document.getElementById('previewImage');
+        const previewCanvas = document.getElementById('previewCanvas');
+        const fileInput = document.getElementById('avatarUpload');
+
+        // Add exit animation
+        newPreview.style.transition = 'all 0.3s ease';
+        newPreview.style.opacity = '0';
+        newPreview.style.transform = 'scale(0.9)';
+
+        setTimeout(() => {
+            // Hide new preview section
+            newPreview.style.display = 'none';
+
+            // Clear image sources
+            previewImg.src = '';
+            previewImg.style.display = 'none';
+            previewCanvas.style.display = 'none';
+
+            // Clear file input
+            fileInput.value = '';
+        }, 300);
+    }
+
+    // Form submission with enhanced loading state
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('editProfileForm');
+        if (!form) return;
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('saveBtn');
+            if (!submitBtn) return;
+
+            const btnText = submitBtn.querySelector('.btn-text');
+            const btnIcon = submitBtn.querySelector('.btn-icon');
+            const originalText = btnText ? btnText.textContent : '';
+
+            // Add loading state
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            if (btnText) {
+                btnText.style.visibility = 'hidden';
+            }
+            if (btnIcon) {
+                btnIcon.style.display = 'none';
+            }
+
+            // Simulate save process
+            setTimeout(() => {
+                // Remove loading, show success
+                submitBtn.classList.remove('loading');
+                submitBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                
+                if (btnText) {
+                    btnText.style.visibility = 'visible';
+                    btnText.innerHTML = '<i class="fas fa-check me-2"></i>Profile Updated!';
+                }
+
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.style.background = '';
+                    if (btnText) {
+                        btnText.textContent = originalText;
+                    }
+                    if (btnIcon) {
+                        btnIcon.style.display = 'flex';
+                    }
+
+                    // Actually submit the form
+                    form.submit();
+                }, 2000);
+            }, 1500);
+        });
+
+        // Staggered entrance animations
+        const animatedElements = document.querySelectorAll('.animate-fade-in-up');
+        animatedElements.forEach((element, index) => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(30px)';
+
+            setTimeout(() => {
+                element.style.transition = `opacity 0.8s ease-out ${index * 0.15}s, transform 0.8s ease-out ${index * 0.15}s`;
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
+            }, 100);
+        });
+
+        // Animate stat cards
+        const statCards = document.querySelectorAll('.edit-stat-item');
+        statCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px) scale(0.95)';
+
+            setTimeout(() => {
+                card.style.transition = `opacity 0.6s ease-out ${index * 0.1}s, transform 0.6s ease-out ${index * 0.1}s`;
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0) scale(1)';
+            }, 1000);
+        });
+
+        // Animate progress bar
+        const progressBar = document.querySelector('.edit-progress-bar');
+        if (progressBar) {
+            const targetWidth = progressBar.style.width;
+            progressBar.style.width = '0%';
+            
+            setTimeout(() => {
+                progressBar.style.width = targetWidth;
+            }, 1500);
+        }
+
+        // Add hover effect to profile avatar
+        const profileAvatar = document.querySelector('.profile-avatar-social');
+        if (profileAvatar) {
+            profileAvatar.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05) rotate(2deg)';
+            });
+            
+            profileAvatar.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) rotate(0deg)';
+            });
+        }
+
+        // Enhanced input focus effects
+        const inputs = document.querySelectorAll('.edit-input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                const formGroup = this.closest('.neon-form-group');
+                if (formGroup) {
+                    formGroup.style.transform = 'translateY(-2px)';
+                }
+            });
+
+            input.addEventListener('blur', function() {
+                const formGroup = this.closest('.neon-form-group');
+                if (formGroup) {
+                    formGroup.style.transform = 'translateY(0)';
+                }
+            });
+
+            // Add typing effect
+            input.addEventListener('input', function() {
+                const formGroup = this.closest('.neon-form-group');
+                if (formGroup) {
+                    const inputGlow = formGroup.querySelector('.input-glow');
+                    if (inputGlow) {
+                        inputGlow.style.animation = 'none';
+                        setTimeout(() => {
+                            inputGlow.style.animation = 'glowPulse 0.5s ease';
+                        }, 10);
+                    }
+                }
+            });
+        });
+
+        // Drag and drop functionality for avatar upload
+        const uploadPlaceholder = document.querySelector('.avatar-upload-placeholder');
+        const avatarInput = document.getElementById('avatarUpload');
+
+        if (uploadPlaceholder && avatarInput) {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadPlaceholder.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadPlaceholder.addEventListener(eventName, () => {
+                    uploadPlaceholder.style.borderColor = 'var(--neon-cyan)';
+                    uploadPlaceholder.style.background = 'linear-gradient(135deg, rgba(0, 255, 255, 0.15), rgba(0, 150, 255, 0.15))';
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadPlaceholder.addEventListener(eventName, () => {
+                    uploadPlaceholder.style.borderColor = '';
+                    uploadPlaceholder.style.background = '';
+                }, false);
+            });
+
+            uploadPlaceholder.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+
+                if (files.length > 0) {
+                    avatarInput.files = files;
+                    previewAvatar(avatarInput);
+                }
+            }, false);
+        }
+
+        // Smooth scroll to form errors if any
+        const errorFields = document.querySelectorAll('.invalid-feedback');
+        if (errorFields.length > 0) {
+            errorFields[0].scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+        }
+    });
+
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + S to save
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+            e.preventDefault();
+            const saveBtn = document.getElementById('saveBtn');
+            if (saveBtn && !saveBtn.disabled) {
+                saveBtn.click();
+            }
+        }
+
+        // Escape to go back
+        if (e.key === 'Escape') {
+            const cancelBtn = document.querySelector('.edit-cancel-btn');
+            if (cancelBtn) {
+                window.location.href = cancelBtn.href;
+            }
+        }
+    });
+</script>
+{% endblock %}

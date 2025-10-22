@@ -1,0 +1,1386 @@
+{% extends 'base.html' %}
+
+{% block title %}Quiz System - {{ current_level|title }} Level{% endblock %}
+
+{% block content %}
+<div class="quiz-container">
+    <!-- Level Header Section -->
+    <section class="level-header">
+        <div class="container-fluid">
+            <div class="header-content">
+                <div class="level-badge-large">
+                    <i class="fas fa-trophy"></i>
+                    <span>{{ current_level|upper }}</span>
+                </div>
+                <div class="header-text">
+                    <p class="header-subtitle">Current Level</p>
+                    <h1>{{ current_level|title }}</h1>
+                    <p class="header-description">Keep practicing to progress to the next level!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="quiz-content">
+        <div class="container-fluid">
+            <!-- Level Up Notification -->
+            {% if can_level_up %}
+                <div class="card-notification level-up-card">
+                    <div class="notification-icon">
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div class="notification-content">
+                        <h3>Ready to Level Up!</h3>
+                        <p>You can advance to <strong>{{ target_level|title }}</strong> level</p>
+                    </div>
+                    <button class="btn-claim-level" onclick="claimLevelUp()">
+                        <i class="fas fa-rocket"></i>Claim Level Up
+                    </button>
+                </div>
+            {% endif %}
+
+            <!-- Level Down Warning -->
+            {% if should_level_down %}
+                <div class="card-notification level-down-card">
+                    <div class="notification-icon">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <div class="notification-content">
+                        <h3>Performance Notice</h3>
+                        <p>Consider returning to <strong>{{ target_down|title }}</strong> level for better practice</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Difficulty Selection Section -->
+            <div class="card-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-list"></i> Available Question Types</h2>
+                    <p>Select a difficulty level or let the system choose for you</p>
+                </div>
+                <div class="difficulty-grid">
+                    {% for difficulty_info in difficulty_info_list %}
+                        <div class="difficulty-card" data-difficulty="{{ difficulty_info.name }}">
+                            <div class="card-background difficulty-{{ difficulty_info.name }}"></div>
+                            <div class="card-inner">
+                                <div class="difficulty-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <h3 class="difficulty-title">{{ difficulty_info.title }}</h3>
+                                <div class="question-count">{{ difficulty_info.count }}</div>
+                                <p class="question-label">questions available</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Level Progress Section -->
+            {% if level_progress.can_level_up %}
+                <div class="card-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-chart-line"></i> Progress to {{ target_level|title }}</h2>
+                    </div>
+                    <div class="progress-content">
+                        <div class="progress-stats">
+                            <div class="stat-block">
+                                <p class="stat-label">Correct Answers</p>
+                                <p class="stat-value">{{ level_progress.current_correct }}/{{ level_progress.required_correct }}</p>
+                            </div>
+                            <div class="progress-bar-wrapper">
+                                <div class="progress-bar-bg">
+                                    <div class="progress-bar-fill" style="width: {{ level_progress.progress_percentage }}%">
+                                        <span class="progress-text">{{ level_progress.progress_percentage|floatformat:0 }}%</span>
+                                    </div>
+                                </div>
+                                <p class="progress-hint">{{ level_progress.remaining_correct }} more correct answers needed</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Statistics Section -->
+            <div class="card-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-bar"></i> Your Statistics</h2>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon attempts">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-label">Total Attempts</p>
+                            <p class="stat-number">{{ user_stats.total_attempts }}</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon correct">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-label">Correct Answers</p>
+                            <p class="stat-number">{{ user_stats.correct_attempts }}</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon accuracy">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-label">Overall Accuracy</p>
+                            <p class="stat-number">{{ user_stats.overall_accuracy|floatformat:1 }}%</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon streak">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-label">Current Streak</p>
+                            <p class="stat-number">{{ user_stats.current_streak }}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Call to Action Section -->
+            <div class="card-section cta-section">
+                <div class="cta-inner">
+                    <div class="cta-icon">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <div class="cta-text">
+                        <h2>Ready to Start?</h2>
+                        <p>The system will automatically select appropriate questions for your level. Let's go!</p>
+                    </div>
+                    <div class="cta-actions">
+                        <button class="btn btn-primary" onclick="startQuiz()">
+                            <i class="fas fa-play"></i>Start Quiz Session
+                        </button>
+                        <a href="{% url 'dashboards:student_dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Loading Modal -->
+    <div class="modal-overlay" id="quizModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-spinner fa-spin"></i> Loading Question...</h3>
+            </div>
+            <div class="modal-body">
+                <div class="spinner"></div>
+                <p>Getting your next question...</p>
+                <small>The AI is analyzing your progress</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* ========== DESIGN SYSTEM ========== */
+    :root {
+        /* Primary Colors */
+        --neon-cyan: #00f0ff;
+        --neon-magenta: #ff00ff;
+        --neon-pink: #ff006e;
+        --neon-purple: #b537f2;
+        
+        /* Supporting Colors */
+        --accent-green: #00ff88;
+        --accent-blue: #0088ff;
+        --accent-orange: #ff8800;
+        
+        /* Neutral - Dark Theme */
+        --bg-primary: #0a0e27;
+        --bg-secondary: #12172d;
+        --bg-tertiary: #1a2147;
+        --bg-light: #232e52;
+        
+        /* Text Colors */
+        --text-primary: #ffffff;
+        --text-secondary: #d4d9e8;
+        --text-tertiary: #8b93b3;
+        
+        /* Status Colors */
+        --success: #00ff88;
+        --error: #ff3366;
+        --warning: #ffaa00;
+        --info: #0088ff;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* ========== LAYOUT ========== */
+    .quiz-container {
+        min-height: 100vh;
+        
+    }
+
+    .container-fluid {
+        width: 100%;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 1400px;
+    }
+
+    /* ========== LEVEL HEADER ========== */
+    .level-header {
+        
+        border-bottom: 2px solid rgba(0, 240, 255, 0.15);
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+    }
+
+    .header-content {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .level-badge-large {
+        width: 120px;
+        height: 120px;
+        background: linear-gradient(135deg, var(--neon-magenta), var(--neon-purple));
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        box-shadow: 0 0 40px rgba(255, 0, 255, 0.3);
+        border: 2px solid rgba(0, 240, 255, 0.2);
+        flex-shrink: 0;
+    }
+
+    .level-badge-large i {
+        font-size: 3rem;
+        color: var(--neon-cyan);
+    }
+
+    .level-badge-large span {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--text-primary);
+    }
+
+    .header-text p {
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    .header-text h1 {
+        margin: 0.5rem 0 1rem 0;
+        font-size: 3rem;
+        background: linear-gradient(135deg, var(--neon-cyan), var(--accent-blue));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 800;
+    }
+
+    .header-description {
+        color: var(--text-secondary);
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    /* ========== QUIZ CONTENT ========== */
+    .quiz-content {
+        padding: 0 0 2rem 0;
+    }
+
+    /* ========== CARD SECTIONS ========== */
+    .card-section {
+        background: var(--bg-secondary);
+        border: 1px solid rgba(0, 240, 255, 0.15);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .card-section:hover {
+        border-color: rgba(0, 240, 255, 0.3);
+        box-shadow: 0 8px 30px rgba(0, 240, 255, 0.1);
+    }
+
+    .section-header {
+        margin-bottom: 2rem;
+    }
+
+    .section-header h2 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: var(--text-primary);
+    }
+
+    .section-header h2 i {
+        color: var(--neon-cyan);
+        text-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+    }
+
+    .section-header p {
+        color: var(--text-tertiary);
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    /* ========== NOTIFICATIONS ========== */
+    .card-notification {
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 100%);
+        border: 2px solid;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        animation: slideDown 0.6s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .level-up-card {
+        border-color: var(--success);
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.05) 0%, rgba(0, 255, 136, 0.02) 100%);
+    }
+
+    .level-down-card {
+        border-color: var(--warning);
+        background: linear-gradient(135deg, rgba(255, 170, 0, 0.05) 0%, rgba(255, 170, 0, 0.02) 100%);
+    }
+
+    .notification-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        flex-shrink: 0;
+    }
+
+    .level-up-card .notification-icon {
+        background: rgba(0, 255, 136, 0.15);
+        color: var(--success);
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+    }
+
+    .level-down-card .notification-icon {
+        background: rgba(255, 170, 0, 0.15);
+        color: var(--warning);
+        box-shadow: 0 0 20px rgba(255, 170, 0, 0.2);
+    }
+
+    .notification-content {
+        flex: 1;
+    }
+
+    .notification-content h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .notification-content p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
+
+    .notification-content strong {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .btn-claim-level {
+        background: linear-gradient(135deg, var(--success), #00cc66);
+        border: none;
+        color: var(--bg-primary);
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+    }
+
+    .btn-claim-level:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 255, 136, 0.3);
+    }
+
+    /* ========== DIFFICULTY GRID ========== */
+    .difficulty-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .difficulty-card {
+        position: relative;
+        border-radius: 14px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid rgba(0, 240, 255, 0.15);
+        height: 100%;
+    }
+
+    .difficulty-card:hover {
+        transform: translateY(-8px);
+        border-color: rgba(0, 240, 255, 0.4);
+        box-shadow: 0 12px 40px rgba(0, 240, 255, 0.15);
+    }
+
+    .card-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 0;
+        opacity: 0.95;
+    }
+
+    .difficulty-easy .card-background {
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 200, 100, 0.1));
+    }
+
+    .difficulty-medium .card-background {
+        background: linear-gradient(135deg, rgba(255, 170, 0, 0.2), rgba(255, 140, 0, 0.1));
+    }
+
+    .difficulty-hard .card-background {
+        background: linear-gradient(135deg, rgba(255, 51, 102, 0.2), rgba(255, 0, 80, 0.1));
+    }
+
+    .card-inner {
+        position: relative;
+        z-index: 1;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .difficulty-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        background: rgba(0, 0, 0, 0.3);
+        border: 2px solid rgba(0, 240, 255, 0.3);
+    }
+
+    .difficulty-easy .difficulty-icon {
+        color: var(--success);
+    }
+
+    .difficulty-medium .difficulty-icon {
+        color: var(--warning);
+    }
+
+    .difficulty-hard .difficulty-icon {
+        color: var(--error);
+    }
+
+    .difficulty-title {
+        margin: 0.5rem 0 0 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .question-count {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin: 0.5rem 0;
+    }
+
+    .question-label {
+        color: var(--text-tertiary);
+        font-size: 0.85rem;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* ========== PROGRESS SECTION ========== */
+    .progress-content {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .progress-stats {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .stat-block {
+        flex: 1;
+        min-width: 150px;
+    }
+
+    .stat-label {
+        color: var(--text-tertiary);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--neon-cyan);
+        text-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+    }
+
+    .progress-bar-wrapper {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .progress-bar-bg {
+        height: 32px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(0, 240, 255, 0.2);
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+        margin-bottom: 0.75rem;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--neon-cyan), var(--accent-blue));
+        border-radius: 8px;
+        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 1rem;
+        box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+    }
+
+    .progress-text {
+        font-weight: 700;
+        color: var(--bg-primary);
+        font-size: 0.9rem;
+    }
+
+    .progress-hint {
+        color: var(--text-tertiary);
+        font-size: 0.85rem;
+        margin: 0;
+    }
+
+    /* ========== STATS GRID ========== */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .stat-card {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(0, 240, 255, 0.15);
+        border-radius: 12px;
+        padding: 1.5rem;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        border-color: rgba(0, 240, 255, 0.3);
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 240, 255, 0.1);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .stat-icon.attempts {
+        background: rgba(0, 136, 255, 0.2);
+        color: var(--info);
+    }
+
+    .stat-icon.correct {
+        background: rgba(0, 255, 136, 0.2);
+        color: var(--success);
+    }
+
+    .stat-icon.accuracy {
+        background: rgba(0, 240, 255, 0.2);
+        color: var(--neon-cyan);
+    }
+
+    .stat-icon.streak {
+        background: rgba(255, 170, 0, 0.2);
+        color: var(--warning);
+    }
+
+    .stat-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .stat-label {
+        color: var(--text-tertiary);
+        font-size: 0.8rem;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    /* ========== CTA SECTION ========== */
+    .cta-section {
+        background: linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(181, 55, 242, 0.1) 100%);
+        border: 2px solid rgba(0, 240, 255, 0.2);
+    }
+
+    .cta-inner {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .cta-icon {
+        font-size: 4rem;
+        color: var(--neon-cyan);
+        text-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
+        flex-shrink: 0;
+    }
+
+    .cta-text {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .cta-text h2 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .cta-text p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 1rem;
+    }
+
+    .cta-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    /* ========== BUTTONS ========== */
+    .btn {
+        padding: 0.875rem 2rem;
+        border-radius: 10px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        font-size: 0.95rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--neon-cyan), var(--accent-blue));
+        color: var(--bg-primary);
+        box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 35px rgba(0, 240, 255, 0.4);
+    }
+
+    .btn-secondary {
+        background: rgba(0, 240, 255, 0.1);
+        border: 2px solid rgba(0, 240, 255, 0.3);
+        color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+        background: rgba(0, 240, 255, 0.15);
+        border-color: rgba(0, 240, 255, 0.5);
+        transform: translateY(-2px);
+    }
+
+    /* ========== MODAL ========== */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(4px);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-overlay.show {
+        display: flex;
+    }
+
+    .modal-content {
+        background: var(--bg-secondary);
+        border: 2px solid rgba(0, 240, 255, 0.3);
+        border-radius: 16px;
+        padding: 3rem 2rem;
+        text-align: center;
+        max-width: 400px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-header {
+        margin-bottom: 2rem;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .modal-header i {
+        color: var(--neon-cyan);
+        animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .modal-body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(0, 240, 255, 0.2);
+        border-top-color: var(--neon-cyan);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    .modal-body p {
+        margin: 0;
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .modal-body small {
+        color: var(--text-tertiary);
+    }
+
+    /* ========== RESPONSIVE DESIGN ========== */
+    @media (max-width: 1200px) {
+        .container-fluid {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+
+        .level-header {
+            padding: 2rem 0;
+        }
+
+        .header-content {
+            gap: 1.5rem;
+        }
+
+        .header-text h1 {
+            font-size: 2rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .level-header {
+            padding: 1.5rem 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .header-content {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .level-badge-large {
+            width: 100px;
+            height: 100px;
+        }
+
+        .level-badge-large i {
+            font-size: 2.5rem;
+        }
+
+        .header-text h1 {
+            font-size: 1.75rem;
+            margin: 0.5rem 0 0.75rem 0;
+        }
+
+        .card-section {
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .difficulty-grid {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .card-inner {
+            padding: 1.5rem 1rem;
+            gap: 0.75rem;
+        }
+
+        .difficulty-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+        }
+
+        .difficulty-title {
+            font-size: 1rem;
+        }
+
+        .question-count {
+            font-size: 2rem;
+        }
+
+        .card-notification {
+            flex-direction: column;
+            text-align: center;
+            padding: 1.5rem;
+            gap: 1rem;
+        }
+
+        .notification-icon {
+            width: 70px;
+            height: 70px;
+            font-size: 1.75rem;
+        }
+
+        .btn-claim-level {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .progress-stats {
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .stat-block {
+            min-width: 100%;
+        }
+
+        .progress-bar-wrapper {
+            min-width: 100%;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-card {
+            padding: 1rem;
+            gap: 0.75rem;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.25rem;
+        }
+
+        .stat-number {
+            font-size: 1.25rem;
+        }
+
+        .cta-inner {
+            gap: 1rem;
+        }
+
+        .cta-icon {
+            font-size: 3rem;
+        }
+
+        .cta-text h2 {
+            font-size: 1.25rem;
+        }
+
+        .cta-text p {
+            font-size: 0.9rem;
+        }
+
+        .cta-actions {
+            gap: 0.75rem;
+            width: 100%;
+        }
+
+        .btn {
+            flex: 1;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 576px) {
+        :root {
+            font-size: 14px;
+        }
+
+        .container-fluid {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+
+        .level-header {
+            padding: 1rem 0;
+            margin-bottom: 1rem;
+        }
+
+        .level-badge-large {
+            width: 90px;
+            height: 90px;
+        }
+
+        .header-text h1 {
+            font-size: 1.5rem;
+        }
+
+        .header-description {
+            font-size: 0.875rem;
+        }
+
+        .card-section {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 12px;
+        }
+
+        .section-header h2 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 0.85rem;
+        }
+
+        .difficulty-grid {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .difficulty-card {
+            min-height: 140px;
+        }
+
+        .card-inner {
+            padding: 1rem 0.75rem;
+        }
+
+        .difficulty-icon {
+            width: 45px;
+            height: 45px;
+        }
+
+        .difficulty-title {
+            font-size: 0.95rem;
+        }
+
+        .question-count {
+            font-size: 1.75rem;
+        }
+
+        .question-label {
+            font-size: 0.75rem;
+        }
+
+        .card-notification {
+            flex-direction: column;
+            padding: 1rem;
+            gap: 0.75rem;
+            border-radius: 12px;
+        }
+
+        .notification-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+        }
+
+        .notification-content h3 {
+            font-size: 1.1rem;
+        }
+
+        .notification-content p {
+            font-size: 0.85rem;
+        }
+
+        .btn-claim-level {
+            padding: 0.625rem 1rem;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+
+        .progress-bar-bg {
+            height: 28px;
+            border-radius: 6px;
+        }
+
+        .progress-bar-fill {
+            padding-right: 0.75rem;
+        }
+
+        .progress-text {
+            font-size: 0.8rem;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .stat-card {
+            padding: 0.875rem;
+            gap: 0.5rem;
+        }
+
+        .stat-icon {
+            width: 45px;
+            height: 45px;
+            font-size: 1.1rem;
+        }
+
+        .stat-number {
+            font-size: 1.1rem;
+        }
+
+        .cta-inner {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .cta-icon {
+            font-size: 2.5rem;
+            order: 1;
+        }
+
+        .cta-text {
+            order: 2;
+        }
+
+        .cta-text h2 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .cta-text p {
+            font-size: 0.85rem;
+        }
+
+        .cta-actions {
+            order: 3;
+            width: 100%;
+            flex-direction: column;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.85rem;
+        }
+
+        .modal-content {
+            padding: 2rem 1.5rem;
+            max-width: 90%;
+        }
+
+        .modal-header h3 {
+            font-size: 1.1rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border-width: 2px;
+        }
+
+        .modal-body p {
+            font-size: 0.95rem;
+        }
+
+        .modal-body small {
+            font-size: 0.75rem;
+        }
+    }
+
+    /* ========== ANIMATIONS ========== */
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .card-section {
+        animation: slideInUp 0.6s ease-out;
+    }
+
+    .stat-card {
+        animation: slideInUp 0.6s ease-out;
+    }
+
+    .difficulty-card {
+        animation: slideInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    .section-header {
+        animation: fadeIn 0.4s ease-out;
+    }
+
+    /* ========== ACCESSIBILITY ========== */
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+
+    @media (prefers-contrast: more) {
+        :root {
+            --text-secondary: #e8edf5;
+            --neon-cyan: #00ffff;
+        }
+
+        .card-section {
+            border-width: 2px;
+        }
+
+        .difficulty-card {
+            border-width: 2px;
+        }
+    }
+
+    /* ========== FOCUS STATES ========== */
+    .btn:focus,
+    .difficulty-card:focus {
+        outline: 2px solid var(--neon-cyan);
+        outline-offset: 2px;
+    }
+
+    button:focus-visible {
+        outline: 2px solid var(--neon-cyan);
+        outline-offset: 2px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function startQuiz() {
+        const modal = document.getElementById('quizModal');
+        modal.classList.add('show');
+
+        fetch('{% url "quizzes:get_next_question" %}', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = `/quizzes/student/take/${data.question.id}/`;
+            } else {
+                alert('Error: ' + (data.error || 'Could not load question'));
+                modal.classList.remove('show');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Network error occurred. Please try again.');
+            modal.classList.remove('show');
+        });
+    }
+
+    function claimLevelUp() {
+        if (confirm('Are you sure you want to level up? This will reset your XP but unlock harder questions!')) {
+            fetch('{% url "qlearning:claim_level" %}', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    alert('Error: ' + (data.error || 'Could not level up'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Network error occurred. Please try again.');
+            });
+        }
+    }
+
+    function showNotification(message, type = 'info') {
+        console.log(`[${type.toUpperCase()}] ${message}`);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Add keyboard support for difficulty cards
+        document.querySelectorAll('.difficulty-card').forEach(card => {
+            card.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    startQuiz();
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

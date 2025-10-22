@@ -1,0 +1,503 @@
+import json
+import random
+from typing import Dict, Tuple, Optional
+from django.db import transaction
+from django.utils import timezone
+
+from accounts.models import StudentProfile
+from quizzes.models import Question, AttemptLog
+from qlearning.engine import QLearningEngine
+from qlearning.models import QTableEntry
+from qlearning.policies import LevelTransitionPolicy
+
+
+class QuizService:
+    """
+    Service class for quiz-related operations with Q-Learning integration.
+
+    This service handles:
+    - ENHANCED state representation with performance metrics
+    - Adaptive question selection using Q-Learning
+    - Attempt recording with reward calculation
+    - Hidden reward system for streaks
+    - Hint policy for easy questions
+    """
+
+    # Reward constants
+    BASE_CORRECT_REWARD = 10
+    BASE_INCORRECT_PENALTY = -2
+    STREAK_REWARD_THRESHOLD = 3
+    HIDDEN_STREAK_REWARD = 10
+
+    # Difficulty mapping for Q-Learning
+    DIFFICULTY_ACTIONS = ['easy', 'medium', 'hard']
+
+    @staticmethod
+    def state_tuple(profile: StudentProfile) -> Tuple:
+        """
+        FIXED: Create an ENHANCED state tuple that captures user performance.
+        
+        Now includes:
+        - User level
+        - Overall accuracy (discretized)
+        - Per-difficulty accuracy (discretized)
+        - Experience per difficulty (discretized)
+        - Current streak
+        - Consecutive performance metrics
+        
+        This allows Q-Learning to properly distinguish between:
+        - High performers (should get harder questions)
+        - Struggling users (should get easier questions)
+
+        Args:
+            profile: StudentProfile instance
+
+        Returns:
+            Tuple representing the current state with performance metrics
+        """
+        try:
+            # Get comprehensive user statistics
+            stats = LevelTransitionPolicy.get_user_statistics(profile.user)
+            
+            # Extract overall accuracy
+            overall_acc = stats.get('overall_accuracy', 0) / 100.0
+            
+            # Extract per-difficulty stats
+            easy_stats = stats.get('difficulty_stats', {}).get('easy', {})
+            medium_stats = stats.get('difficulty_stats', {}).get('medium', {})
+            hard_stats = stats.get('difficulty_stats', {}).get('hard', {})
+            
+            # Calculate accuracies
+            easy_acc = easy_stats.get('accuracy', 0) / 100.0
+            medium_acc = medium_stats.get('accuracy', 0) / 100.0
+            hard_acc = hard_stats.get('accuracy', 0) / 100.0
+            
+            # Get attempt counts (experience)
+            easy_count = easy_stats.get('total', 0)
+            medium_count = medium_stats.get('total', 0)
+            hard_count = hard_stats.get('total', 0)
+            
+            # Get consecutive performance
+            easy_consec_correct = easy_stats.get('consecutive_correct', 0)
+            easy_consec_wrong = easy_stats.get('consecutive_wrong', 0)
+            
+            # Discretize accuracy to reduce state space
+            # 0 = very low (<50%), 1 = low (50-69%), 2 = medium (70-89%), 3 = high (90%+)
+            def discretize_accuracy(acc):
+                if acc >= 0.90:
+                    return 3  # High
+                elif acc >= 0.70:
+                    return 2  # Medium
+                elif acc >= 0.50:
+                    return 1  # Low
+                else:
+                    return 0  # Very low
+            
+            # Discretize experience (attempt counts)
+            # 0 = none (0), 1 = beginner (1-4), 2 = intermediate (5-9), 3 = experienced (10+)
+            def discretize_experience(count):
+                if count == 0:
+                    return 0
+                elif count <= 4:
+                    return 1
+                elif count <= 9:
+                    return 2
+                else:
+                    return 3
+            
+            # Discretize consecutive performance
+            # 0 = none/mixed, 1 = some (2-3), 2 = strong (4-5), 3 = excellent (6+)
+            def discretize_consecutive(count):
+                if count >= 6:
+                    return 3
+                elif count >= 4:
+                    return 2
+                elif count >= 2:
+                    return 1
+                else:
+                    return 0
+            
+            # Cap streak to prevent state explosion
+            capped_streak = min(profile.streak_correct, 5)
+            
+            # Build comprehensive state tuple
+            state = (
+                profile.level,                              # String: beginner/intermediate/advanced/expert
+                discretize_accuracy(overall_acc),           # 0-3: Overall performance
+                discretize_accuracy(easy_acc),              # 0-3: Easy performance
+                discretize_accuracy(medium_acc),            # 0-3: Medium performance
+                discretize_accuracy(hard_acc),              # 0-3: Hard performance (for advanced tracking)
+                discretize_experience(easy_count),          # 0-3: Easy experience
+                discretize_experience(medium_count),        # 0-3: Medium experience
+                discretize_experience(hard_count),          # 0-3: Hard experience
+                capped_streak,                              # 0-5: Current streak
+                discretize_consecutive(easy_consec_correct),# 0-3: Easy consecutive correct
+                discretize_consecutive(easy_consec_wrong),  # 0-3: Easy consecutive wrong
+            )
+            
+            return state
+            
+        except Exception as e:
+            # Fallback to minimal state if error occurs
+            print(f"Error creating state tuple: {e}")
+            return (
+                profile.level,
+                1,  # Medium overall accuracy
+                1,  # Medium easy accuracy
+                0,  # No medium accuracy
+                0,  # No hard accuracy
+                1,  # Some easy experience
+                0,  # No medium experience
+                0,  # No hard experience
+                min(profile.streak_correct, 5),
+                0,  # No consecutive correct
+                0   # No consecutive wrong
+            )
+
+    @staticmethod
+    def pick_next_question(profile: StudentProfile, epsilon: float = None) -> Optional[Question]:
+        """
+        ENHANCED: Pick the next question using Q-Learning with dynamic epsilon.
+
+        Args:
+            profile: StudentProfile instance
+            epsilon: Exploration rate (uses dynamic calculation if None)
+
+        Returns:
+            Question instance or None if no questions available
+        """
+        # Get enhanced state
+        state = QuizService.state_tuple(profile)
+
+        # Use Q-Learning to choose difficulty (with dynamic epsilon if not provided)
+        chosen_difficulty = QLearningEngine.choose_action(
+            profile.user, 
+            state, 
+            epsilon,
+            current_difficulty=profile.last_difficulty
+        )
+
+        # Get questions of the chosen difficulty that user hasn't seen recently
+        # Avoid repetition by excluding recently attempted questions
+        recent_attempts = AttemptLog.objects.filter(
+            user=profile.user
+        ).order_by('-created_at')[:10].values_list('question_id', flat=True)
+
+        questions = Question.objects.filter(
+            difficulty=chosen_difficulty
+        ).exclude(
+            id__in=recent_attempts
+        )
+
+        # If no unseen questions, allow recent questions
+        if not questions.exists():
+            questions = Question.objects.filter(difficulty=chosen_difficulty)
+
+        if not questions.exists():
+            # Fallback: try other difficulties if chosen difficulty has no questions
+            fallback_difficulties = [d for d in QuizService.DIFFICULTY_ACTIONS if d != chosen_difficulty]
+            random.shuffle(fallback_difficulties)
+
+            for fallback_difficulty in fallback_difficulties:
+                questions = Question.objects.filter(difficulty=fallback_difficulty)
+                if questions.exists():
+                    chosen_difficulty = fallback_difficulty
+                    break
+
+        if not questions.exists():
+            # No questions available at all
+            return None
+
+        # Return a random question of the chosen difficulty
+        return random.choice(list(questions))
+
+    @staticmethod
+    def record_attempt(
+        profile: StudentProfile,
+        question: Question,
+        chosen_answer: str,
+        time_spent: float
+    ) -> Dict:
+        """
+        ENHANCED: Record attempt with improved reward calculation and Q-Learning integration.
+
+        Args:
+            profile: StudentProfile instance
+            question: Question instance
+            chosen_answer: Student's answer
+            time_spent: Time spent in seconds
+
+        Returns:
+            Dict with attempt results and metadata
+        """
+        with transaction.atomic():
+            # Determine if answer is correct
+            is_correct = QuizService._validate_answer(question, chosen_answer)
+
+            # Calculate base reward
+            if is_correct:
+                base_reward = QuizService.BASE_CORRECT_REWARD
+            else:
+                base_reward = QuizService.BASE_INCORRECT_PENALTY
+
+            # Store old values for Q-Learning
+            old_streak = profile.streak_correct
+            
+            # Get current state BEFORE updating profile
+            current_state = QuizService.state_tuple(profile)
+
+            # Update profile
+            if is_correct:
+                profile.streak_correct += 1
+                profile.points += base_reward
+            else:
+                profile.streak_correct = 0
+                profile.points += base_reward  # Allow negative points
+
+            # Update progress based on performance
+            progress_increment = 1 if is_correct else 0
+            profile.progress = min(100, profile.progress + progress_increment)
+            profile.last_difficulty = question.difficulty
+            profile.save()
+
+            # Check for hidden streak rewards
+            hidden_reward_applied = False
+            if old_streak < QuizService.STREAK_REWARD_THRESHOLD <= profile.streak_correct:
+                profile.points += QuizService.HIDDEN_STREAK_REWARD
+                profile.save()
+                hidden_reward_applied = True
+
+            # Calculate Q-Learning reward (considers difficulty, streak, time)
+            q_reward = QuizService._calculate_q_reward(
+                is_correct, question.difficulty, profile.streak_correct, time_spent
+            )
+
+            # Get next state AFTER updating profile
+            next_state = QuizService.state_tuple(profile)
+
+            # Update Q-Learning with enhanced state
+            updated_entry = QLearningEngine.update_q(
+                user=profile.user,
+                state_tuple=current_state,
+                action=question.difficulty,
+                reward=q_reward,
+                next_state_tuple=next_state
+            )
+
+            # Create Q-Table snapshot for analysis
+            qtable_snapshot = QuizService._create_qtable_snapshot(profile.user, current_state)
+
+            # Create AttemptLog
+            attempt_log = AttemptLog.objects.create(
+                user=profile.user,
+                question=question,
+                chosen_answer=chosen_answer,
+                is_correct=is_correct,
+                difficulty_attempted=question.difficulty,
+                time_spent=time_spent,
+                hint_given=None,
+                reward_numeric=q_reward,
+                qtable_snapshot=qtable_snapshot
+            )
+
+            # Update global statistics
+            LevelTransitionPolicy.update_global_statistics(attempt_log)
+
+            # Apply hint policy if answer was wrong
+            hint = None
+            if not is_correct:
+                # Count previous wrong attempts for this question
+                previous_wrong = AttemptLog.objects.filter(
+                    user=profile.user,
+                    question=question,
+                    is_correct=False
+                ).count()
+                
+                hint = LevelTransitionPolicy.get_hint_for_question(question, previous_wrong)
+                
+                if hint:
+                    attempt_log.hint_given = hint
+                    attempt_log.save()
+
+            # Check if user can level up (XP-based)
+            can_level_up, target_level = LevelTransitionPolicy.can_level_up(profile)
+            
+            # Check if user should level down (performance-based)
+            should_level_down, down_level = LevelTransitionPolicy.should_level_down(profile)
+
+        return {
+            'attempt_log': attempt_log,
+            'is_correct': is_correct,
+            'hint': hint,
+            'can_level_up': can_level_up,
+            'target_level': target_level,
+            'should_level_down': should_level_down,
+            'down_level': down_level,
+            'hidden_reward_applied': hidden_reward_applied,
+            'streak_reward': QuizService.HIDDEN_STREAK_REWARD if hidden_reward_applied else 0,
+            'q_reward': q_reward,
+            'new_streak': profile.streak_correct,
+            'new_points': profile.points,
+            'new_progress': profile.progress,
+            'current_state': current_state,
+            'next_state': next_state,
+            'q_value_change': updated_entry.q_value if updated_entry else 0
+        }
+
+    @staticmethod
+    def _validate_answer(question: Question, chosen_answer: str) -> bool:
+        """
+        Validate student answer based on question format.
+
+        Args:
+            question: Question instance
+            chosen_answer: Student's answer
+
+        Returns:
+            Boolean indicating if answer is correct
+        """
+        try:
+            if question.format == 'mcq_simple':
+                # For MCQ, expect JSON like "A" or "B"
+                if chosen_answer.strip():
+                    return chosen_answer.strip() == question.answer_key.strip()
+            elif question.format == 'mcq_complex':
+                # For complex MCQ, expect JSON array like ["A", "B"]
+                if chosen_answer.strip():
+                    chosen_answers = json.loads(chosen_answer)
+                    correct_answers = json.loads(question.answer_key)
+                    return set(chosen_answers) == set(correct_answers)
+            elif question.format == 'short_answer':
+                # For short answer, do case-insensitive comparison
+                if chosen_answer.strip() and question.answer_key.strip():
+                    return chosen_answer.strip().lower() == question.answer_key.strip().lower()
+        except (json.JSONDecodeError, ValueError):
+            pass
+        return False
+
+    @staticmethod
+    def _calculate_q_reward(
+        is_correct: bool,
+        difficulty: str,
+        streak: int,
+        time_spent: float
+    ) -> float:
+        """
+        ENHANCED: Calculate Q-Learning reward with better differentiation.
+
+        Reward structure:
+        - Correct answers: Base + difficulty multiplier + streak bonus + time bonus
+        - Wrong answers: Penalty (more severe for easier questions)
+
+        Args:
+            is_correct: Whether the answer was correct
+            difficulty: Question difficulty
+            streak: Current streak count
+            time_spent: Time spent on question
+
+        Returns:
+            Calculated reward value
+        """
+        if is_correct:
+            # Base reward
+            base_reward = QuizService.BASE_CORRECT_REWARD
+            
+            # Difficulty multiplier (reward harder questions more)
+            difficulty_multiplier = {
+                'easy': 1.0,
+                'medium': 1.5,    # 50% bonus for medium
+                'hard': 2.0       # 100% bonus for hard
+            }.get(difficulty, 1.0)
+            
+            # Streak bonus (diminishing returns)
+            streak_bonus = min(streak * 0.5, 5.0)  # Max 5 points bonus
+            
+            # Time bonus (faster completion = better)
+            # Reward if completed in under 60 seconds
+            if time_spent <= 60:
+                time_bonus = 2.0 - (time_spent / 60.0)
+            else:
+                time_bonus = 0
+            
+            return (base_reward * difficulty_multiplier) + streak_bonus + time_bonus
+        else:
+            # Penalty for wrong answers
+            base_penalty = QuizService.BASE_INCORRECT_PENALTY
+            
+            # Easier questions penalized more (should have gotten it right!)
+            difficulty_penalty_multiplier = {
+                'easy': 1.5,      # Worse penalty for getting easy wrong
+                'medium': 1.0,    # Normal penalty
+                'hard': 0.7       # Lighter penalty for hard questions
+            }.get(difficulty, 1.0)
+            
+            return base_penalty * difficulty_penalty_multiplier
+
+    @staticmethod
+    def _create_qtable_snapshot(user, state: Tuple) -> Dict:
+        """
+        Create a snapshot of the Q-Table for the given state.
+
+        Args:
+            user: User instance
+            state: State tuple
+
+        Returns:
+            Dictionary representing Q-Table snapshot
+        """
+        state_hash = QLearningEngine.hash_state(state)
+
+        # Get Q-Table entries for this state
+        entries = QTableEntry.objects.filter(
+            user=user,
+            state_hash=state_hash
+        )
+
+        snapshot = {
+            'state_hash': state_hash,
+            'state': str(state),
+            'timestamp': timezone.now().isoformat(),
+            'q_values': {}
+        }
+
+        for entry in entries:
+            snapshot['q_values'][entry.action] = {
+                'q_value': entry.q_value,
+                'updated_at': entry.updated_at.isoformat()
+            }
+
+        return snapshot
+
+    @staticmethod
+    def _apply_hint_policy(question: Question, is_correct: bool, streak: int) -> Optional[str]:
+        """
+        Apply hint policy based on question difficulty and performance.
+
+        Args:
+            question: Question instance
+            is_correct: Whether the answer was correct
+            streak: Current correct streak
+
+        Returns:
+            Hint text or None
+        """
+        # Only provide hints for wrong answers
+        if is_correct:
+            return None
+            
+        # Use the policies system for hint generation
+        return LevelTransitionPolicy.get_hint_for_question(question, 0)
+
+    @staticmethod
+    def _check_level_up(profile: StudentProfile) -> bool:
+        """
+        Check if the user can level up based on their XP.
+
+        Args:
+            profile: StudentProfile instance
+
+        Returns:
+            Boolean indicating if level up is possible
+        """
+        can_level_up, target_level = LevelTransitionPolicy.can_level_up(profile)
+        return can_level_up

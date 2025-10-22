@@ -1,0 +1,1194 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Quiz Session - Question {{ question.id }} | GamifyLearn{% endblock %}
+
+{% block extra_head %}
+<style>
+/* Quiz Neon-Matte Theme */
+.quiz-container {
+    min-height: calc(100vh - 120px);
+    padding: 2rem 0;
+    position: relative;
+}
+
+/* Animated Background Grid */
+.quiz-bg-grid {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 0;
+    animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+/* Question Card - Glassmorphism */
+.question-card-neon {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 24px;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.9),
+        0 0 40px rgba(0, 255, 255, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.question-card-neon::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        circle at center,
+        rgba(0, 255, 255, 0.1) 0%,
+        transparent 50%
+    );
+    animation: pulseGlow 4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+.question-card-neon:hover {
+    border-color: rgba(0, 255, 255, 0.6);
+    box-shadow: 
+        0 12px 48px rgba(0, 0, 0, 0.95),
+        0 0 60px rgba(0, 255, 255, 0.3),
+        0 0 100px rgba(255, 0, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Card Header with Neon Glow */
+.card-header-neon {
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.15) 0%, rgba(255, 0, 255, 0.15) 100%);
+    border: none;
+    border-bottom: 2px solid rgba(0, 255, 255, 0.4);
+    padding: 1.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-header-neon::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.question-title {
+    color: #00ffff;
+    font-weight: 700;
+    font-size: 1.5rem;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+    margin: 0;
+}
+
+/* Timer with Neon Effect */
+.timer-neon {
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid rgba(255, 255, 0, 0.5);
+    border-radius: 12px;
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    color: #ffff00;
+    text-shadow: 0 0 15px rgba(255, 255, 0, 0.8);
+    box-shadow: 0 0 20px rgba(255, 255, 0, 0.3), inset 0 0 10px rgba(255, 255, 0, 0.1);
+    animation: timerPulse 2s ease-in-out infinite;
+}
+
+@keyframes timerPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(255, 255, 0, 0.3); }
+    50% { box-shadow: 0 0 30px rgba(255, 255, 0, 0.5); }
+}
+
+/* Question Text */
+.question-text-neon {
+    color: #ffffff;
+    font-size: 1.25rem;
+    line-height: 1.8;
+    margin-bottom: 2rem;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Badges with Neon Glow */
+.badge-neon {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border: 2px solid;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.badge-neon.difficulty-easy {
+    background: rgba(0, 255, 0, 0.1);
+    border-color: #00ff00;
+    color: #00ff00;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+}
+
+.badge-neon.difficulty-medium {
+    background: rgba(255, 255, 0, 0.1);
+    border-color: #ffff00;
+    color: #ffff00;
+    box-shadow: 0 0 15px rgba(255, 255, 0, 0.3);
+}
+
+.badge-neon.difficulty-hard {
+    background: rgba(255, 0, 0, 0.1);
+    border-color: #ff0000;
+    color: #ff0000;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+}
+
+.badge-neon.tag {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: #00ffff;
+    color: #00ffff;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+}
+
+/* Option Buttons - Futuristic Design */
+.option-neon {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.option-neon::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.option-neon:hover {
+    border-color: rgba(0, 255, 255, 0.8);
+    background: rgba(0, 255, 255, 0.1);
+    transform: translateX(8px);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+}
+
+.option-neon:hover::before {
+    left: 100%;
+}
+
+.option-neon.selected {
+    border-color: #00ffff;
+    background: rgba(0, 255, 255, 0.15);
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
+}
+
+.option-neon.correct {
+    border-color: #00ff00;
+    background: rgba(0, 255, 0, 0.15);
+    box-shadow: 0 0 40px rgba(0, 255, 0, 0.5);
+    animation: correctPulse 0.6s ease;
+}
+
+.option-neon.incorrect {
+    border-color: #ff0000;
+    background: rgba(255, 0, 0, 0.15);
+    box-shadow: 0 0 40px rgba(255, 0, 0, 0.5);
+    animation: shake 0.5s ease;
+}
+
+@keyframes correctPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.option-label {
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+.option-key {
+    color: #00ffff;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+/* Short Answer Input */
+.answer-input-neon {
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid rgba(0, 255, 255, 0.4);
+    border-radius: 16px;
+    padding: 1.5rem;
+    color: #ffffff;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+}
+
+.answer-input-neon:focus {
+    outline: none;
+    border-color: #00ffff;
+    background: rgba(0, 255, 255, 0.05);
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.4);
+}
+
+/* Hint Box Animation */
+.hint-box-neon {
+    background: rgba(255, 255, 0, 0.08);
+    border: 2px solid rgba(255, 255, 0, 0.5);
+    border-left: 6px solid #ffff00;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 0 30px rgba(255, 255, 0, 0.2);
+    min-height: 120px; /* Prevent layout shift when hint appears */
+    transition: all 0.4s ease;
+    animation: slideInUp 0.4s ease;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hint-icon {
+    color: #ffff00;
+    font-size: 1.5rem;
+    text-shadow: 0 0 15px rgba(255, 255, 0, 0.8);
+}
+
+/* Buttons - Neon Style */
+.btn-neon {
+    background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
+    border: 2px solid rgba(0, 255, 255, 0.6);
+    border-radius: 12px;
+    padding: 1rem 2.5rem;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #000000;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 255, 255, 0.4), 0 0 30px rgba(255, 0, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-neon::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-neon:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-neon:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 35px rgba(0, 255, 255, 0.6), 0 0 50px rgba(255, 0, 255, 0.4);
+}
+
+.btn-neon:active {
+    transform: translateY(-1px);
+}
+
+.btn-outline-neon {
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid rgba(0, 255, 255, 0.5);
+    color: #00ffff;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.btn-outline-neon:hover {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: #00ffff;
+    color: #00ffff;
+}
+
+/* Sidebar Stats - Futuristic Cards */
+.stats-card-neon {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(15px);
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 255, 255, 0.15);
+    transition: all 0.3s ease;
+}
+
+.stats-card-neon:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0, 255, 255, 0.6);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.95), 0 0 50px rgba(0, 255, 255, 0.3);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    text-shadow: 0 0 20px currentColor;
+}
+
+.stat-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Progress Circle */
+.progress-circle-neon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #000000;
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.5), 0 0 60px rgba(255, 0, 255, 0.3);
+    animation: rotatePulse 3s ease-in-out infinite;
+}
+
+@keyframes rotatePulse {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(5deg) scale(1.05); }
+}
+
+/* XP Feedback Toast */
+.xp-feedback-neon {
+    position: fixed;
+    top: 100px;
+    right: 30px;
+    background: rgba(0, 0, 0, 0.95);
+    border: 2px solid;
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    min-width: 300px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.9);
+    transform: translateX(400px);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 9999;
+    backdrop-filter: blur(20px);
+}
+
+.xp-feedback-neon.show {
+    transform: translateX(0);
+}
+
+.xp-feedback-neon.success {
+    border-color: #00ff00;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 255, 0, 0.3);
+}
+
+.xp-feedback-neon.warning {
+    border-color: #ffff00;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.9), 0 0 40px rgba(255, 255, 0, 0.3);
+}
+
+/* Loading Spinner */
+.loading-neon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #00ffff;
+    animation: spin 0.8s linear infinite;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .question-card-neon {
+        border-radius: 16px;
+        margin: 0 0.5rem;
+    }
+    
+    .card-header-neon {
+        padding: 1rem 1.5rem;
+    }
+    
+    .question-title {
+        font-size: 1.25rem;
+    }
+    
+    .option-neon {
+        padding: 1rem 1.25rem;
+    }
+    
+    .stats-card-neon {
+        margin-bottom: 1rem;
+    }
+    
+    .xp-feedback-neon {
+        right: 15px;
+        left: 15px;
+        min-width: auto;
+    }
+}
+
+/* Accessibility */
+.option-neon:focus-within {
+    outline: 3px solid #00ffff;
+    outline-offset: 4px;
+}
+
+.btn-neon:focus {
+    outline: 3px solid #00ffff;
+    outline-offset: 4px;
+}
+
+/* Additional style for level badges */
+.level-badge-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.level-badge {
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    border: 2px solid;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.level-badge.user-level {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: #00ffff;
+    color: #00ffff;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.level-badge.question-level {
+    background: rgba(255, 0, 255, 0.1);
+    border-color: #ff00ff;
+    color: #ff00ff;
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+}
+
+.level-badge small {
+    display: block;
+    font-size: 0.75rem;
+    opacity: 0.8;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.level-badge .value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+/* Session Info Badge */
+.session-info-badge {
+    background: rgba(0, 255, 0, 0.1);
+    border: 2px solid rgba(0, 255, 0, 0.5);
+    border-radius: 12px;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.session-info-badge .session-duration {
+    color: #00ff00;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.session-info-badge small {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.75rem;
+    display: block;
+    margin-top: 0.25rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Background Grid Animation -->
+<div class="quiz-bg-grid"></div>
+
+<div class="quiz-container">
+    <div class="container">
+        <div class="row">
+            <!-- Main Quiz Content -->
+            <div class="col-lg-8 mb-4">
+                <!-- XP Feedback Toast -->
+                <div class="xp-feedback-neon" id="xpFeedback">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="fas fa-coins" style="font-size: 1.5rem; color: #00ffff;"></i>
+                        <div>
+                            <div style="font-weight: 700; color: #00ffff;" id="xpMessage">+10 XP!</div>
+                            <small style="color: rgba(255,255,255,0.7);" id="xpSubtext">Great job!</small>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="quizForm" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="start_time" value="{{ start_time }}">
+                    <input type="hidden" name="wrong_attempts" value="0" id="wrongAttempts">
+                    <input type="hidden" name="question_id" value="{{ question.id }}">
+
+                    <!-- Question Card -->
+                    <div class="question-card-neon">
+                        <div class="card-header-neon">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                                <h4 class="question-title">
+                                    <i class="fas fa-brain me-2"></i>
+                                    Question #{{ question.id }}
+                                </h4>
+                                <div class="timer-neon" id="timer">
+                                    <i class="fas fa-clock me-2"></i>
+                                    <span id="timeDisplay">05:00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body" style="padding: 2rem;">
+                            <div class="mb-4">
+                                <p class="question-text-neon">{{ question.text }}</p>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge-neon tag">
+                                        <i class="fas fa-tag me-1"></i>
+                                        {{ question.curriculum_tag }}
+                                    </span>
+                                    <span class="badge-neon difficulty-{{ question.difficulty }}">
+                                        <i class="fas fa-chart-line me-1"></i>
+                                        {{ question.get_difficulty_display }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Options (sama seperti sebelumnya) -->
+                            {% if question.format == 'mcq_simple' %}
+                                <div class="mb-4">
+                                    <h6 style="color: #00ffff; margin-bottom: 1.5rem;">
+                                        <i class="fas fa-list-ul me-2"></i>Choose one answer:
+                                    </h6>
+                                    <div id="optionsContainer">
+                                        {% for key, value in question.options.items %}
+                                            <div class="option-neon" data-option="{{ key }}">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" 
+                                                           name="answer" value="{{ key }}" id="option{{ key }}"
+                                                           style="display: none;">
+                                                    <label class="option-label w-100" for="option{{ key }}" style="cursor: pointer;">
+                                                        <span class="option-key">{{ key }}.</span> {{ value }}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% elif question.format == 'mcq_complex' %}
+                                <div class="mb-4">
+                                    <h6 style="color: #00ffff; margin-bottom: 1.5rem;">
+                                        <i class="fas fa-check-double me-2"></i>Choose all correct answers:
+                                    </h6>
+                                    <div id="optionsContainer">
+                                        {% for key, value in question.options.items %}
+                                            <div class="option-neon" data-option="{{ key }}">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox"
+                                                           name="answer" value="{{ key }}" id="option{{ key }}"
+                                                           style="display: none;">
+                                                    <label class="option-label w-100" for="option{{ key }}" style="cursor: pointer;">
+                                                        <span class="option-key">{{ key }}.</span> {{ value }}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% elif question.format == 'short_answer' %}
+                                <div class="mb-4">
+                                    <h6 style="color: #00ffff; margin-bottom: 1.5rem;">
+                                        <i class="fas fa-keyboard me-2"></i>Type your answer:
+                                    </h6>
+                                    <input type="text" class="form-control answer-input-neon" name="answer"
+                                           id="shortAnswer" placeholder="Enter your answer here..." autocomplete="off">
+                                </div>
+                            {% endif %}
+
+                            <!-- Hint Box -->
+                            <div id="hintBox" class="hint-box-neon" style="display: none; min-height: 120px; opacity: 0; transform: translateY(20px); transition: all 0.4s ease;">
+                                <div class="d-flex align-items-start gap-3">
+                                    <i class="fas fa-lightbulb hint-icon"></i>
+                                    <div>
+                                        <h6 style="color: #ffff00; margin-bottom: 0.75rem;">💡 Hint</h6>
+                                        <div id="hintContent" style="color: rgba(255, 255, 255, 0.9);"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex flex-wrap gap-3 justify-content-center mt-4">
+                                <button type="submit" class="btn btn-neon" id="submitBtn">
+                                    <i class="fas fa-paper-plane me-2"></i>Submit Answer
+                                </button>
+                                <button type="button" class="btn btn-outline-neon" id="hintBtn" onclick="requestHint()">
+                                    <i class="fas fa-lightbulb me-2"></i>Get Hint
+                                </button>
+                                <button type="button" class="btn btn-outline-neon" onclick="endQuiz()">
+                                    <i class="fas fa-door-open me-2"></i>End Quiz
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Sidebar Stats -->
+            <div class="col-lg-4">
+                <!-- Session Info -->
+                <div class="session-info-badge">
+                    <div class="session-duration" id="sessionDuration">
+                        <i class="fas fa-hourglass-half me-2"></i>
+                        <span id="sessionTime">0m 0s</span>
+                    </div>
+                    <small>Total Session Time</small>
+                </div>
+
+                <!-- Level Cards -->
+                <div class="stats-card-neon">
+                    <h6 style="color: #00ffff; margin-bottom: 1rem; text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);">
+                        <i class="fas fa-trophy me-2"></i>Level Info
+                    </h6>
+                    <div class="level-badge-container">
+                        <!-- User Level -->
+                        <div class="level-badge user-level">
+                            <small>Your Level</small>
+                            <div class="value">{{ profile.level|upper }}</div>
+                        </div>
+                        <!-- Question Level -->
+                        <div class="level-badge question-level">
+                            <small>Question Level</small>
+                            <div class="value">{{ question.difficulty|upper }}</div>
+                        </div>
+                    </div>
+                    {% if can_level_up %}
+                        <div class="mt-3 p-3" style="background: rgba(0, 255, 0, 0.1); border: 2px solid #00ff00; border-radius: 12px;">
+                            <i class="fas fa-arrow-up" style="color: #00ff00;"></i>
+                            <span style="color: #00ff00; font-weight: 600;">Ready to level up!</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Session Stats Card -->
+                <div class="stats-card-neon">
+                    <h6 style="color: #00ffff; margin-bottom: 1.5rem; text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);">
+                        <i class="fas fa-chart-bar me-2"></i>Session Stats
+                    </h6>
+                    <div class="row text-center mb-3">
+                        <div class="col-6">
+                            <div class="stat-number" style="color: #00ff00;" id="correctCount">0</div>
+                            <div class="stat-label">Correct</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-number" style="color: #ff0000;" id="wrongCount">0</div>
+                            <div class="stat-label">Wrong</div>
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-12">
+                            <div class="stat-number" style="color: #00ffff; font-size: 2rem;" id="totalQuestions">0</div>
+                            <div class="stat-label">Total Questions</div>
+                        </div>
+                    </div>
+                    <hr style="border-color: rgba(0, 255, 255, 0.3); margin: 1.5rem 0;">
+                    <div class="text-center">
+                        <div class="stat-number" style="color: #00ffff; font-size: 2rem;" id="accuracy">0%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions Card -->
+                <div class="stats-card-neon">
+                    <h6 style="color: #00ffff; margin-bottom: 1rem;">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h6>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-neon" onclick="skipQuestion()">
+                            <i class="fas fa-forward me-2"></i>Skip Question
+                        </button>
+                        <button class="btn btn-outline-neon" onclick="endQuiz()">
+                            <i class="fas fa-home me-2"></i>End Session
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ========================================
+    // SESSION STORAGE MANAGEMENT
+    // ========================================
+    const SessionManager = {
+        SESSION_KEY: 'quiz_session_stats',
+        SESSION_START_KEY: 'quiz_session_start',
+        
+        // Initialize or get existing session
+        init() {
+            if (!this.getSessionStart()) {
+                this.setSessionStart(Date.now());
+            }
+            return this.getStats();
+        },
+        
+        // Get session stats from localStorage
+        getStats() {
+            const stored = localStorage.getItem(this.SESSION_KEY);
+            if (stored) {
+                return JSON.parse(stored);
+            }
+            return { correct: 0, wrong: 0, total: 0, questions: [] };
+        },
+        
+        // Save stats to localStorage
+        saveStats(stats) {
+            localStorage.setItem(this.SESSION_KEY, JSON.stringify(stats));
+        },
+        
+        // Update stats after answer
+        updateStats(isCorrect, questionId) {
+            const stats = this.getStats();
+            
+            // Prevent duplicate counting for same question
+            if (!stats.questions.includes(questionId)) {
+                stats.questions.push(questionId);
+                stats.total++;
+                
+                if (isCorrect) {
+                    stats.correct++;
+                } else {
+                    stats.wrong++;
+                }
+                
+                this.saveStats(stats);
+            }
+            
+            return stats;
+        },
+        
+        // Clear session (when quiz ends)
+        clearSession() {
+            localStorage.removeItem(this.SESSION_KEY);
+            localStorage.removeItem(this.SESSION_START_KEY);
+        },
+        
+        // Get session start time
+        getSessionStart() {
+            return localStorage.getItem(this.SESSION_START_KEY);
+        },
+        
+        // Set session start time
+        setSessionStart(timestamp) {
+            localStorage.setItem(this.SESSION_START_KEY, timestamp.toString());
+        },
+        
+        // Calculate total session duration
+        getSessionDuration() {
+            const start = parseInt(this.getSessionStart() || Date.now());
+            const now = Date.now();
+            return Math.floor((now - start) / 1000); // in seconds
+        }
+    };
+    
+    // ========================================
+    // QUIZ STATE
+    // ========================================
+    let sessionStats = SessionManager.init();
+    let startTime = Date.now();
+    let timeSpent = 0;
+    let wrongAttempts = 0;
+    const MAX_ATTEMPTS = 3;
+    const CURRENT_QUESTION_ID = {{ question.id }};
+    
+    // ========================================
+    // UI UPDATE FUNCTIONS
+    // ========================================
+    function updateSessionStats() {
+        document.getElementById('correctCount').textContent = sessionStats.correct;
+        document.getElementById('wrongCount').textContent = sessionStats.wrong;
+        document.getElementById('totalQuestions').textContent = sessionStats.total;
+        
+        const accuracy = sessionStats.total > 0 
+            ? Math.round((sessionStats.correct / sessionStats.total) * 100) 
+            : 0;
+        document.getElementById('accuracy').textContent = `${accuracy}%`;
+    }
+    
+    function updateSessionDuration() {
+        const duration = SessionManager.getSessionDuration();
+        const minutes = Math.floor(duration / 60);
+        const seconds = duration % 60;
+        document.getElementById('sessionTime').textContent = `${minutes}m ${seconds}s`;
+    }
+    
+    function updateTimer() {
+        timeSpent = Math.floor((Date.now() - startTime) / 1000);
+        const minutes = Math.floor(timeSpent / 60);
+        const seconds = timeSpent % 60;
+        document.getElementById('timeDisplay').textContent =
+            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    
+    // ========================================
+    // INITIALIZE
+    // ========================================
+    document.addEventListener('DOMContentLoaded', function() {
+        // Display current stats
+        updateSessionStats();
+        updateSessionDuration();
+        
+        // Start timers
+        setInterval(updateTimer, 1000);
+        setInterval(updateSessionDuration, 1000);
+        updateTimer();
+        
+        // Option selection handlers
+        {% if question.format == 'mcq_simple' %}
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    document.querySelectorAll('.option-neon').forEach(btn => {
+                        btn.classList.remove('selected');
+                    });
+                    this.closest('.option-neon').classList.add('selected');
+                });
+            });
+            
+            document.querySelectorAll('.option-neon').forEach(option => {
+                option.addEventListener('click', function() {
+                    const radio = this.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event('change'));
+                });
+            });
+        {% elif question.format == 'mcq_complex' %}
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    this.closest('.option-neon').classList.toggle('selected', this.checked);
+                });
+            });
+            
+            document.querySelectorAll('.option-neon').forEach(option => {
+                option.addEventListener('click', function(e) {
+                    if (e.target.tagName !== 'INPUT') {
+                        const checkbox = this.querySelector('input[type="checkbox"]');
+                        checkbox.checked = !checkbox.checked;
+                        checkbox.dispatchEvent(new Event('change'));
+                    }
+                });
+            });
+        {% endif %}
+    });
+    
+    // ========================================
+    // FORM SUBMISSION
+    // ========================================
+    document.getElementById('quizForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+    
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="loading-neon me-2"></span>Checking...';
+    
+        const formData = new FormData(this);
+        formData.set('time_spent', timeSpent);
+        formData.set('wrong_attempts', wrongAttempts);
+    
+        {% if question.format == 'mcq_complex' %}
+            const selectedOptions = [];
+            document.querySelectorAll('input[name="answer"]:checked').forEach(cb => {
+                selectedOptions.push(cb.value);
+            });
+            if (selectedOptions.length > 0) {
+                formData.set('answer', JSON.stringify(selectedOptions));
+            }
+        {% endif %}
+    
+        fetch('{% url "quizzes:submit_answer" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update session stats in localStorage
+                sessionStats = SessionManager.updateStats(data.is_correct, CURRENT_QUESTION_ID);
+                updateSessionStats();
+                
+                if (data.is_correct) {
+                    showXPFeedback(`+${data.xp_change} XP!`, 'Awesome! 🎉', true);
+                    
+                    {% if question.format == 'mcq_simple' %}
+                        const correctOption = document.querySelector(`[data-option="${data.correct_answer}"]`);
+                        if (correctOption) correctOption.classList.add('correct');
+                    {% endif %}
+    
+                    if (window.RobotCompanion) {
+                        RobotCompanion.showAchievement('Correct!', 'Great job! 🎉', 'completion');
+                    }
+    
+                    setTimeout(() => getNextQuestion(), 2000);
+                    
+                } else {
+                    wrongAttempts++;
+                    document.getElementById('wrongAttempts').value = wrongAttempts;
+    
+                    if (data.xp_change < 0) {
+                        showXPFeedback(`${data.xp_change} XP`, 'Try again!', false);
+                    }
+    
+                    {% if question.format == 'mcq_simple' %}
+                        const selectedOption = document.querySelector('input[name="answer"]:checked');
+                        if (selectedOption) {
+                            selectedOption.closest('.option-neon').classList.add('incorrect');
+                        }
+                    {% endif %}
+    
+                    if (data.show_hint) {
+                        showAutoHint(`💡 Attempt ${wrongAttempts}/${MAX_ATTEMPTS}. Think carefully!`);
+                    }
+    
+                    if (wrongAttempts >= MAX_ATTEMPTS) {
+                        setTimeout(() => {
+                            if (confirm('Maximum attempts reached. Move to next question?')) {
+                                getNextQuestion();
+                            }
+                        }, 2000);
+                    } else {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Try Again';
+                        
+                        setTimeout(() => {
+                            document.querySelectorAll('.option-neon.incorrect').forEach(opt => {
+                                opt.classList.remove('incorrect');
+                            });
+                        }, 2000);
+                    }
+                }
+            } else {
+                alert('Error: ' + (data.error || 'Something went wrong'));
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Answer';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Network error. Please try again.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Answer';
+        });
+    });
+    
+    // ========================================
+    // NAVIGATION FUNCTIONS
+    // ========================================
+    function getNextQuestion() {
+        fetch('{% url "quizzes:get_next_question" %}', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.question && data.question.id) {
+                // Navigate to next question (stats will persist via localStorage)
+                window.location.href = `/quizzes/student/take/${data.question.id}/`;
+            } else {
+                alert('No more questions available.');
+                endQuiz();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error loading next question.');
+        });
+    }
+    
+    function skipQuestion() {
+        if (confirm('Skip this question? It will count as wrong.')) {
+            sessionStats = SessionManager.updateStats(false, CURRENT_QUESTION_ID);
+            updateSessionStats();
+            getNextQuestion();
+        }
+    }
+    
+    function endQuiz() {
+        const stats = SessionManager.getStats();
+        const duration = SessionManager.getSessionDuration();
+        const minutes = Math.floor(duration / 60);
+        
+        const message = `Session Summary:\n\n` +
+                       `✅ Correct: ${stats.correct}\n` +
+                       `❌ Wrong: ${stats.wrong}\n` +
+                       `📊 Total: ${stats.total}\n` +
+                       `⏱️ Duration: ${minutes} minutes\n\n` +
+                       `End this session?`;
+        
+        if (confirm(message)) {
+            SessionManager.clearSession();
+            window.location.href = '{% url "quizzes:student_quiz_list" %}';
+        }
+    }
+    
+    // ========================================
+    // UTILITY FUNCTIONS
+    // ========================================
+    function showXPFeedback(message, subtext, isPositive = true) {
+        const feedback = document.getElementById('xpFeedback');
+        const xpMessage = document.getElementById('xpMessage');
+        const xpSubtext = document.getElementById('xpSubtext');
+    
+        feedback.className = `xp-feedback-neon ${isPositive ? 'success' : 'warning'}`;
+        xpMessage.textContent = message;
+        xpSubtext.textContent = subtext;
+    
+        setTimeout(() => feedback.classList.add('show'), 100);
+        setTimeout(() => feedback.classList.remove('show'), 3500);
+    }
+    
+    function showAutoHint(hintText) {
+        const hintBox = document.getElementById('hintBox');
+        const hintContent = document.getElementById('hintContent');
+        hintContent.innerHTML = `<p class="mb-0">${hintText}</p>`;
+        
+        // Smooth animation instead of sudden display change
+        hintBox.style.display = 'block';
+        setTimeout(() => {
+            hintBox.style.opacity = '1';
+            hintBox.style.transform = 'translateY(0)';
+        }, 10);
+        
+        // Smooth scroll to hint box
+        setTimeout(() => {
+            hintBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+    }
+    
+    function requestHint() {
+        const hintBtn = document.getElementById('hintBtn');
+        hintBtn.disabled = true;
+        hintBtn.innerHTML = '<span class="loading-neon me-2"></span>Getting Hint...';
+
+        fetch(`/quizzes/student/hint/{{ question.id }}/?attempts=${wrongAttempts}`, {
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.hint) {
+                showAutoHint(data.hint);
+            } else {
+                alert('No hint available');
+            }
+            hintBtn.disabled = false;
+            hintBtn.innerHTML = '<i class="fas fa-lightbulb me-2"></i>Get Hint';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            hintBtn.disabled = false;
+            hintBtn.innerHTML = '<i class="fas fa-lightbulb me-2"></i>Get Hint';
+        });
+    }
+    
+    // ========================================
+    // PREVENT ACCIDENTAL LEAVE (Only legitimate cases)
+    // ========================================
+    window.addEventListener('beforeunload', (e) => {
+        // Only prevent if user is in middle of answering (has selected but not submitted)
+        const hasSelection = document.querySelector('input[name="answer"]:checked') || 
+                            document.getElementById('shortAnswer')?.value;
+        const submitBtn = document.getElementById('submitBtn');
+        const isSubmitting = submitBtn.disabled && submitBtn.innerHTML.includes('Checking');
+        
+        // Don't prevent if:
+        // 1. Going to next question (isSubmitting)
+        // 2. No answer selected yet
+        if (!isSubmitting && hasSelection && sessionStats.total > 0) {
+            e.preventDefault();
+            e.returnValue = 'You have an answer selected. Sure you want to leave?';
+        }
+    });
+    </script>
+{% endblock %}

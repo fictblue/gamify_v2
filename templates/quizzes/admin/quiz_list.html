@@ -1,0 +1,764 @@
+{% extends 'base.html' %}
+
+{% block title %}Quiz Management - Admin{% endblock %}
+
+{% block content %}
+<div class="container quiz-admin-container">
+    <!-- Header -->
+    <div class="gamify-card mb-4 fade-in">
+        <div class="card-header text-center">
+            <h2 class="mb-2">
+                <i class="fas fa-list text-white me-2"></i>
+                Question Management
+            </h2>
+            <p class="mb-0 text-white-50">Manage questions for the gamification system</p>
+        </div>
+        <div class="card-body text-center">
+            <a href="{% url 'quizzes:admin_quiz_create' %}" class="btn btn-gamify btn-lg">
+                <i class="fas fa-plus me-2"></i>Create Question
+            </a>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="gamify-card mb-4 fade-in" style="animation-delay: 0.1s;">
+        <div class="card-header text-center">
+            <h4 class="mb-0">
+                <i class="fas fa-search text-white me-2"></i>
+                Search & Filter
+            </h4>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="search" name="search"
+                               value="{{ search_query }}" placeholder="Search questions...">
+                        <label for="search">
+                            <i class="fas fa-search me-1"></i>Search Questions
+                        </label>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-floating">
+                        <select class="form-select" id="difficulty" name="difficulty">
+                            <option value="">All Difficulties</option>
+                            {% for value, label in difficulty_choices %}
+                                <option value="{{ value }}" {% if difficulty_filter == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <label for="difficulty">
+                            <i class="fas fa-chart-line me-1"></i>Difficulty
+                        </label>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-floating">
+                        <select class="form-select" id="format" name="format">
+                            <option value="">All Formats</option>
+                            {% for value, label in format_choices %}
+                                <option value="{{ value }}" {% if format_filter == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <label for="format">
+                            <i class="fas fa-file-alt me-1"></i>Format
+                        </label>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <button type="submit" class="btn btn-gamify w-100" style="height: 58px;">
+                        <i class="fas fa-search me-2"></i>Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Questions List -->
+    <div class="row">
+        {% for question in questions %}
+            <div class="col-lg-6 col-md-6 mb-3">
+                <div class="gamify-card h-100 fade-in question-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h6 class="card-title">
+                                <i class="fas fa-question-circle text-primary me-2"></i>
+                                {{ question.text|truncatechars:60 }}
+                            </h6>
+                            <div>
+                                <span class="badge bg-{% if question.difficulty == 'easy' %}success{% elif question.difficulty == 'medium' %}warning{% else %}danger{% endif %} difficulty-badge">
+                                    {{ question.get_difficulty_display }}
+                                </span>
+                                <span class="badge bg-info format-badge ms-1">
+                                    {{ question.get_format_display }}
+                                </span>
+                            </div>
+                        </div>
+
+                        {% if question.curriculum_tag %}
+                            <p class="curriculum-tag mb-3">
+                                <i class="fas fa-tag me-1"></i>{{ question.curriculum_tag }}
+                            </p>
+                        {% endif %}
+
+                        {% if question.options %}
+                            <div class="mb-3">
+                                <small class="text-muted d-block mb-1">Options:</small>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for key, value in question.options.items %}
+                                        <span class="option-badge">{{ key }}: {{ value }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>Created: {{ question.created_at|date:"M d, Y" }}
+                            </small>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'quizzes:admin_quiz_edit' question.id %}"
+                                   class="btn btn-outline-primary">
+                                    <i class="fas fa-edit me-1"></i>Edit
+                                </a>
+                                <form method="post" action="{% url 'quizzes:admin_quiz_delete' question.id %}"
+                                      class="d-inline"
+                                      onsubmit="return confirm('Are you sure you want to delete this question?')">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger">
+                                        <i class="fas fa-trash me-1"></i>Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="gamify-card text-center fade-in empty-state">
+                    <div class="card-body">
+                        <i class="fas fa-info-circle fa-3x text-info mb-3"></i>
+                        <h5>No Questions Found</h5>
+                        <p class="text-muted mb-4">No questions match your current filters. Try adjusting your search criteria or create a new question.</p>
+                        <a href="{% url 'quizzes:admin_quiz_create' %}" class="btn btn-gamify btn-lg">
+                            <i class="fas fa-plus me-2"></i>Create First Question
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Results Summary -->
+    {% if questions %}
+        <div class="text-center mt-4 fade-in" style="animation-delay: 0.3s;">
+            <div class="gamify-card d-inline-block results-summary">
+                <div class="card-body text-center">
+                    <i class="fas fa-info-circle text-info me-2"></i>
+                    <span class="text-muted">
+                        Showing {{ questions|length }} question{{ questions|length|pluralize }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Quiz Admin List Styles - Neon Matte Theme */
+    .quiz-admin-container {
+        background: linear-gradient(135deg,
+            rgba(5, 15, 25, 0.95) 0%,
+            rgba(8, 20, 35, 0.9) 100%);
+        min-height: calc(100vh - 72px);
+        padding: 2rem 0;
+        position: relative;
+    }
+
+    .quiz-admin-container::before {
+        content: '';
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background:
+            radial-gradient(circle at 20% 80%, rgba(0, 255, 255, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(255, 0, 255, 0.05) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    /* Enhanced Gamify Cards - Neon Matte */
+    .gamify-card {
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.95) 0%,
+            rgba(0, 20, 40, 0.9) 100%);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(0, 255, 255, 0.3);
+        border-radius: 20px;
+        box-shadow:
+            0 8px 25px rgba(0, 0, 0, 0.4),
+            0 0 0 1px rgba(0, 255, 255, 0.2),
+            0 0 60px rgba(0, 255, 255, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .gamify-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg,
+            transparent,
+            rgba(0, 255, 255, 0.05),
+            transparent);
+        animation: cardShimmer 4s infinite;
+        z-index: 1;
+    }
+
+    @keyframes cardShimmer {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+
+    .gamify-card:hover {
+        transform: translateY(-8px);
+        box-shadow:
+            0 20px 50px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(0, 255, 255, 0.4),
+            0 0 80px rgba(0, 255, 255, 0.2);
+        border-color: rgba(0, 255, 255, 0.5);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg,
+            rgba(0, 25, 50, 0.9) 0%,
+            rgba(0, 35, 70, 0.8) 100%);
+        color: #ffffff;
+        border: none;
+        padding: 1.5rem 2rem;
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+        border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+    }
+
+    .card-header::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle at top right,
+            rgba(0, 255, 255, 0.05) 0%,
+            transparent 70%);
+        pointer-events: none;
+    }
+
+    @keyframes cardHeaderFloat {
+        0%, 100% {
+            transform: translateY(0) scale(1);
+            opacity: 0.8;
+        }
+        50% {
+            transform: translateY(-2px) scale(1.01);
+            opacity: 1;
+        }
+    }
+
+    .card-header h2, .card-header h4 {
+        position: relative;
+        z-index: 2;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    }
+
+    .card-body {
+        padding: 2rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Enhanced Question Cards - Neon Matte */
+    .question-card {
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.8) 0%,
+            rgba(0, 20, 40, 0.7) 100%);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 16px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .question-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(135deg,
+            rgba(0, 255, 255, 0.02) 0%,
+            rgba(255, 0, 255, 0.02) 100%);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        pointer-events: none;
+    }
+
+    .question-card:hover::before {
+        opacity: 1;
+    }
+
+    .question-card:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow:
+            0 12px 30px rgba(0, 255, 255, 0.15),
+            0 0 0 1px rgba(0, 255, 255, 0.3);
+        border-color: rgba(0, 255, 255, 0.4);
+    }
+
+    .question-card .card-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 1rem;
+        line-height: 1.4;
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+    }
+
+    .question-card .card-title i {
+        color: var(--neon-cyan);
+        margin-right: 0.5rem;
+        text-shadow: 0 0 10px var(--neon-cyan);
+    }
+
+    /* Enhanced Badges - Neon Matte */
+    .difficulty-badge {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .difficulty-badge::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg,
+            transparent,
+            rgba(255,255,255,0.3),
+            transparent);
+        transition: left 0.5s ease;
+    }
+
+    .difficulty-badge:hover::before {
+        left: 100%;
+    }
+
+    .difficulty-badge.bg-success {
+        background: linear-gradient(135deg,
+            rgba(16, 185, 129, 0.2) 0%,
+            rgba(5, 150, 105, 0.2) 100%);
+        color: #10b981;
+        border-color: rgba(16, 185, 129, 0.4);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        text-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+    }
+
+    .difficulty-badge.bg-warning {
+        background: linear-gradient(135deg,
+            rgba(245, 158, 11, 0.2) 0%,
+            rgba(217, 119, 6, 0.2) 100%);
+        color: #f59e0b;
+        border-color: rgba(245, 158, 11, 0.4);
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        text-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+    }
+
+    .difficulty-badge.bg-danger {
+        background: linear-gradient(135deg,
+            rgba(239, 68, 68, 0.2) 0%,
+            rgba(220, 38, 38, 0.2) 100%);
+        color: #ef4444;
+        border-color: rgba(239, 68, 68, 0.4);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+    }
+
+    .format-badge {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        background: linear-gradient(135deg,
+            rgba(0, 255, 255, 0.15) 0%,
+            rgba(0, 150, 255, 0.15) 100%);
+        color: var(--neon-cyan);
+        box-shadow:
+            0 4px 12px rgba(0, 255, 255, 0.2),
+            0 0 0 1px rgba(0, 255, 255, 0.3);
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+        text-shadow: 0 0 8px var(--neon-cyan);
+    }
+
+    /* Enhanced Form Styling - Neon Matte */
+    .form-floating > .form-control,
+    .form-floating > .form-select {
+        height: calc(3.5rem + 2px);
+        border: 2px solid rgba(0, 255, 255, 0.2);
+        border-radius: 14px;
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.9) 0%,
+            rgba(0, 20, 40, 0.8) 100%);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 1rem 1.25rem;
+        font-size: 1rem;
+        font-weight: 400;
+        color: #ffffff;
+        box-shadow:
+            0 4px 15px rgba(0, 0, 0, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .form-floating > .form-control:focus,
+    .form-floating > .form-select:focus {
+        border-color: var(--neon-cyan);
+        background: linear-gradient(135deg,
+            rgba(0, 20, 40, 0.95) 0%,
+            rgba(0, 25, 50, 0.9) 100%);
+        box-shadow:
+            0 0 0 3px rgba(0, 255, 255, 0.15),
+            0 8px 25px rgba(0, 255, 255, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        outline: none;
+        transform: translateY(-2px) scale(1.02);
+    }
+
+    .form-floating > .form-control:hover:not(:focus),
+    .form-floating > .form-select:hover:not(:focus) {
+        border-color: rgba(0, 255, 255, 0.4);
+        background: linear-gradient(135deg,
+            rgba(0, 18, 35, 0.92) 0%,
+            rgba(0, 22, 45, 0.85) 100%);
+        box-shadow:
+            0 6px 20px rgba(0, 0, 0, 0.25),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        transform: translateY(-1px);
+    }
+
+    .form-floating > label {
+        padding: 1rem 1.25rem;
+        color: rgba(255, 255, 255, 0.6);
+        font-weight: 500;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Enhanced Buttons - Neon Matte */
+    .btn-gamify {
+        background: linear-gradient(135deg,
+            var(--neon-cyan) 0%,
+            var(--neon-blue) 100%);
+        border: none;
+        border-radius: 14px;
+        font-weight: 700;
+        color: #000000;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        padding: 0.75rem 2rem;
+        font-size: 1.125rem;
+        box-shadow:
+            0 8px 25px rgba(0, 255, 255, 0.3),
+            0 0 0 1px rgba(0, 255, 255, 0.4);
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-gamify::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg,
+            transparent,
+            rgba(255,255,255,0.2),
+            transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn-gamify:hover::before {
+        left: 100%;
+    }
+
+    .btn-gamify:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow:
+            0 12px 35px rgba(0, 255, 255, 0.4),
+            0 0 0 1px rgba(0, 255, 255, 0.6),
+            0 0 40px rgba(0, 255, 255, 0.2);
+        filter: brightness(1.1);
+    }
+
+    .btn-gamify:active {
+        transform: translateY(-1px) scale(0.98);
+    }
+
+    .btn-outline-primary {
+        border: 2px solid var(--neon-cyan);
+        color: var(--neon-cyan);
+        background: rgba(0, 255, 255, 0.05);
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(10px);
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+    }
+
+    .btn-outline-primary:hover {
+        background: linear-gradient(135deg,
+            var(--neon-cyan) 0%,
+            var(--neon-blue) 100%);
+        border-color: var(--neon-cyan);
+        color: #000000;
+        transform: translateY(-2px);
+        box-shadow:
+            0 8px 20px rgba(0, 255, 255, 0.3),
+            0 0 0 1px rgba(0, 255, 255, 0.5);
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-outline-danger {
+        border: 2px solid #ef4444;
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.05);
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(10px);
+        text-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-outline-danger:hover {
+        background: linear-gradient(135deg,
+            #ef4444 0%,
+            #dc2626 100%);
+        border-color: #ef4444;
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow:
+            0 8px 20px rgba(239, 68, 68, 0.3),
+            0 0 0 1px rgba(239, 68, 68, 0.5);
+    }
+
+    /* Options Preview - Neon Matte */
+    .option-badge {
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.8) 0%,
+            rgba(0, 20, 40, 0.7) 100%);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.8);
+        padding: 0.375rem 0.75rem;
+        border-radius: 16px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin: 0.25rem;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        text-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
+    }
+
+    .option-badge:hover {
+        background: linear-gradient(135deg,
+            rgba(0, 20, 40, 0.9) 0%,
+            rgba(0, 25, 50, 0.8) 100%);
+        border-color: rgba(0, 255, 255, 0.4);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 255, 255, 0.2);
+        color: var(--neon-cyan);
+    }
+
+    /* Curriculum Tag - Neon Matte */
+    .curriculum-tag {
+        background: linear-gradient(135deg,
+            rgba(0, 255, 255, 0.1) 0%,
+            rgba(0, 150, 255, 0.1) 100%);
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        color: var(--neon-cyan);
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+    }
+
+    /* Action Buttons Group - Neon Matte */
+    .btn-group-sm .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.8) 0%,
+            rgba(0, 20, 40, 0.7) 100%);
+        color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+    }
+
+    .btn-group-sm .btn:hover {
+        transform: translateY(-1px);
+        background: linear-gradient(135deg,
+            rgba(0, 20, 40, 0.9) 0%,
+            rgba(0, 25, 50, 0.8) 100%);
+        border-color: rgba(0, 255, 255, 0.4);
+        color: var(--neon-cyan);
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+    }
+
+    /* Results Summary - Neon Matte */
+    .results-summary {
+        background: linear-gradient(135deg,
+            rgba(0, 15, 30, 0.8) 0%,
+            rgba(0, 20, 40, 0.7) 100%);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 16px;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+        text-align: center;
+    }
+
+    .results-summary .text-muted {
+        color: rgba(255, 255, 255, 0.6) !important;
+    }
+
+    /* Empty State - Neon Matte */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: var(--neon-cyan);
+        margin-bottom: 1.5rem;
+        opacity: 0.8;
+        text-shadow: 0 0 20px var(--neon-cyan);
+    }
+
+    .empty-state h5 {
+        color: #ffffff;
+        margin-bottom: 1rem;
+        font-weight: 600;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+    }
+
+    .empty-state p {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 1.125rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Animations - Neon Matte */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes cardFloat {
+        0%, 100% {
+            transform: translateY(0) scale(1);
+        }
+        50% {
+            transform: translateY(-4px) scale(1.01);
+        }
+    }
+
+    .fade-in {
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    .slide-in-left {
+        animation: slideInLeft 0.8s ease-out forwards;
+    }
+
+    /* Responsive Enhancements - Neon Matte */
+    @media (max-width: 768px) {
+        .quiz-admin-container {
+            padding: 1rem 0;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-header {
+            padding: 1.25rem 1.5rem;
+        }
+
+        .btn-gamify {
+            padding: 0.625rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        .question-card .card-title {
+            font-size: 1rem;
+        }
+
+        .btn-group-sm .btn {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .question-card {
+            margin-bottom: 1rem;
+        }
+
+        .form-floating > .form-control,
+        .form-floating > .form-select {
+            height: calc(3rem + 2px);
+        }
+    }
+
+    /* Neon Matte Variables */
+    :root {
+        --neon-cyan: #00ffff;
+        --neon-magenta: #ff00ff;
+        --neon-blue: #0066ff;
+        --neon-purple: #9933ff;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,2411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GamifyLearn - Adaptive Learning Platform{% endblock %}</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{% block meta_description %}Transform your learning experience with our AI-powered adaptive platform. Learn smarter, not harder with personalized quizzes and gamified education.{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}adaptive learning, AI education, gamified learning, personalized quizzes, online learning platform{% endblock %}">
+    <meta name="author" content="GamifyLearn">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{% block og_url %}{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}GamifyLearn - Adaptive Learning Platform{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Transform your learning experience with our AI-powered adaptive platform. Learn smarter, not harder with personalized quizzes and gamified education.{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{% endblock %}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{% block twitter_url %}{% endblock %}">
+    <meta property="twitter:title" content="{% block twitter_title %}GamifyLearn - Adaptive Learning Platform{% endblock %}">
+    <meta property="twitter:description" content="{% block twitter_description %}Transform your learning experience with our AI-powered adaptive platform. Learn smarter, not harder with personalized quizzes and gamified education.{% endblock %}">
+    <meta property="twitter:image" content="{% block twitter_image %}{% endblock %}">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+    /* Simpler Gamification Color Palette */
+    --primary-color: #4f46e5;
+    --primary-dark: #3730a3;
+    --primary-light: #6366f1;
+    --secondary-color: #7c3aed;
+    --success-color: #059669;
+    --success-dark: #047857;
+    --warning-color: #d97706;
+    --danger-color: #dc2626;
+    --info-color: #0284c7;
+    
+    /* Balanced Neutral Colors */
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    
+    /* Subtle Accent Colors */
+    --gold: #f59e0b;
+    --gold-dark: #d97706;
+    --silver: #94a3b8;
+    --bronze: #b45309;
+    
+    /* Clean Gradients */
+    --gradient-primary: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    --gradient-success: linear-gradient(135deg, #059669 0%, #047857 100%);
+    --gradient-warm: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    --gradient-cool: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+    
+    /* Simplified Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    
+    /* Clean Transitions */
+    --transition-fast: 150ms ease;
+    --transition-base: 250ms ease;
+    --transition-smooth: 350ms ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #000000;
+    background-attachment: fixed;
+    color: #ffffff;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Simple background pattern - disabled for better performance */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(circle at 25% 25%, rgba(0, 17, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(0, 255, 0, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Simplified particles effect - disabled for better performance */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(1px 1px at 25% 25%, rgba(0, 255, 255, 0.3) 0%, transparent 50%),
+        radial-gradient(1px 1px at 75% 75%, rgba(255, 0, 255, 0.3) 0%, transparent 50%),
+        radial-gradient(1px 1px at 50% 50%, rgba(0, 255, 0, 0.2) 0%, transparent 50%);
+    background-size: 200px 200px;
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    body::before, body::after {
+        animation: none !important;
+    }
+}
+
+/* Enhanced Navbar - Clean and simple */
+.navbar {
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 255, 0.1);
+    padding: 1rem 0;
+    transition: all var(--transition-smooth);
+    position: relative;
+    z-index: 100;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+    background-image: linear-gradient(135deg,
+        rgba(0, 255, 255, 0.02) 0%,
+        rgba(255, 0, 255, 0.02) 50%,
+        rgba(0, 255, 0, 0.02) 100%);
+}
+
+.navbar-toggler {
+    border: 2px solid rgba(0, 255, 255, 0.6);
+    background: rgba(0, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.5rem;
+    transition: all var(--transition-base);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.navbar-toggler:hover {
+    border-color: rgba(0, 255, 255, 0.9);
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    transform: scale(1.05);
+}
+
+.navbar-toggler:focus {
+    outline: 3px solid rgba(0, 255, 255, 0.8);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 6px rgba(0, 255, 255, 0.3), 0 0 20px rgba(0, 255, 255, 0.4);
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(0, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='3' d='m4 7h22m-22 8h22m-22 8h22'/%3e%3c/svg%3e");
+    filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.6));
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #00ffff;
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    opacity: 1;
+}
+
+.navbar-brand i {
+    color: #00ffff !important;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    transition: all var(--transition-base);
+}
+
+.navbar-brand:hover i {
+    color: #ffffff !important;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+}
+
+.navbar-brand:hover {
+    color: #ffffff;
+    transform: translateY(-1px);
+    text-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    color: #ffffff !important;
+    margin: 0 0.25rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all var(--transition-base);
+    opacity: 1;
+    position: relative;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+.navbar-nav .nav-link i {
+    color: #00ffff !important;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+    transition: all var(--transition-base);
+}
+
+.navbar-nav .nav-link:hover i {
+    color: #ffffff !important;
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+}
+
+.navbar-nav .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    opacity: 0;
+    transition: all var(--transition-base);
+    z-index: -1;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #00ffff;
+    background: rgba(0, 255, 255, 0.15);
+    transform: translateY(-1px);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+    opacity: 1;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+}
+
+.navbar-nav .nav-link:hover::before {
+    opacity: 1;
+}
+
+.navbar-nav .nav-link.active {
+    color: #000000;
+    background: linear-gradient(135deg, #00ffff 0%, #ffffff 100%);
+    font-weight: 600;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    opacity: 1;
+}
+
+/* User Avatar - Simplified */
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000000;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    border: 2px solid rgba(0, 255, 255, 0.5);
+    font-size: 0.875rem;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000000;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 255, 255, 0.2);
+}
+
+.user-avatar:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 255, 255, 0.5), 0 0 25px rgba(255, 0, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.navbar-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    transition: all var(--transition-base);
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+}
+
+.navbar-avatar-img:hover {
+    transform: scale(1.05);
+    filter: brightness(1.1) contrast(1.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+}
+
+/* Fallback untuk avatar yang gagal dimuat */
+.navbar-avatar-img:not([src]),
+.navbar-avatar-img[src=""],
+.navbar-avatar-img:not([complete]) {
+    background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000000;
+    font-size: 1.1rem;
+    font-weight: 600;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+}
+
+.navbar-avatar-img:not([src])::after,
+.navbar-avatar-img[src=""]::after {
+    content: attr(alt);
+    font-size: 0.7rem;
+}
+
+.user-dropdown {
+    position: absolute;
+    top: calc(100% + 16px);
+    right: 16%;
+    left: auto;
+    transform: translateY(-8px);
+    background: rgba(0, 0, 0, 0.95);
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 255, 255, 0.2);
+    padding: 0.75rem;
+    min-width: 220px;
+    max-width: 280px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-smooth);
+    z-index: 1001;
+    backdrop-filter: blur(20px);
+}
+
+.user-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.user-dropdown::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid rgba(0, 255, 255, 0.3);
+    filter: drop-shadow(0 -2px 2px rgba(0, 0, 0, 0.5));
+    z-index: 1002;
+}
+
+.user-dropdown a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.125rem;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all var(--transition-fast);
+    font-weight: 500;
+    position: relative;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+}
+
+.user-dropdown a i {
+    color: #00ffff !important;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+    transition: all var(--transition-fast);
+    width: 16px;
+    text-align: center;
+}
+
+.user-dropdown a:hover i {
+    color: #ffffff !important;
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+}
+
+.user-dropdown a:hover {
+    background: rgba(0, 255, 255, 0.1);
+    color: #00ffff;
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(0, 255, 255, 0.3);
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+/* Navbar Layout Structure */
+.navbar {
+    position: relative;
+}
+
+.navbar > .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    position: relative;
+    min-height: 72px;
+}
+
+.navbar > .container > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Navbar Brand - Always left */
+.navbar-brand {
+    flex-shrink: 0;
+    margin-right: auto;
+    order: 1;
+}
+
+/* Navbar Toggler - Always rightmost */
+.navbar-toggler {
+    margin-left: auto;
+    order: 3;
+    flex-shrink: 0;
+}
+
+/* User Menu - Between brand and toggler */
+.user-menu-mobile {
+    margin-right: 1rem;
+    order: 2;
+    flex-shrink: 0;
+}
+
+/* Collapse - Takes remaining space in center */
+.navbar-collapse {
+    flex: 1;
+    order: 1;
+    margin: 0 1rem;
+    align-self: stretch;
+}
+
+/* Desktop Layout */
+@media (min-width: 769px) {
+    .navbar > .container {
+        justify-content: flex-start;
+    }
+
+    .navbar-brand {
+        order: 1;
+        margin-right: 2rem;
+    }
+
+    .navbar-collapse {
+        order: 2;
+        flex: 1;
+        margin: 0;
+    }
+
+    .user-menu-mobile {
+        order: 3;
+        margin-right: 0;
+        margin-left: auto;
+    }
+}
+
+/* Main Content */
+.main-content {
+    min-height: calc(100vh - 72px);
+    padding: 2.5rem 0;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+/* Clean Cards */
+.gamify-card {
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid rgba(0, 255, 255, 0.4);
+    border-radius: 16px;
+    box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.8),
+        0 0 25px rgba(0, 255, 255, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all var(--transition-base);
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+    position: relative;
+}
+
+.gamify-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg,
+        rgba(0, 255, 255, 0.05) 0%,
+        rgba(255, 0, 255, 0.05) 50%,
+        rgba(0, 255, 0, 0.05) 100%);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.gamify-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.9),
+        0 0 40px rgba(0, 255, 255, 0.3),
+        0 0 60px rgba(255, 0, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border-color: rgba(0, 255, 255, 0.8);
+    background: rgba(0, 0, 0, 0.95);
+}
+
+.gamify-card:hover::before {
+    opacity: 1;
+}
+
+.card-header {
+    background: rgba(0, 255, 255, 0.15);
+    border: none;
+    padding: 1.25rem;
+    font-weight: 600;
+    font-size: 1.125rem;
+    color: #00ffff;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+.card-body {
+    padding: 1.5rem;
+    color: #ffffff;
+    position: relative;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Clean Buttons */
+.btn-gamify {
+    background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
+    border: 2px solid rgba(0, 255, 255, 0.5);
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    color: #000000;
+    transition: all var(--transition-base);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 255, 255, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.875rem;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.btn-gamify:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 255, 255, 0.5), 0 0 25px rgba(255, 0, 255, 0.3);
+    background: linear-gradient(135deg, #ffffff 0%, #00ffff 100%);
+    border-color: rgba(255, 255, 255, 0.8);
+    color: #000000;
+}
+
+.btn-success-gamify {
+    background: linear-gradient(135deg, #00ff00 0%, #ffff00 100%);
+    border: 2px solid rgba(0, 255, 0, 0.5);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 255, 0, 0.3);
+    color: #000000;
+}
+
+.btn-success-gamify:hover {
+    background: linear-gradient(135deg, #ffff00 0%, #00ff00 100%);
+    box-shadow: 0 4px 16px rgba(0, 255, 0, 0.5), 0 0 25px rgba(255, 255, 0, 0.3);
+    border-color: rgba(255, 255, 0, 0.8);
+    color: #000000;
+}
+
+/* Clean Progress Bars */
+.progress-gamify {
+    height: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 255, 255, 0.2);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.progress-gamify .progress-bar {
+    background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
+    transition: width var(--transition-base);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    border-right: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Simplified Robot Companion */
+.robot-companion {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 80px;
+    height: 80px;
+    z-index: 999;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
+    box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.3),
+        0 0 25px rgba(0, 255, 255, 0.4),
+        0 0 45px rgba(255, 0, 255, 0.3);
+    animation: robotIdle 8s ease-in-out infinite;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Idle animation untuk robot yang hidup tapi ga ganggu */
+@keyframes robotIdle {
+    0%, 90% {
+        transform: translateY(0) scale(1);
+    }
+    92% {
+        transform: translateY(-2px) scale(1.02);
+    }
+    94% {
+        transform: translateY(0) scale(1);
+    }
+    96% {
+        transform: translateY(-1px) scale(1.01);
+    }
+    98% {
+        transform: translateY(0) scale(1);
+    }
+}
+
+.robot-companion:hover {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.4),
+        0 0 35px rgba(0, 255, 255, 0.6),
+        0 0 65px rgba(255, 0, 255, 0.4),
+        0 0 85px rgba(0, 255, 0, 0.2);
+    animation: none; /* Stop idle animation when hovered */
+    border-color: rgba(255, 255, 255, 0.6);
+    background: linear-gradient(135deg, #ffffff 0%, #00ffff 50%, #ff00ff 100%);
+}
+
+/* Simplified Robot Badge */
+.robot-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: linear-gradient(135deg, #ff0000 0%, #ffff00 100%);
+    color: #000000;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    box-shadow:
+        0 2px 8px rgba(255, 0, 0, 0.4),
+        0 0 15px rgba(255, 255, 0, 0.3);
+    opacity: 0;
+    transform: scale(0);
+    transition: all var(--transition-base);
+}
+
+.robot-badge.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Simplified Companion Tooltip */
+.companion-tooltip {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    right: 0;
+    background: rgba(0, 0, 0, 0.95);
+    border: 2px solid rgba(0, 255, 255, 0.4);
+    border-radius: 12px;
+    padding: 1rem;
+    min-width: 280px;
+    max-width: 320px;
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.8),
+        0 0 30px rgba(0, 255, 255, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: all var(--transition-base);
+    z-index: 1000;
+    backdrop-filter: blur(15px);
+}
+
+.companion-tooltip.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.tooltip-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.tooltip-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+.tooltip-action-btn {
+    flex: 1;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+}
+
+.tooltip-action-btn:hover {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: rgba(0, 255, 255, 0.6);
+    color: #00ffff;
+    transform: translateY(-1px);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.tooltip-action-btn.primary {
+    background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
+    color: #000000;
+    border: 2px solid rgba(0, 255, 255, 0.8);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 255, 255, 0.4);
+    text-shadow: none;
+}
+
+.tooltip-action-btn.primary:hover {
+    background: linear-gradient(135deg, #ffffff 0%, #00ffff 100%);
+    box-shadow: 0 4px 12px rgba(0, 255, 255, 0.5), 0 0 25px rgba(255, 0, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.9);
+    color: #000000;
+}
+
+.tooltip-close {
+    border: none;
+    background: none;
+    
+}
+
+/* Robot Settings Panel */
+.robot-settings-panel {
+    position: absolute;
+    bottom: calc(100% + 16px);
+    right: 0;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(0, 255, 255, 0.4);
+    border-radius: 16px;
+    padding: 1.25rem;
+    width: 300px;
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.8),
+        0 0 40px rgba(0, 255, 255, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px) scale(0.9);
+    transition: all var(--transition-bounce);
+    z-index: 1001;
+}
+
+.robot-settings-panel.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 0.625rem;
+    transition: all var(--transition-base);
+    background: rgba(0, 255, 255, 0.05);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.settings-item:hover {
+    background: rgba(0, 255, 255, 0.1);
+    transform: translateX(5px);
+    border-color: rgba(0, 255, 255, 0.4);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+}
+
+.settings-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #ffffff;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+}
+
+.settings-toggle {
+    width: 52px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    position: relative;
+    cursor: pointer;
+    transition: all var(--transition-bounce);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+.settings-toggle.active {
+    background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
+    box-shadow:
+        0 0 15px rgba(0, 255, 255, 0.5),
+        inset 0 2px 4px rgba(255, 255, 255, 0.2);
+    border-color: rgba(0, 255, 255, 0.8);
+}
+
+.settings-toggle::after {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    background: linear-gradient(135deg, #ffffff 0%, #00ffff 100%);
+    border-radius: 50%;
+    top: 3px;
+    left: 3px;
+    transition: all var(--transition-bounce);
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.4),
+        0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.settings-toggle.active::after {
+    left: 27px;
+    box-shadow:
+        0 2px 10px rgba(0, 255, 255, 0.4),
+        0 0 15px rgba(255, 255, 255, 0.5);
+    background: linear-gradient(135deg, #000000 0%, #ffffff 100%);
+}
+
+/* Simplified XP Toast */
+.xp-toast {
+    position: fixed;
+    top: 90px;
+    right: 30px;
+    background: rgba(0, 0, 0, 0.95);
+    border: 2px solid rgba(0, 255, 0, 0.4);
+    border-left: 4px solid #00ff00;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.8),
+        0 0 30px rgba(0, 255, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transform: translateX(400px);
+    transition: all var(--transition-base);
+    z-index: 9999;
+    min-width: 280px;
+    backdrop-filter: blur(15px);
+}
+
+.xp-toast.show {
+    transform: translateX(0);
+}
+
+.xp-toast-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00ff00 0%, #ffff00 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000000;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    box-shadow:
+        0 2px 8px rgba(0, 255, 0, 0.4),
+        0 0 15px rgba(0, 255, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.xp-toast-content {
+    flex: 1;
+}
+
+.xp-toast-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #00ff00;
+    margin-bottom: 0.25rem;
+    text-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
+}
+
+.xp-toast-message {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+}
+
+/* Simplified Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.slide-in-right {
+    animation: slideInRight 0.4s ease;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Custom Scrollbar - Gamified */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #ff00ff 0%, #00ffff 100%);
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.6);
+}
+
+/* Utility Classes */
+.text-primary { color: #00ffff; text-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
+.text-success { color: #00ff00; text-shadow: 0 0 10px rgba(0, 255, 0, 0.5); }
+.text-warning { color: #ffff00; text-shadow: 0 0 10px rgba(255, 255, 0, 0.5); }
+.text-muted { color: rgba(255, 255, 255, 0.6); }
+.bg-primary { background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%); }
+.bg-success { background: linear-gradient(135deg, #00ff00 0%, #ffff00 100%); }
+
+/* Enhanced Focus States for Accessibility */
+.btn:focus,
+.form-control:focus,
+.form-select:focus,
+.navbar-nav .nav-link:focus {
+    outline: 3px solid #00ffff;
+    outline-offset: 3px;
+    box-shadow: 0 0 0 6px rgba(0, 255, 255, 0.3), 0 0 20px rgba(0, 255, 255, 0.2);
+}
+
+/* Enhanced Hover States */
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Loading States */
+.btn.loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn.loading::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    top: 50%;
+    left: 50%;
+    margin-left: -9px;
+    margin-top: -9px;
+    border: 3px solid rgba(0,0,0,.3);
+    border-radius: 50%;
+    border-top-color: #00ffff;
+    animation: spin 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+/* Error States */
+.form-control.is-invalid {
+    border-color: #ff0000;
+    box-shadow: 0 0 0 0.3rem rgba(255, 0, 0, 0.3), 0 0 15px rgba(255, 0, 0, 0.2);
+    background: rgba(255, 0, 0, 0.05);
+}
+
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.375rem;
+    font-size: 0.875rem;
+    color: #ff0000;
+    font-weight: 600;
+    text-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
+}
+
+/* Success States */
+.form-control.is-valid {
+    border-color: #00ff00;
+    box-shadow: 0 0 0 0.3rem rgba(0, 255, 0, 0.3), 0 0 15px rgba(0, 255, 0, 0.2);
+    background: rgba(0, 255, 0, 0.05);
+}
+
+.valid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.375rem;
+    font-size: 0.875rem;
+    color: #00ff00;
+    font-weight: 600;
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+}
+
+/* Enhanced Animations */
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3) translateY(30px);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.1) translateY(-10px);
+    }
+    70% {
+        transform: scale(0.95) translateY(5px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Enhanced Alert Messages */
+.alert-enhanced {
+    border: 2px solid;
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    animation: slideInUp 0.5s ease;
+    backdrop-filter: blur(10px);
+}
+
+.alert-enhanced.success {
+    background: rgba(0, 255, 0, 0.1);
+    border-color: #00ff00;
+    color: #00ff00;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 0, 0.3);
+}
+
+.alert-enhanced.error {
+    background: rgba(255, 0, 0, 0.1);
+    border-color: #ff0000;
+    color: #ff0000;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 0, 0, 0.3);
+}
+
+.alert-enhanced.warning {
+    background: rgba(255, 255, 0, 0.1);
+    border-color: #ffff00;
+    color: #ffff00;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 255, 0, 0.3);
+}
+
+.alert-enhanced.info {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: #00ffff;
+    color: #00ffff;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.alert-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    animation: bounceIn 0.6s ease;
+}
+
+.alert-content {
+    flex: 1;
+}
+
+.alert-title {
+    font-weight: 700;
+    margin-bottom: 0.375rem;
+    font-size: 1rem;
+}
+
+.alert-message {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    line-height: 1.5;
+}
+
+/* Enhanced Tooltips */
+.tooltip-gamify {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip-gamify .tooltip-text {
+    visibility: hidden;
+    width: 220px;
+    background: rgba(0, 0, 0, 0.95);
+    color: #ffffff;
+    text-align: center;
+    border-radius: 10px;
+    padding: 0.625rem 1rem;
+    position: absolute;
+    z-index: 1001;
+    bottom: 135%;
+    left: 50%;
+    margin-left: -110px;
+    opacity: 0;
+    transition: all var(--transition-smooth);
+    font-size: 0.875rem;
+    font-weight: 500;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 255, 255, 0.2);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.tooltip-gamify .tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -6px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: rgba(0, 255, 255, 0.3) transparent transparent transparent;
+}
+
+.tooltip-gamify:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(-5px);
+}
+
+/* Skip Link for Accessibility */
+.skip-link {
+    position: absolute;
+    top: -50px;
+    left: 10px;
+    background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
+    color: #000000;
+    padding: 10px 16px;
+    text-decoration: none;
+    border-radius: 8px;
+    z-index: 10000;
+    transition: top var(--transition-smooth);
+    font-weight: 600;
+    box-shadow: 0 5px 15px rgba(0, 255, 255, 0.5), 0 0 20px rgba(255, 0, 255, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.skip-link:focus {
+    top: 10px;
+}
+
+@media (max-width: 768px) {
+    .navbar-nav .nav-link {
+        margin: 0.375rem 0;
+        padding: 0.625rem 1.125rem !important;
+    }
+
+    .robot-settings-panel {
+        right: 0;
+        left: 0;
+        margin: 0 20px;
+        min-width: auto;
+        max-width: calc(100vw - 40px);
+    }
+
+    .xp-toast {
+        right: 20px;
+        left: 20px;
+        min-width: auto;
+    }
+
+    /* User avatar mobile responsive */
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+
+    .user-menu-mobile {
+        margin-right: 0.75rem;
+    }
+
+    /* User dropdown mobile positioning */
+    .user-dropdown {
+        right: -0.5rem;
+        left: auto;
+        top: calc(100% + 8px);
+        transform: translateY(-8px);
+        min-width: 180px;
+        max-width: calc(100vw - 2rem);
+        border-radius: 8px; /* Smaller radius for mobile */
+    }
+
+    .user-dropdown.show {
+        transform: translateY(0);
+    }
+
+    /* Navbar mobile layout */
+    .navbar > .container {
+        justify-content: flex-start;
+    }
+
+    .navbar-collapse {
+        margin: 0;
+        flex: none;
+        order: 3;
+        width: 100%;
+    }
+
+    body::before,
+    body::after {
+        opacity: 0.3;
+    }
+}
+
+/* Special Gamification Effects */
+
+/* Level Up Animation */
+@keyframes levelUp {
+    0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2) rotate(180deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) rotate(360deg);
+        opacity: 1;
+    }
+}
+
+.level-up-animation {
+    animation: levelUp 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Achievement Unlock Effect */
+@keyframes achievementUnlock {
+    0% {
+        transform: translateY(100px) scale(0.5);
+        opacity: 0;
+    }
+    60% {
+        transform: translateY(-20px) scale(1.1);
+        opacity: 1;
+    }
+    80% {
+        transform: translateY(10px) scale(0.95);
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.achievement-unlock {
+    animation: achievementUnlock 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Coin Collect Effect */
+@keyframes coinCollect {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(-30px) scale(1.3) rotate(180deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-60px) scale(0.3) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+.coin-collect {
+    animation: coinCollect 0.6s ease-out;
+}
+
+/* Star Rating Effect */
+@keyframes starPop {
+    0% {
+        transform: scale(0) rotate(-180deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.3) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+.star-pop {
+    animation: starPop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Streak Fire Effect */
+@keyframes streakFire {
+    0%, 100% {
+        filter: hue-rotate(0deg) brightness(1);
+        transform: scale(1);
+    }
+    50% {
+        filter: hue-rotate(45deg) brightness(1.2);
+        transform: scale(1.1);
+    }
+}
+
+.streak-fire {
+    animation: streakFire 1s ease-in-out infinite;
+}
+
+/* Combo Multiplier */
+@keyframes comboMultiplier {
+    0% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    50% {
+        transform: scale(1.2);
+        filter: brightness(1.5);
+    }
+    100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+}
+
+.combo-multiplier {
+    animation: comboMultiplier 0.3s ease;
+}
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Skip Link for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Enhanced Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNavbar">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-graduation-cap"></i>
+                GamifyLearn
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            {% if user.is_authenticated %}
+                <div class="user-menu-mobile">
+                    <div class="user-avatar" onclick="toggleUserMenu()" role="button" aria-label="User menu" tabindex="0">
+                        {% if user.avatar %}
+                            <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="navbar-avatar-img">
+                        {% elif user.student_profile %}
+                            {{ user.student_profile.level|first|upper }}
+                        {% else %}
+                            <i class="fas fa-user"></i>
+                        {% endif %}
+                    </div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-200); margin-bottom: 0.5rem;">
+                            <div style="font-weight: 600; color: var(--gray-900);">{{ user.username }}</div>
+                            <div style="font-size: 0.813rem; color: var(--gray-500); margin-top: 0.125rem;">
+                                {% if user.role == 'student' %}
+                                    Level {{ user.student_profile.level|title }}
+                                {% else %}
+                                    Administrator
+                                {% endif %}
+                            </div>
+                        </div>
+                        <a href="{% url 'accounts:profile' %}">
+                            <i class="fas fa-user"></i>
+                            Profile
+                        </a>
+                        <a href="{% url 'accounts:logout' %}">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Logout
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+
+                    {% if not user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:login' %}">
+                                <i class="fas fa-sign-in-alt me-1"></i>Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:register' %}">
+                                <i class="fas fa-user-plus me-1"></i>Register
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% if user.is_authenticated and user.role == 'student' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:profile' %}">
+                                <i class="fas fa-user me-1"></i>Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'quizzes:student_quiz_list' %}">
+                                <i class="fas fa-play me-1"></i>Start Quiz
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% if user.is_authenticated and user.role == 'admin' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:profile' %}">
+                                <i class="fas fa-user me-1"></i>Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin:index' %}">
+                                <i class="fas fa-cog me-1"></i>Admin Panel
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Enhanced Robot Companion -->
+    <div class="robot-companion" id="robotCompanion" role="button" aria-label="Learning companion - click for tips" tabindex="0">
+        <!-- Robot Badge (shows interaction count) -->
+        <div class="robot-badge" id="robotBadge">0</div>
+        
+        <!-- Settings Button -->
+        <div class="robot-settings" onclick="toggleRobotSettings(event)" role="button" aria-label="Robot settings">
+            <i class="fas fa-cog"></i>
+        </div>
+
+        <!-- Robot SVG -->
+        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="robotGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            
+            <!-- Body -->
+            <rect x="20" y="30" width="40" height="40" rx="8" fill="url(#robotGradient)"/>
+            
+            <!-- Head -->
+            <rect x="25" y="15" width="30" height="20" rx="6" fill="url(#robotGradient)"/>
+            
+            <!-- Antenna -->
+            <line x1="40" y1="15" x2="40" y2="8" stroke="#4f46e5" stroke-width="2"/>
+            <circle cx="40" cy="6" r="3" fill="#f59e0b"/>
+            
+            <!-- Eyes -->
+            <circle cx="33" cy="22" r="3" fill="#ffffff"/>
+            <circle cx="47" cy="22" r="3" fill="#ffffff"/>
+            <circle cx="33" cy="22" r="1.5" fill="#4f46e5"/>
+            <circle cx="47" cy="22" r="1.5" fill="#4f46e5"/>
+            
+            <!-- Smile -->
+            <path d="M 30 26 Q 40 30 50 26" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round"/>
+            
+            <!-- Arms -->
+            <rect x="12" y="35" width="8" height="20" rx="4" fill="url(#robotGradient)"/>
+            <rect x="60" y="35" width="8" height="20" rx="4" fill="url(#robotGradient)"/>
+            
+            <!-- Legs -->
+            <rect x="28" y="70" width="8" height="12" rx="4" fill="url(#robotGradient)"/>
+            <rect x="44" y="70" width="8" height="12" rx="4" fill="url(#robotGradient)"/>
+            
+            <!-- Chest Panel -->
+            <rect x="32" y="42" width="16" height="16" rx="3" fill="rgba(255,255,255,0.2)"/>
+            <circle cx="40" cy="50" r="2" fill="#10b981"/>
+        </svg>
+
+        <!-- Companion Tooltip -->
+        <div class="companion-tooltip" id="companionTooltip">
+            <div class="tooltip-header">
+                <div class="tooltip-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <button class="tooltip-close" onclick="closeTooltip(event)" aria-label="Close">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="tooltip-title" id="tooltipTitle">Tips Belajar</div>
+            <div class="tooltip-text" id="tooltipText">
+                Klik robot ini kapan saja untuk mendapat tips belajar yang bermanfaat!
+            </div>
+            <div class="tooltip-actions">
+                <button class="tooltip-action-btn" onclick="nextTip(event)">
+                    <i class="fas fa-arrow-right me-1"></i>
+                    Tips Lain
+                </button>
+                <button class="tooltip-action-btn primary" onclick="closeTooltip(event)">
+                    Mengerti
+                </button>
+            </div>
+        </div>
+
+        <!-- Robot Settings Panel -->
+        <div class="robot-settings-panel" id="robotSettingsPanel">
+            <div style="font-weight: 700; color: var(--gray-900); margin-bottom: 1rem; font-size: 0.938rem;">
+                <i class="fas fa-cog me-2"></i>Robot Settings
+            </div>
+            
+            <div class="settings-item">
+                <div class="settings-label">Show Badge</div>
+                <div class="settings-toggle active" onclick="toggleSetting('badge')" id="badgeToggle"></div>
+            </div>
+            
+            <div class="settings-item">
+                <div class="settings-label">Daily Greetings</div>
+                <div class="settings-toggle active" onclick="toggleSetting('greetings')" id="greetingsToggle"></div>
+            </div>
+            
+            <div class="settings-item">
+                <div class="settings-label">Sound Effects</div>
+                <div class="settings-toggle" onclick="toggleSetting('sound')" id="soundToggle"></div>
+            </div>
+            
+            <div class="settings-item">
+                <div class="settings-label">Animations</div>
+                <div class="settings-toggle active" onclick="toggleSetting('animations')" id="animationsToggle"></div>
+            </div>
+            
+            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                <button class="tooltip-action-btn" onclick="resetRobotStats()" style="width: 100%;">
+                    <i class="fas fa-redo me-1"></i>
+                    Reset Statistics
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- XP Toast Notification -->
+    <div class="xp-toast" id="xpToast">
+        <div class="xp-toast-icon">
+            <i class="fas fa-star"></i>
+        </div>
+        <div class="xp-toast-content">
+            <div class="xp-toast-title" id="xpToastTitle">Great Job!</div>
+            <div class="xp-toast-message" id="xpToastMessage">+10 XP earned</div>
+        </div>
+    </div>
+
+    <!-- Enhanced Footer -->
+    <footer class=" mt-5 py-4" style="border-top: 2px solid rgba(0, 255, 255, 0.3); background: rgba(0, 0, 0, 0.8);">
+        <div class="container" style="background: transparent;">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center gap-3 mb-3 mb-md-0">
+                        <i class="fas fa-graduation-cap text-primary" style="font-size: 1.5rem; text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);"></i>
+                        <div>
+                            <h6 class="mb-0 fw-bold" style="color: #00ffff; text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);">GamifyLearn</h6>
+                            <small class="text-muted">Adaptive Learning Platform</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center gap-3 justify-content-md-end">
+                        <a href="#" class="text-muted text-decoration-none small" style="color: rgba(255, 255, 255, 0.7); transition: all 0.3s ease;" onmouseover="this.style.color='#00ffff'; this.style.textShadow='0 0 10px rgba(0, 255, 255, 0.5)'" onmouseout="this.style.color='rgba(255, 255, 255, 0.7)'; this.style.textShadow='none'">Privacy Policy</a>
+                        <a href="#" class="text-muted text-decoration-none small" style="color: rgba(255, 255, 255, 0.7); transition: all 0.3s ease;" onmouseover="this.style.color='#00ffff'; this.style.textShadow='0 0 10px rgba(0, 255, 255, 0.5)'" onmouseout="this.style.color='rgba(255, 255, 255, 0.7)'; this.style.textShadow='none'">Terms of Service</a>
+                        <a href="#" class="text-muted text-decoration-none small" style="color: rgba(255, 255, 255, 0.7); transition: all 0.3s ease;" onmouseover="this.style.color='#00ffff'; this.style.textShadow='0 0 10px rgba(0, 255, 255, 0.5)'" onmouseout="this.style.color='rgba(255, 255, 255, 0.7)'; this.style.textShadow='none'">Support</a>
+                        <small class="text-muted" style="color: rgba(255, 255, 255, 0.5);">© 2024 GamifyLearn. All rights reserved.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        // Enhanced Robot Companion with Advanced Behaviors
+        const RobotCompanion = {
+            interactionCount: 0,
+            settings: {
+                badge: true,
+                sound: false,
+                animations: true,
+                greetings: true
+            },
+            tips: [
+                {
+                    title: 'Tips Fokus Belajar',
+                    text: 'Gunakan teknik Pomodoro: belajar 25 menit, istirahat 5 menit. Ini membantu menjaga konsentrasi optimal!',
+                    category: 'focus'
+                },
+                {
+                    title: 'Cara Mengingat Lebih Baik',
+                    text: 'Ulangi materi dalam 24 jam pertama. Otak kita mengingat lebih baik dengan pengulangan bertahap!',
+                    category: 'memory'
+                },
+                {
+                    title: 'Motivasi Belajar',
+                    text: 'Setiap kesalahan adalah kesempatan belajar. Jangan takut salah, karena itulah cara terbaik untuk berkembang!',
+                    category: 'motivation'
+                },
+                {
+                    title: 'Produktivitas Maksimal',
+                    text: 'Buat target kecil dan rayakan setiap pencapaian. Progres kecil konsisten lebih baik dari target besar yang berat!',
+                    category: 'productivity'
+                },
+                {
+                    title: 'Kesehatan Saat Belajar',
+                    text: 'Jangan lupa minum air putih 8 gelas sehari dan jaga postur tubuh. Tubuh sehat = pikiran fokus!',
+                    category: 'health'
+                },
+                {
+                    title: 'Teknik Feynman',
+                    text: 'Coba jelaskan konsep yang kamu pelajari dengan kata-kata sederhana. Kalau bisa menjelaskan, berarti sudah paham!',
+                    category: 'technique'
+                },
+                {
+                    title: 'Waktu Terbaik Belajar',
+                    text: 'Setiap orang punya waktu optimal berbeda. Coba identifikasi kapan konsentrasimu paling tinggi!',
+                    category: 'time'
+                },
+                {
+                    title: 'Lingkungan Belajar',
+                    text: 'Pastikan ruang belajarmu nyaman, pencahayaan cukup, dan minim distraksi. Lingkungan mempengaruhi fokus!',
+                    category: 'environment'
+                }
+            ],
+            greetings: [
+                '👋 Halo! Siap belajar lagi hari ini?',
+                '🌟 Selamat pagi! Mari mulai petualangan belajar!',
+                '📚 Hai! Apa yang ingin kita pelajari hari ini?',
+                '💪 Hello! Semangat belajar hari ini!',
+                '🎯 Hi there! Ready untuk tantangan baru?'
+            ],
+            motivationalMessages: {
+                general: [
+                    'Mantap! Kamu sudah menyelesaikan misi hari ini! 🎉',
+                    'Wow! Sudah 3 hari belajar berturut-turut 🔥',
+                    'Amazing progress! Kamu semakin pintar setiap hari! 🌟',
+                    'Gapapa salah, coba lagi ya! Kamu pasti bisa 💪',
+                    'Setiap langkah kecil membawa kita lebih dekat ke tujuan! 🎯'
+                ],
+                completion: [
+                    '🎉 Selamat! Misi harian sudah selesai!',
+                    '⭐ Kamu berhasil menyelesaikan semua target hari ini!',
+                    '🏆 Excellent work! Misi completed dengan sempurna!'
+                ],
+                streak: [
+                    '🔥 Wow! Streak belajar sudah 5 hari berturut-turut!',
+                    '⚡ Kamu lagi hot streak nih! Jangan berhenti!',
+                    '🚀 Learning streak kamu luar biasa! Keep it up!'
+                ],
+                failure: [
+                    '💪 Gapapa salah, itu bagian dari proses belajar!',
+                    '🔄 Coba lagi dengan lebih fokus ya!',
+                    '🌟 Setiap kesalahan adalah kesempatan untuk belajar lebih baik!'
+                ],
+                encouragement: [
+                    '💪 Kamu bisa kok! Percaya sama diri sendiri!',
+                    '🚀 Jangan menyerah, kamu sudah sejauh ini!',
+                    '⭐ Kamu punya potensi yang luar biasa!'
+                ]
+            },
+            currentTipIndex: 0,
+            lastGreetingDate: null,
+            idleTimer: null,
+            pageContext: 'home',
+
+            init() {
+                this.loadSettings();
+                this.attachEventListeners();
+                this.updateBadge();
+                this.checkDailyGreeting();
+                this.startIdleDetection();
+                this.detectPageContext();
+            },
+
+            detectPageContext() {
+                // Detect current page context for contextual tips
+                const path = window.location.pathname;
+                if (path.includes('quiz')) {
+                    this.pageContext = 'quiz';
+                    this.showContextualTip('quiz');
+                } else if (path.includes('lesson') || path.includes('course')) {
+                    this.pageContext = 'lesson';
+                    this.showContextualTip('lesson');
+                } else if (path.includes('profile')) {
+                    this.pageContext = 'profile';
+                    this.showContextualTip('profile');
+                } else if (path.includes('dashboard') || path.includes('admin')) {
+                    this.pageContext = 'dashboard';
+                    this.showContextualTip('dashboard');
+                } else {
+                    this.pageContext = 'home';
+                    this.showContextualTip('home');
+                }
+            },
+
+            showContextualTip(context) {
+                // Show contextual tips based on current page
+                const contextualTips = {
+                    quiz: {
+                        title: 'Tips Quiz',
+                        text: 'Baca pertanyaan dengan teliti dan jangan terburu-buru. Gunakan teknik eliminasi untuk pilihan ganda!'
+                    },
+                    lesson: {
+                        title: 'Tips Belajar',
+                        text: 'Catat poin-poin penting dan buat rangkuman sendiri. Ini membantu memahami dan mengingat materi lebih baik!'
+                    },
+                    profile: {
+                        title: 'Tips Profile',
+                        text: 'Update profile kamu dengan foto dan informasi yang menarik. Profile yang lengkap terlihat lebih profesional!'
+                    },
+                    dashboard: {
+                        title: 'Tips Dashboard',
+                        text: 'Pantau progress belajarmu secara rutin. Tracking progress membantu kamu tetap termotivasi!'
+                    },
+                    home: {
+                        title: 'Tips Hari Ini',
+                        text: 'Coba eksplorasi fitur-fitur baru di platform ini. Setiap fitur dirancang untuk membantu belajarmu!'
+                    }
+                };
+
+                if (contextualTips[context]) {
+                    setTimeout(() => {
+                        const tip = contextualTips[context];
+                        this.showCustomTip(tip.title, tip.text, 'info');
+                    }, 2000);
+                }
+            },
+
+            checkDailyGreeting() {
+                // Check if we should show daily greeting
+                const today = new Date().toDateString();
+                const lastGreeting = this.getStoredData('lastGreeting');
+
+                if (this.settings.greetings && lastGreeting !== today) {
+                    setTimeout(() => {
+                        this.showGreeting();
+                        this.setStoredData('lastGreeting', today);
+                    }, 1000);
+                }
+            },
+
+            showGreeting() {
+                const greeting = this.greetings[Math.floor(Math.random() * this.greetings.length)];
+                this.showCustomTip('🤖 Robot Companion', greeting, 'greeting');
+            },
+
+            showCustomTip(title, text, type = 'info') {
+                const tooltip = document.getElementById('companionTooltip');
+                const titleEl = document.getElementById('tooltipTitle');
+                const textEl = document.getElementById('tooltipText');
+
+                titleEl.textContent = title;
+                textEl.textContent = text;
+
+                tooltip.classList.add('show');
+
+                // Auto hide berdasarkan jenis tips
+                let hideDelay = 5000; // Default 5 seconds
+
+                if (type === 'greeting') {
+                    hideDelay = 5000; // Greeting hilang setelah 5 detik
+                } else if (type === 'idle') {
+                    hideDelay = 4000; // Idle tips hilang setelah 4 detik
+                } else if (type === 'motivation') {
+                    hideDelay = 6000; // Motivasi hilang setelah 6 detik
+                } else {
+                    hideDelay = 5000; // Info tips hilang setelah 5 detik
+                }
+
+                setTimeout(() => {
+                    tooltip.classList.remove('show');
+                }, hideDelay);
+            },
+
+            startIdleDetection() {
+                // Detect when user is idle and show contextual tips
+                const resetIdleTimer = () => {
+                    if (this.idleTimer) clearTimeout(this.idleTimer);
+                    this.idleTimer = setTimeout(() => {
+                        if (!document.getElementById('companionTooltip').classList.contains('show')) {
+                            // Show contextual tips based on current page context
+                            const contextualIdleTips = {
+                                quiz: 'Coba fokus dulu ke soal ini, kamu bisa kok 🚀',
+                                lesson: 'Ambil waktu sebentar untuk memahami konsep ini dengan baik 💭',
+                                profile: 'Lengkapi profile kamu biar terlihat lebih menarik! ⭐',
+                                dashboard: 'Cek progress belajarmu, kamu sudah bagus sekali! 📊',
+                                home: 'Eksplorasi fitur-fitur menarik di platform ini! 🔍'
+                            };
+
+                            const idleTip = contextualIdleTips[this.pageContext] || 'Istirahat sebentar, lalu lanjut belajar ya! ☕';
+                            this.showCustomTip('💡 Tips', idleTip, 'idle');
+                        }
+                    }, 15000); // 15 seconds of inactivity (reduced from 30s)
+                };
+
+                // Reset timer on user activity
+                ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(event => {
+                    document.addEventListener(event, resetIdleTimer, { passive: true });
+                });
+
+                resetIdleTimer();
+            },
+
+            showMotivationalMessage(type = 'general') {
+                const category = this.motivationalMessages[type] || this.motivationalMessages.general;
+                const message = category[Math.floor(Math.random() * category.length)];
+                this.showCustomTip('💪 Motivasi', message, 'motivation');
+            },
+
+            // Method untuk menampilkan motivasi berdasarkan situasi
+            showCompletionMotivation() {
+                this.showMotivationalMessage('completion');
+                this.showAchievement('🎉 Misi Completed!', 'Misi harian berhasil diselesaikan!', 'completion');
+            },
+
+            showStreakMotivation(streakDays) {
+                const streakMessages = {
+                    3: '🔥 Wow! 3 hari berturut-turut! Kamu lagi hot streak!',
+                    5: '⚡ 5 hari belajar terus! Kamu luar biasa!',
+                    7: '🚀 7 hari streak! Kamu adalah juaranya!',
+                    10: '⭐ 10 hari berturut-turut! Legendary streak!'
+                };
+
+                const message = streakMessages[streakDays] || `🔥 ${streakDays} hari belajar berturut-turut!`;
+                this.showMotivationalMessage('streak');
+                this.showAchievement('🔥 Streak Master!', message, 'streak');
+            },
+
+            showFailureMotivation() {
+                this.showMotivationalMessage('failure');
+            },
+
+            showEncouragement() {
+                this.showMotivationalMessage('encouragement');
+            },
+
+            showAchievement(title, message, type = 'achievement') {
+                // Show achievement with animation
+                const robot = document.getElementById('robotCompanion');
+
+                // Different animations based on achievement type
+                if (type === 'streak') {
+                    robot.classList.add('streak-fire');
+                } else if (type === 'levelup') {
+                    robot.classList.add('level-up-animation');
+                } else if (type === 'completion') {
+                    robot.classList.add('achievement-unlock');
+                } else {
+                    robot.classList.add('achievement-unlock');
+                }
+
+                // Show toast
+                showXPToast(title, message, type);
+
+                // Remove animation class after animation completes
+                setTimeout(() => {
+                    robot.classList.remove('achievement-unlock', 'streak-fire', 'level-up-animation');
+                }, 600);
+            },
+
+            loadSettings() {
+                const stored = this.getStoredSettings();
+                if (stored) {
+                    this.settings = { ...this.settings, ...stored };
+                    this.applySettings();
+                }
+            },
+
+            getStoredSettings() {
+                // In real app, use localStorage or backend
+                return null;
+            },
+
+            getStoredData(key) {
+                // In real app, use localStorage or backend
+                return null;
+            },
+
+            setStoredData(key, value) {
+                // In real app, use localStorage or backend
+                console.log(`Storing ${key}: ${value}`);
+            },
+
+            attachEventListeners() {
+                const robot = document.getElementById('robotCompanion');
+
+                // Enhanced click handling
+                robot.addEventListener('click', (e) => {
+                    if (e.target.closest('.robot-settings') ||
+                        e.target.closest('.companion-tooltip') ||
+                        e.target.closest('.robot-settings-panel')) {
+                        return;
+                    }
+                    this.showTooltip();
+                });
+
+                // Keyboard support
+                robot.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.showTooltip();
+                    }
+                });
+
+                // Close on click outside
+                document.addEventListener('click', (e) => {
+                    const tooltip = document.getElementById('companionTooltip');
+                    const settings = document.getElementById('robotSettingsPanel');
+
+                    if (!robot.contains(e.target) &&
+                        !tooltip.contains(e.target) &&
+                        !settings.contains(e.target)) {
+                        this.closeAll();
+                    }
+                });
+            },
+
+            showTooltip() {
+                const tooltip = document.getElementById('companionTooltip');
+                const settings = document.getElementById('robotSettingsPanel');
+
+                // Close settings if open
+                settings.classList.remove('show');
+
+                // Show helper panel dengan konten yang berguna
+                this.displayHelperPanel();
+                tooltip.classList.add('show');
+
+                // Increment interaction count
+                this.interactionCount++;
+                this.updateBadge();
+
+                // Show achievement for milestones
+                if (this.interactionCount === 5) {
+                    this.showAchievement('Curious Learner!', 'You\'ve checked tips 5 times');
+                } else if (this.interactionCount === 10) {
+                    this.showAchievement('Knowledge Seeker!', 'You\'ve checked tips 10 times');
+                } else if (this.interactionCount === 25) {
+                    this.showAchievement('Learning Champion!', 'You\'ve checked tips 25 times');
+                }
+            },
+
+            displayHelperPanel() {
+                const titleEl = document.getElementById('tooltipTitle');
+                const textEl = document.getElementById('tooltipText');
+
+                // Helper panel content berdasarkan konteks
+                const helperContent = {
+                    home: {
+                        title: '🤖 Helper Panel',
+                        text: 'Tips hari ini: Eksplorasi fitur-fitur baru!\n\nShortcut: Klik menu Quiz untuk mulai belajar.\n\nMotivasi: Setiap langkah kecil membawa kita lebih dekat ke tujuan! 🎯'
+                    },
+                    quiz: {
+                        title: '📝 Quiz Helper',
+                        text: 'Tips: Baca soal dengan teliti dan gunakan eliminasi.\n\nShortcut: Selesaikan 3 quiz hari ini untuk bonus XP!\n\nMotivasi: Kamu pasti bisa! 💪'
+                    },
+                    lesson: {
+                        title: '📚 Lesson Helper',
+                        text: 'Tips: Buat catatan dan rangkuman untuk retention maksimal.\n\nShortcut: Complete lesson untuk unlock quiz berikutnya.\n\nMotivasi: Kamu semakin pintar setiap hari! 🌟'
+                    },
+                    profile: {
+                        title: '👤 Profile Helper',
+                        text: 'Tips: Lengkapi profile dengan foto dan bio yang menarik.\n\nShortcut: Update profile untuk dapat badge "Complete Profile".\n\nMotivasi: Profile bagus bikin kamu terlihat lebih profesional! ⭐'
+                    },
+                    dashboard: {
+                        title: '📊 Dashboard Helper',
+                        text: 'Tips: Track progress kamu secara rutin.\n\nShortcut: Lihat statistik belajar di menu Analytics.\n\nMotivasi: Progress kecil yang konsisten = hasil besar! 🎯'
+                    }
+                };
+
+                const content = helperContent[this.pageContext] || helperContent.home;
+
+                titleEl.textContent = content.title;
+                textEl.textContent = content.text;
+            },
+
+            displayTip(index) {
+                const tip = this.tips[index];
+                document.getElementById('tooltipTitle').textContent = tip.title;
+                document.getElementById('tooltipText').textContent = tip.text;
+            },
+
+            nextTip() {
+                this.currentTipIndex = (this.currentTipIndex + 1) % this.tips.length;
+                this.displayTip(this.currentTipIndex);
+            },
+
+            closeTooltip() {
+                document.getElementById('companionTooltip').classList.remove('show');
+            },
+
+            closeAll() {
+                this.closeTooltip();
+                document.getElementById('robotSettingsPanel').classList.remove('show');
+            },
+
+            updateBadge() {
+                const badge = document.getElementById('robotBadge');
+                if (this.settings.badge && this.interactionCount > 0) {
+                    badge.textContent = this.interactionCount;
+                    badge.classList.add('show');
+                } else {
+                    badge.classList.remove('show');
+                }
+            },
+
+            applySettings() {
+                this.updateBadge();
+
+                // Update toggle states
+                document.getElementById('badgeToggle').classList.toggle('active', this.settings.badge);
+                document.getElementById('soundToggle').classList.toggle('active', this.settings.sound);
+                document.getElementById('animationsToggle').classList.toggle('active', this.settings.animations);
+
+                // Apply animations setting
+                const robot = document.getElementById('robotCompanion');
+                if (!this.settings.animations) {
+                    robot.style.transition = 'none';
+                } else {
+                    robot.style.transition = '';
+                }
+            }
+        };
+
+        // Global Functions
+        function closeTooltip(event) {
+            if (event) event.stopPropagation();
+            RobotCompanion.closeTooltip();
+        }
+
+        function nextTip(event) {
+            if (event) event.stopPropagation();
+            RobotCompanion.nextTip();
+        }
+
+        function toggleRobotSettings(event) {
+            event.stopPropagation();
+            const settings = document.getElementById('robotSettingsPanel');
+            const tooltip = document.getElementById('companionTooltip');
+            
+            // Close tooltip if open
+            tooltip.classList.remove('show');
+            
+            // Toggle settings
+            settings.classList.toggle('show');
+        }
+
+        function toggleSetting(setting) {
+            RobotCompanion.settings[setting] = !RobotCompanion.settings[setting];
+            RobotCompanion.applySettings();
+        }
+
+        function resetRobotStats() {
+            if (confirm('Reset semua statistik robot companion?')) {
+                RobotCompanion.interactionCount = 0;
+                RobotCompanion.currentTipIndex = 0;
+                RobotCompanion.updateBadge();
+                showXPToast('Statistics Reset', 'All robot statistics have been reset', 'info');
+                document.getElementById('robotSettingsPanel').classList.remove('show');
+            }
+        }
+
+        // XP Toast Function
+        function showXPToast(title, message, type = 'success') {
+            const toast = document.getElementById('xpToast');
+            const titleEl = document.getElementById('xpToastTitle');
+            const messageEl = document.getElementById('xpToastMessage');
+            const icon = toast.querySelector('.xp-toast-icon i');
+            
+            // Set content
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            
+            // Set icon based on type
+            const icons = {
+                success: 'fa-star',
+                achievement: 'fa-trophy',
+                info: 'fa-info-circle',
+                warning: 'fa-exclamation-triangle'
+            };
+            
+            icon.className = `fas ${icons[type] || icons.success}`;
+            
+            // Show toast
+            toast.classList.add('show');
+            
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // User Menu Toggle
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Navbar Scroll Effect
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('mainNavbar');
+            const currentScroll = window.scrollY;
+
+            if (currentScroll > 20) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+
+            lastScroll = currentScroll;
+        }, { passive: true });
+
+        // Close dropdowns on outside click
+        document.addEventListener('click', (e) => {
+            const userMenu = document.querySelector('.user-menu-mobile');
+            const dropdown = document.getElementById('userDropdown');
+
+            if (userMenu && !userMenu.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Card fade-in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('fade-in');
+                    }, index * 100);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Robot Companion
+            RobotCompanion.init();
+
+            // Observe cards for animation
+            document.querySelectorAll('.gamify-card').forEach(card => {
+                observer.observe(card);
+            });
+
+            // Auto-hide alerts
+            setTimeout(() => {
+                document.querySelectorAll('.alert').forEach(alert => {
+                    alert.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateY(-10px)';
+
+                    setTimeout(() => {
+                        const bsAlert = bootstrap.Alert.getInstance(alert) || new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    }, 300);
+                });
+            }, 5000);
+
+            // Add ripple effect to buttons
+            document.querySelectorAll('.btn-gamify').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+
+                    ripple.style.cssText = `
+                        width: ${size}px;
+                        height: ${size}px;
+                        left: ${x}px;
+                        top: ${y}px;
+                        position: absolute;
+                        border-radius: 50%;
+                        background: rgba(255, 255, 255, 0.6);
+                        transform: scale(0);
+                        animation: ripple 0.6s ease-out;
+                        pointer-events: none;
+                    `;
+
+                    this.style.position = 'relative';
+                    this.style.overflow = 'hidden';
+                    this.appendChild(ripple);
+
+                    setTimeout(() => ripple.remove(), 600);
+                });
+            });
+
+            // Form loading states
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', function() {
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    if (submitBtn && !submitBtn.disabled) {
+                        const originalHTML = submitBtn.innerHTML;
+                        submitBtn.innerHTML = '<span class="loading-spinner me-2"></span>Loading...';
+                        submitBtn.disabled = true;
+
+                        // Fallback to re-enable after 5 seconds
+                        setTimeout(() => {
+                            submitBtn.innerHTML = originalHTML;
+                            submitBtn.disabled = false;
+                        }, 5000);
+                    }
+                });
+            });
+        });
+
+        // Add ripple animation to document
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Keyboard accessibility
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                RobotCompanion.closeAll();
+                document.getElementById('userDropdown').classList.remove('show');
+            }
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
