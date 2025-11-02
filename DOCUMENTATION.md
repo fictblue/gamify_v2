@@ -246,11 +246,6 @@ def calculate_adaptive_reward(question, is_correct, wrong_attempts, time_spent, 
         reward = base_penalty
 
     return round(reward, 1)
-
-# Example Results:
-# Easy + Very Fast: 10 × 1.0 × 1.3 = 13 XP
-# Medium + Very Fast: 10 × 1.5 × 1.3 = 19.5 XP → 19 XP
-# Hard + Very Fast: 10 × 2.0 × 1.3 = 26 XP
 ```
 
 #### Q-Learning Update Rule
@@ -377,11 +372,30 @@ def get_hint_for_question(question, wrong_count):
 
 ### Level Progression System
 
-#### XP and Level Mechanics (UPDATED)
-- **Beginner**: 0-199 XP (Foundation building with extended practice time)
-- **Intermediate**: 200-499 XP (Concept application with sustained learning)
-- **Advanced**: 500-799 XP (Complex problem solving with deeper understanding)
-- **Expert**: 800-999 XP (Mastery demonstration with final achievement at 1000 XP)
+#### XP Calculation with Repetition Handling (UPDATED)
+```python
+# NEW: Diminishing returns for repeated questions
+🎯 First attempt: 100% XP (10-20 base)
+🟡 Second attempt: 70% XP (7-14 points)
+🟠 Third attempt: 50% XP (5-10 points)
+🔴 Fourth+ attempts: 30% XP (3-6 points)
+
+# Prevents XP farming while encouraging learning
+# Time bonus only applies to first attempts
+# Difficulty multipliers still apply to all attempts
+```
+
+#### Question Selection Intelligence (UPDATED)
+```python
+# ENHANCED: Smart question prioritization
+1️⃣ New questions (highest priority)
+2️⃣ Questions user got wrong recently (medium priority)
+3️⃣ Questions user got right but not recently (lower priority)
+4️⃣ Questions user has mastered (lowest priority)
+
+# Repetition penalty: 5-20 point deduction for over-attempted questions
+# Recency bonus: 2-30 points for questions not seen recently
+```
 
 #### User Registration (UPDATED)
 - **Immediate Activation**: Users are active immediately upon registration - no email verification required
@@ -432,6 +446,69 @@ def create_student_profile(sender, instance, created, **kwargs):
 - XP multipliers for long streaks
 - Special badges for streak milestones
 - Leaderboard integration
+
+---
+
+## 📚 Question Bank (UPDATED - EXPANDED)
+
+### Current Question Database
+```bash
+🎯 TOTAL: 60 questions (20 per difficulty level)
+   ✅ Easy: 20 MCQ Simple questions
+   ✅ Medium: 20 MCQ Complex questions
+   ✅ Hard: 20 Short Answer (fill-in-blank) questions
+
+📚 CURRICULUM COVERAGE:
+   ✅ SMP Class VIII English standards
+   ✅ 54 different curriculum areas
+   ✅ Progressive difficulty scaling
+   ✅ Comprehensive grammar and vocabulary
+```
+
+### Question Types and Distribution
+```bash
+🎯 EASY (MCQ Simple):
+   - Basic grammar (verbs, prepositions, articles)
+   - Simple vocabulary (antonyms, plurals)
+   - Question formation and sentence structure
+   - 20 questions for foundational learning
+
+🔷 MEDIUM (MCQ Complex):
+   - Parts of speech and word classes
+   - Verb tenses and conditional structures
+   - Sentence types and passive voice
+   - 20 questions for concept application
+
+🔴 HARD (Short Answer):
+   - Advanced vocabulary (academic, scientific, professional)
+   - Complex grammar structures
+   - Context-dependent word usage
+   - 20 questions for mastery demonstration
+```
+
+### Expansion Benefits
+```bash
+📊 REPETITION REDUCTION:
+   Before: 57% unique questions (19/33 attempts)
+   After: ~90%+ unique questions (much less repetition needed)
+
+🧠 Q-LEARNING IMPROVEMENT:
+   Before: 10 questions per level (limited learning data)
+   After: 20 questions per level (2x more learning data)
+   Result: Better pattern recognition and adaptation
+
+🎮 STUDENT EXPERIENCE:
+   Before: Questions repeat after 10-15 attempts
+   After: Questions repeat only after 40-60 attempts
+   Result: Much more variety and engagement
+
+💰 REPETITION HANDLING (Still Active):
+   - First attempt: 100% XP (10-20 base)
+   - Second attempt: 70% XP (7-14 points)
+   - Third attempt: 50% XP (5-10 points)
+   - Fourth+ attempts: 30% XP (3-6 points)
+   - Safety net even with expanded question bank
+```
 
 ---
 
@@ -628,8 +705,11 @@ QLEARNING_CONFIG = {
 #### Taking Quizzes
 1. Navigate to "Quiz List" from dashboard
 2. System selects appropriate difficulty based on Q-Learning
-3. Answer questions with real-time feedback
-4. Receive XP and progress updates
+3. **Smart Question Selection**: Prioritizes new questions and those you struggle with
+4. Answer questions with real-time feedback
+5. **Transparent XP System**: See exactly why you earned specific XP amounts
+6. **Diminishing Returns**: Repeated questions give less XP to encourage variety
+7. Receive XP and progress updates
 
 #### Level Progression
 - Accumulate XP through correct answers

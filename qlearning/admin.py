@@ -2,7 +2,8 @@ from django.contrib import admin
 from .models import (
     QTableEntry, QLearningLog,
     UserEngagementLog, SuccessRateLog, ResponseToAdaptationLog,
-    QLearningPerformanceLog, LevelTransitionLog, RewardIncentivesLog, GlobalSystemLog
+    QLearningPerformanceLog, LevelTransitionLog, RewardIncentivesLog, GlobalSystemLog,
+    UserSurveyResponse, LoginActivityLog, AdaptationEffectivenessLog, QLearningDecisionLog
 )
 
 @admin.register(QTableEntry)
@@ -236,3 +237,127 @@ class GlobalSystemLogAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+
+
+@admin.register(UserSurveyResponse)
+class UserSurveyResponseAdmin(admin.ModelAdmin):
+    """Admin interface for user survey responses"""
+
+    list_display = ('user', 'survey_type', 'satisfaction_rating', 'would_continue', 'timestamp')
+    list_filter = ('survey_type', 'satisfaction_rating', 'would_continue', 'timestamp')
+    search_fields = ('user__username', 'feedback_text')
+    ordering = ('-timestamp',)
+    readonly_fields = ('timestamp',)
+
+    fieldsets = (
+        ('Survey Info', {
+            'fields': ('user', 'survey_type', 'timestamp')
+        }),
+        ('Ratings', {
+            'fields': ('satisfaction_rating', 'difficulty_rating', 'engagement_rating', 'adaptation_helpful')
+        }),
+        ('Feedback', {
+            'fields': ('feedback_text', 'would_continue')
+        }),
+        ('Context', {
+            'fields': ('context_data',),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user')
+
+
+@admin.register(LoginActivityLog)
+class LoginActivityLogAdmin(admin.ModelAdmin):
+    """Admin interface for login activity logs"""
+
+    list_display = ('user', 'login_timestamp', 'logout_timestamp', 'session_duration_seconds', 'ip_address')
+    list_filter = ('login_timestamp',)
+    search_fields = ('user__username', 'ip_address')
+    ordering = ('-login_timestamp',)
+    readonly_fields = ('login_timestamp',)
+
+    fieldsets = (
+        ('Session Info', {
+            'fields': ('user', 'login_timestamp', 'logout_timestamp', 'session_duration_seconds')
+        }),
+        ('Connection Details', {
+            'fields': ('ip_address', 'user_agent')
+        }),
+        ('Activities', {
+            'fields': ('activities_performed',),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user')
+
+
+@admin.register(AdaptationEffectivenessLog)
+class AdaptationEffectivenessLogAdmin(admin.ModelAdmin):
+    """Admin interface for adaptation effectiveness logs"""
+
+    list_display = ('user', 'success_rate_change', 'continued_session', 'timestamp')
+    list_filter = ('continued_session', 'timestamp')
+    search_fields = ('user__username',)
+    ordering = ('-timestamp',)
+    readonly_fields = ('timestamp',)
+
+    fieldsets = (
+        ('Adaptation Reference', {
+            'fields': ('user', 'adaptation_event', 'measurement_window_days')
+        }),
+        ('Before Metrics', {
+            'fields': ('success_rate_before', 'avg_time_before', 'attempts_before')
+        }),
+        ('After Metrics', {
+            'fields': ('success_rate_after', 'avg_time_after', 'attempts_after')
+        }),
+        ('Changes', {
+            'fields': ('success_rate_change', 'time_efficiency_change')
+        }),
+        ('User Behavior', {
+            'fields': ('continued_session', 'attempts_until_quit')
+        }),
+        ('Metadata', {
+            'fields': ('timestamp',),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user', 'adaptation_event')
+
+
+@admin.register(QLearningDecisionLog)
+class QLearningDecisionLogAdmin(admin.ModelAdmin):
+    """Admin interface for Q-Learning decision logs"""
+
+    list_display = ('user', 'decision_type', 'action_chosen', 'is_optimal', 'epsilon_value', 'timestamp')
+    list_filter = ('decision_type', 'is_optimal', 'timestamp')
+    search_fields = ('user__username', 'state_hash')
+    ordering = ('-timestamp',)
+    readonly_fields = ('timestamp',)
+
+    fieldsets = (
+        ('Decision Info', {
+            'fields': ('user', 'state_hash', 'decision_type', 'epsilon_value')
+        }),
+        ('Action Details', {
+            'fields': ('action_chosen', 'q_value_chosen', 'best_q_value', 'is_optimal')
+        }),
+        ('Q-Values', {
+            'fields': ('all_q_values',),
+            'classes': ('collapse',)
+        }),
+        ('Metadata', {
+            'fields': ('timestamp',),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user')

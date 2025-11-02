@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from .services import QuizService
 from .models import Question, AttemptLog
 from django.views.generic import View
 import time
@@ -822,56 +823,6 @@ def select_action_epsilon_greedy_adaptive(user, state_hash, available_difficulti
     return selected_action
 
 
-def calculate_adaptive_reward(question, is_correct, wrong_attempts, time_spent, user_level):
-    """Calculate adaptive reward based on context with realistic values"""
-    base_reward = 10  # Base reward for correct answer
-
-    # Difficulty multiplier (more realistic)
-    difficulty_multipliers = {
-        'easy': 1.0,      # 10 XP for easy correct
-        'medium': 1.5,    # 15 XP for medium correct
-        'hard': 2.0       # 20 XP for hard correct
-    }
-
-    multiplier = difficulty_multipliers.get(question.difficulty, 1.0)
-    reward = base_reward * multiplier
-
-    # Penalty for hints used (reduce reward by 20% per hint, max 60% reduction)
-    if wrong_attempts > 0:
-        hint_penalty = min(wrong_attempts * 0.2, 0.6)  # Max 60% penalty
-        reward = max(1, reward * (1 - hint_penalty))
-
-    # Time bonus/penalty (more realistic)
-    if time_spent > 0:
-        if time_spent < 30:  # Very fast (<30s)
-            reward *= 1.3  # 30% bonus for speed
-        elif time_spent < 60:  # Fast (30-60s)
-            reward *= 1.1  # 10% bonus for reasonable speed
-        elif time_spent > 300:  # Too slow (>5min)
-            reward *= 0.8  # 20% penalty for being too slow
-        elif time_spent > 180:  # Slow (3-5min)
-            reward *= 0.9  # 10% penalty for being slow
-
-    # Penalty for wrong answer (adaptive based on user level and difficulty)
-    if not is_correct:
-        # Base penalty is smaller for struggling users to encourage persistence
-        base_penalty = -2
-
-        # Reduce penalty for higher difficulties (encourage attempting hard questions)
-        if question.difficulty == 'hard':
-            base_penalty = -1  # Less penalty for attempting hard questions
-        elif question.difficulty == 'medium':
-            base_penalty = -1.5  # Moderate penalty for medium
-
-        # Further reduce penalty for users who are clearly struggling
-        if user_level in ['advanced', 'expert']:
-            base_penalty *= 0.7  # 30% less penalty for advanced users
-
-        reward = base_penalty
-
-    return round(reward, 1)
-
-
 def update_q_table(user, current_state, action, reward, next_state, learning_rate=LEARNING_RATE, discount_factor=DISCOUNT_FACTOR):
     """Update Q-table using Q-Learning formula with normalization"""
     # Get current Q-value
@@ -950,8 +901,11 @@ class StudentQuizTakeView(View):
         # Validate answer based on question format
         is_correct = self.validate_answer(question, chosen_answer)
 
-        # Calculate reward
-        reward_numeric = 10 if is_correct else -2
+        # Calculate reward using new repetition-aware system
+        xp_calculation = QuizService.calculate_attempt_xp(
+            question, request.user, is_correct, time_spent
+        )
+        reward_numeric = xp_calculation['final_xp']
 
         # Create attempt log
         attempt_log = AttemptLog.objects.create(
@@ -986,6 +940,7 @@ class StudentQuizTakeView(View):
             'is_correct': is_correct,
             'time_spent': round(time_spent, 2),
             'reward_earned': reward_numeric,
+            'xp_calculation': xp_calculation,
         }
 
         return render(request, 'quizzes/student/quiz_result.html', context)
@@ -1044,10 +999,11 @@ def submit_answer(request):
         # Get user profile for Q-Learning
         profile = request.user.student_profile
 
-        # Calculate adaptive reward with proper time tracking
-        adaptive_reward = calculate_adaptive_reward(
-            question, is_correct, wrong_attempts, time_spent, profile.level
+        # Calculate XP using new repetition-aware system
+        xp_calculation = QuizService.calculate_attempt_xp(
+            question, request.user, is_correct, time_spent
         )
+        adaptive_reward = xp_calculation['final_xp']
 
         # Q-Learning: Get current state and next state
         current_state = get_user_state(profile)
@@ -1369,6 +1325,7 @@ def submit_answer(request):
             'success': True,
             'is_correct': is_correct,
             'xp_change': adaptive_reward,
+            'xp_calculation': xp_calculation,
             'new_xp': profile.xp,
             'new_total_xp': profile.total_xp,
             'leveled_up': leveled_up,

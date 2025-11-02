@@ -350,7 +350,29 @@
                     </h2>
                     <div class="score-display {% if is_correct %}text-success{% else %}text-white{% endif %}">
                         {{ reward_earned }} Points
+                        {% if xp_calculation %}
+                            <small class="d-block opacity-75">
+                                {% if xp_calculation.is_first_attempt %}
+                                    <i class="fas fa-star text-warning"></i> First time!
+                                {% else %}
+                                    <i class="fas fa-redo text-info"></i> {{ xp_calculation.xp_category|title|replace:"_"|" " }}
+                                {% endif %}
+                            </small>
+                        {% endif %}
                     </div>
+                    {% if xp_calculation %}
+                        <div class="reward-display {% if is_correct %}text-success{% else %}text-white{% endif %} opacity-75">
+                            <small>
+                                Base: {{ xp_calculation.base_xp }} × {{ xp_calculation.repetition_multiplier }} ({{ xp_calculation.xp_category|title|replace:"_"|" " }})
+                                {% if xp_calculation.difficulty_multiplier != 1 %}
+                                    × {{ xp_calculation.difficulty_multiplier }} ({{ question.get_difficulty_display }})
+                                {% endif %}
+                                {% if xp_calculation.time_bonus > 0 %}
+                                    + {{ xp_calculation.time_bonus }} (Speed bonus)
+                                {% endif %}
+                            </small>
+                        </div>
+                    {% endif %}
                     <p class="{% if is_correct %}text-success{% else %}text-white{% endif %}">
                         {% if is_correct %}
                             Great job! You got it right.
@@ -425,9 +447,76 @@
                     <h6>Progress</h6>
                     <div class="h4">{{ user.student_profile.progress }}%</div>
                 </div>
-            </div>
+            <!-- XP Breakdown (if available) -->
+            {% if xp_calculation %}
+                <div class="card result-card mt-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-calculator"></i> XP Breakdown</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="stat-card">
+                                    <i class="fas fa-plus-circle text-success"></i>
+                                    <h6>Base XP</h6>
+                                    <div class="h5">{{ xp_calculation.base_xp }} XP</div>
+                                    <small class="text-muted">Standard reward</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="stat-card">
+                                    <i class="fas fa-redo text-info"></i>
+                                    <h6>Repetition</h6>
+                                    <div class="h5">{{ xp_calculation.repetition_multiplier }}x</div>
+                                    <small class="text-muted">
+                                        {% if xp_calculation.is_first_attempt %}
+                                            First attempt bonus
+                                        {% else %}
+                                            {{ xp_calculation.xp_category|title|replace:"_"|" " }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
 
-            <!-- Next Actions -->
+                        {% if xp_calculation.difficulty_multiplier != 1 %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="stat-card">
+                                        <i class="fas fa-chart-line text-warning"></i>
+                                        <h6>Difficulty</h6>
+                                        <div class="h5">{{ xp_calculation.difficulty_multiplier }}x</div>
+                                        <small class="text-muted">{{ question.get_difficulty_display }} bonus</small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if xp_calculation.time_bonus > 0 %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="stat-card">
+                                        <i class="fas fa-clock text-primary"></i>
+                                        <h6>Speed Bonus</h6>
+                                        <div class="h5">+{{ xp_calculation.time_bonus }} XP</div>
+                                        <small class="text-muted">Quick completion</small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Learning System:</strong>
+                            {% if xp_calculation.is_first_attempt %}
+                                Full XP for new questions encourages exploration and learning new concepts.
+                            {% else %}
+                                Reduced XP for repeated questions prevents farming while still rewarding learning. Each attempt helps reinforce knowledge!
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
             <div class="next-actions text-center">
                 <div class="btn-group" role="group">
                     <a href="{% url 'quizzes:student_quiz_list' %}" class="btn btn-primary">

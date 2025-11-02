@@ -14,12 +14,25 @@ An intelligent adaptive learning platform that uses **Q-Learning algorithms** to
 - **14-Dimensional State Space**: Sophisticated performance tracking
 - **Individual Performance Learning**: Each user gets personalized adaptation
 - **Dynamic Difficulty Selection**: Real-time adjustment based on capability
+- **Smart Question Selection**: Prioritizes new questions and areas of struggle
+- **Repetition Management**: Diminishing XP rewards prevent farming while encouraging learning
 - **Confidence Building**: Progressive challenge introduction for beginners
 - **Smart Fallback**: Automatic support for struggling users
 
+### 📚 **Comprehensive Question Bank**
+- **60 Questions Total**: 20 per difficulty level (2x expansion)
+- **Easy**: 20 MCQ Simple (basic grammar, vocabulary)
+- **Medium**: 20 MCQ Complex (parts of speech, tenses, structures)
+- **Hard**: 20 Short Answer (advanced vocabulary, context usage)
+- **SMP Class VIII Curriculum**: Aligned with Indonesian junior high standards
+- **54 Curriculum Areas**: Comprehensive English language coverage
+
 ### 🏆 **Complete Gamification**
 - **4-Level Progression**: Beginner (0-199 XP) → Intermediate (200-499 XP) → Advanced (500-799 XP) → Expert (800+ XP)
-- **Adaptive Rewards**: Easy (10 XP) → Medium (15 XP) → Hard (20 XP) with time bonuses
+- **Smart XP System**: 
+  - **First attempts**: Full XP (10-20 base) + time bonuses
+  - **Repeated questions**: Diminishing returns (70% → 50% → 30% XP)
+  - **Prevents farming**: Maintains learning value while discouraging repetition abuse
 - **Contextual Hints**: 3-level progressive hint system
 - **Streak Tracking**: Consecutive correct answer bonuses
 - **Achievement System**: Level-up celebrations and progress indicators

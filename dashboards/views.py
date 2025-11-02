@@ -106,11 +106,11 @@ class AdminDashboardView(View):
         correct_attempts = AttemptLog.objects.filter(is_correct=True).count()
         success_rate = (correct_attempts / total_attempts * 100) if total_attempts > 0 else 0
 
-        # Get recent student registrations (ensure consistency)
-        recent_registrations = CustomUser.objects.filter(
+        # Get recent student registrations with profile data
+        recent_registrations = list(CustomUser.objects.select_related('student_profile').filter(
             role='student',
             is_active=True  # Only count active students
-        ).order_by('-date_joined')[:5]
+        ).order_by('-date_joined')[:5])  # Convert to list to prevent multiple queries
 
         # Debug information to help identify discrepancies
         all_students = CustomUser.objects.filter(role='student')
@@ -138,7 +138,7 @@ class AdminDashboardView(View):
                 'total_students_displayed': total_students,  # This should match the card
                 'active_students_count': active_students.count(),
                 'inactive_students_count': inactive_students.count(),
-                'recent_registrations_count': recent_registrations.count(),
+                'recent_registrations_count': len(recent_registrations),  # Use len() for list
             },
             # Analytics data
             'analytics': analytics_data,

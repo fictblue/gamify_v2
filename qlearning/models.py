@@ -425,3 +425,238 @@ class GlobalSystemLog(models.Model):
         verbose_name = 'Global System Log'
         verbose_name_plural = 'Global System Logs'
         ordering = ['-timestamp']
+
+
+class UserSurveyResponse(models.Model):
+    """Track user satisfaction surveys and feedback (Metrik 2.1.4.3)"""
+    
+    SURVEY_TYPE_CHOICES = [
+        ('post_adaptation', 'Post Adaptation Survey'),
+        ('session_end', 'Session End Survey'),
+        ('weekly_feedback', 'Weekly Feedback'),
+        ('difficulty_feedback', 'Difficulty Feedback'),
+    ]
+    
+    SATISFACTION_CHOICES = [
+        (1, 'Very Dissatisfied'),
+        (2, 'Dissatisfied'),
+        (3, 'Neutral'),
+        (4, 'Satisfied'),
+        (5, 'Very Satisfied'),
+    ]
+    
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='survey_responses'
+    )
+    survey_type = models.CharField(
+        max_length=20,
+        choices=SURVEY_TYPE_CHOICES,
+        help_text='Type of survey'
+    )
+    satisfaction_rating = models.IntegerField(
+        choices=SATISFACTION_CHOICES,
+        help_text='Overall satisfaction rating (1-5)'
+    )
+    difficulty_rating = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text='Difficulty appropriateness rating (1-5)'
+    )
+    engagement_rating = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text='Engagement level rating (1-5)'
+    )
+    feedback_text = models.TextField(
+        blank=True,
+        help_text='Open-ended feedback from user'
+    )
+    would_continue = models.BooleanField(
+        default=True,
+        help_text='Would user continue using the system'
+    )
+    adaptation_helpful = models.BooleanField(
+        null=True,
+        blank=True,
+        help_text='Was the adaptation helpful (for post-adaptation surveys)'
+    )
+    context_data = models.JSONField(
+        default=dict,
+        help_text='Context when survey was taken (level, difficulty, etc.)'
+    )
+    timestamp = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.survey_type} - Rating: {self.satisfaction_rating}/5"
+    
+    class Meta:
+        verbose_name = 'User Survey Response'
+        verbose_name_plural = 'User Survey Responses'
+        ordering = ['-timestamp']
+
+
+class LoginActivityLog(models.Model):
+    """Track login frequency and patterns (Metrik 2.1.4.1)"""
+    
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='login_activities'
+    )
+    login_timestamp = models.DateTimeField(auto_now_add=True)
+    logout_timestamp = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='When user logged out or session ended'
+    )
+    session_duration_seconds = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text='Total session duration in seconds'
+    )
+    ip_address = models.GenericIPAddressField(
+        null=True,
+        blank=True,
+        help_text='IP address of login'
+    )
+    user_agent = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='Browser/device information'
+    )
+    activities_performed = models.JSONField(
+        default=dict,
+        help_text='Activities performed during this session'
+    )
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.login_timestamp.strftime('%Y-%m-%d %H:%M')}"
+    
+    class Meta:
+        verbose_name = 'Login Activity Log'
+        verbose_name_plural = 'Login Activity Logs'
+        ordering = ['-login_timestamp']
+
+
+class AdaptationEffectivenessLog(models.Model):
+    """Track effectiveness of adaptations - Before vs After comparison (Metrik 2.1.4.2)"""
+    
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='adaptation_effectiveness_logs'
+    )
+    adaptation_event = models.ForeignKey(
+        ResponseToAdaptationLog,
+        on_delete=models.CASCADE,
+        related_name='effectiveness_logs',
+        help_text='The adaptation event being tracked'
+    )
+    
+    # Before adaptation metrics
+    success_rate_before = models.FloatField(
+        help_text='Success rate before adaptation (percentage)'
+    )
+    avg_time_before = models.FloatField(
+        help_text='Average time per question before adaptation (seconds)'
+    )
+    attempts_before = models.PositiveIntegerField(
+        help_text='Number of attempts before adaptation'
+    )
+    
+    # After adaptation metrics
+    success_rate_after = models.FloatField(
+        help_text='Success rate after adaptation (percentage)'
+    )
+    avg_time_after = models.FloatField(
+        help_text='Average time per question after adaptation (seconds)'
+    )
+    attempts_after = models.PositiveIntegerField(
+        help_text='Number of attempts after adaptation'
+    )
+    
+    # Calculated improvements
+    success_rate_change = models.FloatField(
+        help_text='Change in success rate (percentage points)'
+    )
+    time_efficiency_change = models.FloatField(
+        help_text='Change in time efficiency (percentage)'
+    )
+    
+    # User behavior after adaptation
+    continued_session = models.BooleanField(
+        help_text='Did user continue session after adaptation'
+    )
+    attempts_until_quit = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text='Number of attempts before quitting (if applicable)'
+    )
+    
+    measurement_window_days = models.PositiveIntegerField(
+        default=7,
+        help_text='Days used for before/after comparison'
+    )
+    timestamp = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.user.username} - Δ Success: {self.success_rate_change:+.1f}%"
+    
+    class Meta:
+        verbose_name = 'Adaptation Effectiveness Log'
+        verbose_name_plural = 'Adaptation Effectiveness Logs'
+        ordering = ['-timestamp']
+
+
+class QLearningDecisionLog(models.Model):
+    """Track Q-Learning decision making process - Exploration vs Exploitation (Metrik 2.1.4.4)"""
+    
+    DECISION_TYPE_CHOICES = [
+        ('exploitation', 'Exploitation (Best Q-value)'),
+        ('exploration', 'Exploration (Random)'),
+    ]
+    
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='qlearning_decisions'
+    )
+    state_hash = models.CharField(
+        max_length=32,
+        help_text='Current state hash'
+    )
+    decision_type = models.CharField(
+        max_length=15,
+        choices=DECISION_TYPE_CHOICES,
+        help_text='Was this exploration or exploitation'
+    )
+    epsilon_value = models.FloatField(
+        help_text='Epsilon value at time of decision'
+    )
+    action_chosen = models.CharField(
+        max_length=20,
+        help_text='Action that was chosen'
+    )
+    q_value_chosen = models.FloatField(
+        help_text='Q-value of chosen action'
+    )
+    best_q_value = models.FloatField(
+        help_text='Best available Q-value'
+    )
+    all_q_values = models.JSONField(
+        help_text='All Q-values for this state'
+    )
+    is_optimal = models.BooleanField(
+        help_text='Was the optimal action chosen'
+    )
+    timestamp = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.decision_type} - {self.action_chosen}"
+    
+    class Meta:
+        verbose_name = 'Q-Learning Decision Log'
+        verbose_name_plural = 'Q-Learning Decision Logs'
+        ordering = ['-timestamp']

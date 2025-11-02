@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
+from dashboards.api_views import top_users_success_rate, qlearning_logs_api, download_qtable
 
 app_name = 'gamify_ai'
 
@@ -29,6 +30,11 @@ urlpatterns = [
     path('dashboard/', include('dashboards.urls')),
     path('quizzes/', include('quizzes.urls')),
     path('qlearning/', include('qlearning.urls')),
+    
+    # API endpoints for admin dashboard
+    path('api/top-users-success-rate/', top_users_success_rate, name='api_top_users'),
+    path('api/qlearning-logs/', qlearning_logs_api, name='api_qlearning_logs'),
+    path('api/download-qtable/', download_qtable, name='api_download_qtable'),
 ]
 
 # Serve media files during development

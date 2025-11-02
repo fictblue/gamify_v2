@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 
     # local apps
     'accounts',
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'qlearning',
     'quizzes',
     'students',
+    'mathfilters',
 ]
 
 MIDDLEWARE = [

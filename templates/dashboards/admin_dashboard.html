@@ -340,6 +340,9 @@
         </div>
     </div>
 
+    <!-- Research Metrics for Bab 2 & 3 -->
+    {% include 'dashboards/partials/research_metrics.html' %}
+
     <!-- Enhanced Recent Activity & Management -->
     <div class="row">
         <div class="col-md-8"  style="margin-top: 2rem;">
@@ -897,17 +900,19 @@
                     </tr>
                 </tbody>
             </table>
-            {% else %}
+        </div>
+    {% else %}
         <div class="empty-state">
             <div class="empty-icon">
                 <i class="fas fa-robot fa-3x text-muted"></i>
             </div>
             <h5 class="empty-title">No Q-Learning Data Yet</h5>
-                        <p class="empty-message">Q-Learning performance metrics will appear here as the AI learns from student interactions.</p>
+            <p class="empty-message">Q-Learning performance metrics will appear here as the AI learns from student interactions.</p>
         </div>
-                {% endif %}
-            </div>
+    {% endif %}
+</div>
         </div>
+        <!-- End col-md-8 -->
 
         <div class="col-md-4" style="margin-top: 2rem;">
             <h4 class="section-title mb-3">
@@ -931,6 +936,23 @@
                 </a>
                 <a href="{% url 'admin:qlearning_globalsystemlog_changelist' %}" class="btn btn-outline-dark">
                     <i class="fas fa-database"></i> Global System Logs
+                </a>
+                
+                <!-- New Research Metrics -->
+                <hr class="my-2" style="border-color: rgba(255,255,255,0.2);">
+                <small class="text-muted ms-2"><i class="fas fa-flask me-1"></i>Research Metrics</small>
+                
+                <a href="{% url 'admin:qlearning_usersurveyresponse_changelist' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-poll"></i> Survey Responses
+                </a>
+                <a href="{% url 'admin:qlearning_loginactivitylog_changelist' %}" class="btn btn-outline-success btn-sm">
+                    <i class="fas fa-sign-in-alt"></i> Login Activity
+                </a>
+                <a href="{% url 'admin:qlearning_adaptationeffectivenesslog_changelist' %}" class="btn btn-outline-warning btn-sm">
+                    <i class="fas fa-sync-alt"></i> Adaptation Effectiveness
+                </a>
+                <a href="{% url 'admin:qlearning_qlearningdecisionlog_changelist' %}" class="btn btn-outline-info btn-sm">
+                    <i class="fas fa-brain"></i> Q-Learning Decisions
                 </a>
             </div>
 
@@ -956,6 +978,29 @@
                 <button type="button" class="btn btn-outline-dark" onclick="exportLogs('global')">
                     <i class="fas fa-file-csv"></i> Export Global
                 </button>
+                
+                <!-- New Research Data Exports -->
+                <hr class="my-2" style="border-color: rgba(255,255,255,0.2);">
+                <small class="text-muted ms-2"><i class="fas fa-flask me-1"></i>Research Data</small>
+                
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="exportLogs('surveys')">
+                    <i class="fas fa-file-csv"></i> Export Surveys
+                </button>
+                <button type="button" class="btn btn-outline-success btn-sm" onclick="exportLogs('login_activity')">
+                    <i class="fas fa-file-csv"></i> Export Login Activity
+                </button>
+                <button type="button" class="btn btn-outline-warning btn-sm" onclick="exportLogs('adaptation_effectiveness')">
+                    <i class="fas fa-file-csv"></i> Export Adaptations
+                </button>
+                <button type="button" class="btn btn-outline-info btn-sm" onclick="exportLogs('qlearning_decisions')">
+                    <i class="fas fa-file-csv"></i> Export Q-Decisions
+                </button>
+                
+                <!-- Download Q-Table -->
+                <hr class="my-2" style="border-color: rgba(255,255,255,0.2);">
+                <a href="/api/download-qtable/" class="btn btn-outline-success btn-sm" download>
+                    <i class="fas fa-download"></i> Download Q-Table (JSON)
+                </a>
             </div>
 
             <h4 class="section-title mb-3 mt-4">
@@ -1142,18 +1187,22 @@
                 </div>
             </div>
         </div>
+        <!-- End col-md-4 -->
     </div>
+    <!-- End row (col-md-8 and col-md-4) -->
 </div>
+<!-- End container -->
 {% endblock %}
 
 {% block extra_head %}
 <style>
-    /* Admin Dashboard Styles - Performance Optimized */
+    /* Dark Matte Admin Dashboard - Elegant Professional Design */
     .admin-dashboard-container {
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        background: linear-gradient(135deg, rgba(10, 10, 10, 0.98) 0%, rgba(15, 15, 15, 0.95) 100%);
         min-height: calc(100vh - 72px);
         padding: 2rem 0;
-        
+        position: relative;
+
         /* Performance optimizations */
         transform: translateZ(0);
         -webkit-transform: translateZ(0);
@@ -1165,8 +1214,8 @@
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
         background:
-            radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.02) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.02) 0%, transparent 50%);
+            radial-gradient(circle at 25% 75%, rgba(0, 255, 255, 0.02) 0%, transparent 40%),
+            radial-gradient(circle at 75% 25%, rgba(255, 0, 255, 0.02) 0%, transparent 40%);
         pointer-events: none;
         z-index: -1;
         /* Optimize background performance */
@@ -1174,19 +1223,79 @@
         -webkit-transform: translateZ(0);
     }
 
-    /* Enhanced Stats Cards - Performance Optimized */
+    /* Dark Matte Admin Header */
+    .admin-header-section {
+        background: rgba(5, 5, 5, 0.95);
+        border-bottom: 2px solid rgba(0, 255, 255, 0.15);
+        backdrop-filter: blur(15px);
+        padding: 2rem 0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+    }
+
+    .admin-title {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+    }
+
+    .admin-subtitle {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 0.75rem;
+        text-shadow: 0 0 4px rgba(255, 255, 255, 0.05);
+    }
+
+    .admin-breadcrumb .badge {
+        background: rgba(0, 255, 255, 0.1);
+        color: #00ffff;
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        text-shadow: 0 0 4px rgba(0, 255, 255, 0.2);
+    }
+
+    .admin-breadcrumb .text-muted {
+        color: rgba(255, 255, 255, 0.5) !important;
+        font-size: 0.875rem;
+    }
+
+    .admin-actions .btn {
+        background: rgba(0, 0, 0, 0.8);
+        border: 2px solid rgba(0, 255, 255, 0.3);
+        color: #00ffff;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        text-shadow: 0 0 4px rgba(0, 255, 255, 0.2);
+    }
+
+    .admin-actions .btn:hover {
+        background: rgba(0, 255, 255, 0.1);
+        border-color: rgba(0, 255, 255, 0.5);
+        color: #00ffff;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 255, 255, 0.15);
+    }
+
+    /* Enhanced Stats Cards - Dark Matte Design */
     .stats-card {
-        background: rgba(255, 255, 255, 0.98);
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(15, 15, 15, 0.95);
+        border: 2px solid rgba(0, 255, 255, 0.2);
         border-radius: 20px;
         box-shadow:
-            0 8px 25px rgba(0, 0, 0, 0.08),
-            0 0 0 1px rgba(255, 255, 255, 0.6);
+            0 8px 25px rgba(0, 0, 0, 0.6),
+            0 0 15px rgba(0, 255, 255, 0.08);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
                     box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         overflow: hidden;
         border-left: 5px solid;
+        backdrop-filter: blur(10px);
+
         /* Performance optimizations */
         transform: translateZ(0);
         -webkit-transform: translateZ(0);
@@ -1199,7 +1308,7 @@
         content: '';
         position: absolute;
         top: 0; left: 0; right: 0; bottom: 0;
-        background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.01) 100%);
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.02) 0%, rgba(255, 0, 255, 0.01) 100%);
         pointer-events: none;
         /* Optimize pseudo-element performance */
         transform: translateZ(0);
@@ -1209,31 +1318,32 @@
     .stats-card:hover {
         transform: translateY(-6px) scale(1.02);
         box-shadow:
-            0 16px 32px rgba(0, 0, 0, 0.12),
-            0 0 0 1px rgba(255, 255, 255, 0.8);
+            0 16px 32px rgba(0, 0, 0, 0.8),
+            0 0 25px rgba(0, 255, 255, 0.12);
+        border-color: rgba(0, 255, 255, 0.4);
         /* Performance optimizations */
         backface-visibility: hidden;
         -webkit-backface-visibility: hidden;
     }
 
     .stats-card.primary {
-        border-left-color: #6366f1;
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(255, 255, 255, 0.98) 100%);
+        border-left-color: rgba(0, 255, 255, 0.6);
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.03) 0%, rgba(15, 15, 15, 0.95) 100%);
     }
 
     .stats-card.success {
-        border-left-color: #10b981;
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.02) 0%, rgba(255, 255, 255, 0.98) 100%);
+        border-left-color: rgba(0, 255, 0, 0.6);
+        background: linear-gradient(135deg, rgba(0, 255, 0, 0.03) 0%, rgba(15, 15, 15, 0.95) 100%);
     }
 
     .stats-card.info {
-        border-left-color: #06b6d4;
-        background: linear-gradient(135deg, rgba(6, 182, 212, 0.02) 0%, rgba(255, 255, 255, 0.98) 100%);
+        border-left-color: rgba(0, 255, 255, 0.6);
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.03) 0%, rgba(15, 15, 15, 0.95) 100%);
     }
 
     .stats-card.warning {
-        border-left-color: #f59e0b;
-        background: linear-gradient(135deg, rgba(245, 158, 11, 0.02) 0%, rgba(255, 255, 255, 0.98) 100%);
+        border-left-color: rgba(255, 255, 0, 0.6);
+        background: linear-gradient(135deg, rgba(255, 255, 0, 0.03) 0%, rgba(15, 15, 15, 0.95) 100%);
     }
 
     .stats-card .card-body {
@@ -1245,7 +1355,7 @@
     .stats-card .card-title {
         font-size: 0.875rem;
         font-weight: 600;
-        color: #6b7280;
+        color: rgba(255, 255, 255, 0.7);
         margin-bottom: 0.5rem;
         text-transform: uppercase;
         letter-spacing: 0.05em;
@@ -1255,23 +1365,28 @@
         font-size: 2.25rem;
         font-weight: 800;
         margin-bottom: 0.25rem;
-        color: #1f2937;
+        color: #ffffff;
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
     }
 
-    .stats-card .text-primary { color: #6366f1 !important; }
-    .stats-card .text-success { color: #10b981 !important; }
-    .stats-card .text-info { color: #06b6d4 !important; }
-    .stats-card .text-warning { color: #f59e0b !important; }
+    .stats-card .text-primary { color: #00ffff !important; }
+    .stats-card .text-success { color: #00ff00 !important; }
+    .stats-card .text-info { color: #00ffff !important; }
+    .stats-card .text-warning { color: #ffff00 !important; }
 
-    /* Enhanced Main Cards - Performance Optimized */
+    /* Enhanced Main Cards - Dark Matte Design */
     .card {
-        background: rgba(211, 211, 211, 0.98);
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(20, 20, 20, 0.95);
+        border: 2px solid rgba(0, 255, 255, 0.2);
         border-radius: 20px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        box-shadow:
+            0 8px 25px rgba(0, 0, 0, 0.6),
+            0 0 15px rgba(0, 255, 255, 0.08);
         overflow: hidden;
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
                     box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(10px);
+
         /* Performance optimizations */
         transform: translateZ(0);
         -webkit-transform: translateZ(0);
@@ -1283,16 +1398,20 @@
 
     .card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+        box-shadow:
+            0 16px 32px rgba(0, 0, 0, 0.8),
+            0 0 25px rgba(0, 255, 255, 0.12);
+        border-color: rgba(0, 255, 255, 0.4);
         /* Performance optimizations */
         backface-visibility: hidden;
         -webkit-backface-visibility: hidden;
     }
 
     .card-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: linear-gradient(135deg, rgba(0, 20, 30, 0.95) 0%, rgba(0, 30, 40, 0.9) 100%);
+        color: #ffffff;
         border: none;
+        border-bottom: 2px solid rgba(0, 255, 255, 0.2);
         padding: 1.5rem 2rem;
         position: relative;
         overflow: hidden;
@@ -1302,18 +1421,11 @@
         content: '';
         position: absolute;
         top: 0; left: 0; right: 0; bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.08)"/><circle cx="80" cy="80" r="1.5" fill="rgba(255,255,255,0.06)"/><circle cx="60" cy="30" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
-        background-size: 150px 150px;
-        animation: cardHeaderFloat 8s ease-in-out infinite;
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.03) 0%, rgba(255, 0, 255, 0.02) 100%);
         pointer-events: none;
         /* Optimize animation performance */
         transform: translateZ(0);
         -webkit-transform: translateZ(0);
-    }
-
-    @keyframes cardHeaderFloat {
-        0%, 100% { transform: translateY(0) scale(1); }
-        50% { transform: translateY(-2px) scale(1.005); }
     }
 
     .card-header h5 {
@@ -1322,19 +1434,25 @@
         margin-bottom: 0;
         font-weight: 700;
         font-size: 1.25rem;
+        color: #ffffff;
+        text-shadow: 0 0 6px rgba(255, 255, 255, 0.1);
     }
 
     .card-body {
         padding: 2rem;
+        background: rgba(15, 15, 15, 0.9);
     }
 
-    /* Analytics Cards - Performance Optimized */
+    /* Analytics Cards - Dark Matte Design */
     .analytics-card {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
-        border: 1px solid rgba(99, 102, 241, 0.08);
+        background: linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(25, 25, 25, 0.9) 100%);
+        border: 2px solid rgba(0, 255, 255, 0.2);
         border-radius: 16px;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         height: 100%;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+
         /* Performance optimizations */
         transform: translateZ(0);
         -webkit-transform: translateZ(0);
@@ -1345,8 +1463,10 @@
 
     .analytics-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.12);
-        border-color: rgba(99, 102, 241, 0.15);
+        box-shadow:
+            0 16px 32px rgba(0, 0, 0, 0.8),
+            0 0 20px rgba(0, 255, 255, 0.1);
+        border-color: rgba(0, 255, 255, 0.4);
         /* Performance optimizations */
         backface-visibility: hidden;
         -webkit-backface-visibility: hidden;
@@ -1355,7 +1475,7 @@
     .analytics-card .card-title {
         font-size: 0.875rem;
         font-weight: 600;
-        color: #6b7280;
+        color: rgba(255, 255, 255, 0.7);
         margin-bottom: 1rem;
         text-transform: uppercase;
         letter-spacing: 0.05em;
@@ -1365,29 +1485,79 @@
         font-size: 2rem;
         font-weight: 800;
         margin-bottom: 0.5rem;
+        color: #ffffff;
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
     }
 
-    .analytics-card .text-primary { color: #6366f1 !important; }
-    .analytics-card .text-success { color: #10b981 !important; }
-    .analytics-card .text-warning { color: #f59e0b !important; }
-    .analytics-card .text-info { color: #06b6d4 !important; }
+    .analytics-card .text-primary { color: #00ffff !important; }
+    .analytics-card .text-success { color: #00ff00 !important; }
+    .analytics-card .text-warning { color: #ffff00 !important; }
+    .analytics-card .text-info { color: #00ffff !important; }
 
-    /* Enhanced Tables - Performance Optimized */
+    /* Enhanced Tables - Dark Matte Design */
     .table {
-        background: rgba(255, 255, 255, 0.9);
+        background: rgba(20, 20, 20, 0.95);
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-        /* Performance optimizations */
-        transform: translateZ(0);
-        -webkit-transform: translateZ(0);
+        box-shadow:
+            0 8px 25px rgba(0, 0, 0, 0.6),
+            0 0 15px rgba(0, 255, 255, 0.08);
+        border: 2px solid rgba(0, 255, 255, 0.2);
+    }
+
+    .table thead th {
+        background: linear-gradient(135deg, rgba(0, 20, 30, 0.95) 0%, rgba(0, 30, 40, 0.9) 100%);
+        border: none;
+        font-weight: 600;
+        color: #ffffff;
+        padding: 1.5rem 1rem;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        text-shadow: 0 0 4px rgba(255, 255, 255, 0.1);
+    }
+
+    .table thead th::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 255, 0.3) 50%, transparent 100%);
+    }
+
+    .table tbody tr {
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .table tbody tr:hover {
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.03) 0%, rgba(255, 0, 255, 0.02) 100%);
+        transform: translateX(4px);
+        box-shadow: 0 4px 15px rgba(0, 255, 255, 0.08);
+    }
+
+    .table tbody td {
+        border: none;
+        padding: 1rem;
+        vertical-align: middle;
+        color: rgba(255, 255, 255, 0.9);
     }
 
     .table th {
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.06) 0%, rgba(139, 92, 246, 0.06) 100%);
-        border-color: rgba(99, 102, 241, 0.15);
+        background: linear-gradient(135deg, rgba(0, 20, 30, 0.95) 0%, rgba(0, 30, 40, 0.9) 100%);
+        border-color: rgba(0, 255, 255, 0.2);
         font-weight: 600;
-        color: #374151;
+        color: #ffffff;
+        text-shadow: 0 0 4px rgba(255, 255, 255, 0.1);
+    }
+
+    .table td {
+        color: rgba(255, 255, 255, 0.9);
+        border-color: rgba(0, 255, 255, 0.1);
+    }
         font-size: 0.875rem;
         text-transform: uppercase;
         letter-spacing: 0.05em;
@@ -2034,17 +2204,41 @@
         z-index: 1;
     }
 
-    /* Enhanced Badges */
+    /* Section Titles - Dark Matte Design */
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-shadow: 0 0 6px rgba(255, 255, 255, 0.1);
+    }
+
+    .section-title i {
+        color: #00ffff;
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+        font-size: 1.75rem;
+    }
+
+    /* Enhanced Badges - Dark Matte Design */
     .badge-enhanced {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         font-size: 0.75rem;
         padding: 0.5rem 0.75rem;
         border-radius: 12px;
         margin: 0.125rem;
         display: inline-block;
+        background: rgba(0, 255, 255, 0.1);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        color: #00ffff;
+        text-shadow: 0 0 4px rgba(0, 255, 255, 0.2);
     }
 
-    /* Difficulty Badges Styling */
+    /* Difficulty Badges - Dark Matte Design */
     .difficulty-badges {
         display: flex;
         flex-wrap: wrap;
@@ -2052,10 +2246,10 @@
         margin-bottom: 0.5rem;
     }
 
-    /* Enhanced Card Headers */
+    /* Enhanced Card Headers - Dark Matte Design */
     .card-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        border: none !important;
+        background: linear-gradient(135deg, rgba(0, 20, 30, 0.95) 0%, rgba(0, 30, 40, 0.9) 100%);
+        border: none;
         position: relative;
         overflow: hidden;
     }
@@ -2064,99 +2258,132 @@
         content: '';
         position: absolute;
         top: 0; left: 0; right: 0; bottom: 0;
-        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.03) 0%, rgba(255, 0, 255, 0.02) 100%);
         pointer-events: none;
     }
 
     .card-header h5 {
         position: relative;
         z-index: 2;
+        color: #ffffff;
+        text-shadow: 0 0 6px rgba(255, 255, 255, 0.1);
     }
 
-    /* Enhanced Tables */
+    /* Enhanced Tables - Dark Matte Design */
     .table-enhanced {
-        background: rgba(255, 255, 255, 0.8);
+        background: rgba(20, 20, 20, 0.95);
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        box-shadow:
+            0 8px 25px rgba(0, 0, 0, 0.6),
+            0 0 15px rgba(0, 255, 255, 0.08);
+        border: 2px solid rgba(0, 255, 255, 0.2);
     }
 
     .table-enhanced thead th {
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        background: linear-gradient(135deg, rgba(0, 20, 30, 0.95) 0%, rgba(0, 30, 40, 0.9) 100%);
         border: none;
         font-weight: 600;
-        color: #475569;
-        padding: 1rem;
+        color: #ffffff;
+        padding: 1.5rem 1rem;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        text-shadow: 0 0 4px rgba(255, 255, 255, 0.1);
+    }
+
+    .table-enhanced thead th::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 255, 0.3) 50%, transparent 100%);
+    }
+
+    .table-enhanced thead th i {
+        color: #00ffff;
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+        margin-right: 0.5rem;
     }
 
     .table-enhanced tbody tr {
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
+        border: none;
     }
 
     .table-enhanced tbody tr:hover {
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.02), rgba(139, 92, 246, 0.01));
-        transform: translateX(2px);
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.03) 0%, rgba(255, 0, 255, 0.02) 100%);
+        transform: translateX(4px);
+        box-shadow: 0 4px 15px rgba(0, 255, 255, 0.08);
     }
 
     .table-enhanced tbody td {
         border: none;
         padding: 1rem;
         vertical-align: middle;
+        color: rgba(255, 255, 255, 0.9);
     }
 
-    /* Status Badges */
-    .status-badge {
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-
-    .status-badge.active {
-        background: linear-gradient(135deg, #10b981, #059669);
-        color: white;
-        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-    }
-
-    .status-badge.pending {
-        background: linear-gradient(135deg, #f59e0b, #d97706);
-        color: white;
-        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
-    }
-
-    /* Action Buttons Enhancement */
-    .btn-enhanced {
-        border-radius: 12px;
-        font-weight: 600;
-        padding: 0.75rem 1.5rem;
-        transition: all 0.3s ease;
-        position: relative;
+    /* Activity Table - Dark Matte Design */
+    .activity-table {
+        background: linear-gradient(135deg, rgba(15, 15, 15, 0.95) 0%, rgba(20, 20, 20, 0.9) 100%);
+        border-radius: 16px;
         overflow: hidden;
+        box-shadow:
+            0 8px 25px rgba(0, 0, 0, 0.6),
+            0 0 15px rgba(0, 255, 255, 0.08);
+        border: 2px solid rgba(0, 255, 255, 0.2);
     }
 
-    .btn-enhanced::before {
+    .activity-table thead th {
+        background: linear-gradient(135deg, rgba(0, 15, 30, 0.95) 0%, rgba(0, 25, 40, 0.9) 100%);
+        border: none;
+        font-weight: 600;
+        color: #ffffff;
+        padding: 1.5rem 1rem;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        text-shadow: 0 0 4px rgba(255, 255, 255, 0.1);
+    }
+
+    .activity-table thead th::after {
         content: '';
         position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
-        opacity: 0;
-        transition: opacity 0.3s ease;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 255, 0.3) 50%, transparent 100%);
     }
 
-    .btn-enhanced:hover::before {
-        opacity: 1;
+    .activity-table thead th i {
+        color: #00ffff;
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+        margin-right: 0.5rem;
     }
 
-    .btn-enhanced:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    .activity-table tbody tr {
+        transition: all 0.3s ease;
+        border: none;
     }
 
-    /* Loading Animation */
-    .loading-shimmer {
-        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    .activity-table tbody tr:hover {
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.05) 0%, rgba(255, 0, 255, 0.03) 100%);
+        transform: translateX(4px);
+        box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1);
+    }
+
+    .activity-table tbody td {
+        border: none;
+        padding: 1.25rem 1rem;
+        vertical-align: middle;
+        color: rgba(255, 255, 255, 0.9);
+    }
         background-size: 200% 100%;
         animation: shimmer 1.5s infinite;
     }
@@ -2808,6 +3035,7 @@
         color: rgba(255, 255, 255, 0.9);
     }
 
+    /* Student Info & Elements - Dark Matte Design */
     .student-info {
         display: flex;
         align-items: center;
@@ -2818,29 +3046,50 @@
         width: 48px;
         height: 48px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #00ffff, #ff00ff);
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
         display: flex;
         align-items: center;
         justify-content: center;
         color: #000000;
         font-weight: 600;
         font-size: 1rem;
-        box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
-        border: 2px solid rgba(0, 255, 255, 0.3);
+        box-shadow: 0 0 12px rgba(0, 255, 255, 0.3);
+        border: 2px solid rgba(0, 255, 255, 0.4);
+        text-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
     }
 
+    .student-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .student-name {
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 0.25rem;
+        text-shadow: 0 0 4px rgba(255, 255, 255, 0.1);
+    }
+
+    .student-level {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* Email & Date Display - Dark Matte Design */
     .email-display, .date-display {
         display: flex;
         align-items: center;
         gap: 0.5rem;
         font-size: 0.875rem;
-        color: rgba(255, 255, 255, 0.8);
+        color: rgba(255, 255, 255, 0.7);
     }
 
     .email-display i, .date-display i {
         color: #00ffff;
+        text-shadow: 0 0 4px rgba(0, 255, 255, 0.3);
     }
 
+    /* Status Badges - Dark Matte Design */
     .status-badge {
         display: inline-flex;
         align-items: center;
@@ -2866,38 +3115,7 @@
         border-color: rgba(255, 255, 0, 0.3);
     }
 
-    .student-details {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .student-name {
-        font-weight: 600;
-        color: #ffffff;
-        margin-bottom: 0.25rem;
-    }
-
-    .student-level {
-        font-size: 0.8rem;
-        color: rgba(255, 255, 255, 0.7);
-    }
-
-    .question-preview {
-        max-width: 250px;
-    }
-
-    .question-text {
-        font-weight: 500;
-        color: #ffffff;
-        margin-bottom: 0.25rem;
-        line-height: 1.4;
-    }
-
-    .question-topic {
-        font-size: 0.8rem;
-        color: rgba(255, 255, 255, 0.6);
-    }
-
+    /* Difficulty Badges - Dark Matte Design */
     .difficulty-badge {
         display: inline-flex;
         align-items: center;
@@ -2929,6 +3147,7 @@
         border-color: rgba(255, 68, 68, 0.3);
     }
 
+    /* Result Badges - Dark Matte Design */
     .result-badge {
         display: inline-flex;
         align-items: center;
@@ -2954,18 +3173,21 @@
         border-color: rgba(255, 68, 68, 0.3);
     }
 
+    /* Time & Date Display - Dark Matte Design */
     .time-display, .date-display {
         display: flex;
         align-items: center;
         gap: 0.5rem;
         font-size: 0.875rem;
-        color: rgba(255, 255, 255, 0.8);
+        color: rgba(255, 255, 255, 0.7);
     }
 
     .time-display i, .date-display i {
         color: #00ffff;
+        text-shadow: 0 0 4px rgba(0, 255, 255, 0.3);
     }
 
+    /* Action Buttons - Dark Matte Design */
     .action-buttons {
         display: flex;
         gap: 0.5rem;
@@ -2979,24 +3201,25 @@
         padding: 0.5rem 0.75rem;
         border-radius: 8px;
         transition: all 0.3s ease;
+        text-shadow: 0 0 2px rgba(255, 255, 255, 0.1);
     }
 
     .action-buttons .btn:hover {
-        background: linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(255, 0, 255, 0.3));
-        border-color: rgba(0, 255, 255, 0.6);
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
+        border-color: rgba(0, 255, 255, 0.5);
         transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
+        box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2);
+        color: #00ffff;
     }
 
-    /* Empty States - Neon Matte Design */
+    /* Empty States - Dark Matte Design */
     .empty-state {
         text-align: center;
         padding: 4rem 2rem;
-        background: linear-gradient(135deg,
-            rgba(10, 25, 47, 0.8) 0%,
-            rgba(15, 35, 65, 0.6) 100%);
+        background: linear-gradient(135deg, rgba(15, 15, 15, 0.9) 0%, rgba(20, 20, 20, 0.8) 100%);
         border-radius: 20px;
         border: 2px solid rgba(0, 255, 255, 0.2);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
     }
 
     .empty-icon {
@@ -3007,7 +3230,7 @@
     .empty-icon i {
         font-size: 4rem;
         color: #00ffff;
-        text-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+        text-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
     }
 
     .empty-title {
@@ -3015,12 +3238,111 @@
         font-weight: 600;
         color: #ffffff;
         margin-bottom: 0.75rem;
+        text-shadow: 0 0 6px rgba(255, 255, 255, 0.1);
     }
 
     .empty-message {
-        color: rgba(255, 255, 255, 0.7);
+        color: rgba(255, 255, 255, 0.6);
         margin: 0;
         font-size: 1rem;
+    }
+
+    /* Question Preview - Dark Matte Design */
+    .question-preview {
+        max-width: 250px;
+    }
+
+    .question-text {
+        font-weight: 500;
+        color: #ffffff;
+        margin-bottom: 0.25rem;
+        line-height: 1.4;
+        text-shadow: 0 0 4px rgba(255, 255, 255, 0.1);
+    }
+
+    .question-topic {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Loading Animation - Dark Matte Design */
+    .loading-shimmer {
+        background: linear-gradient(90deg, rgba(30, 30, 30, 0.8) 25%, rgba(40, 40, 40, 0.6) 50%, rgba(30, 30, 30, 0.8) 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        border-radius: 8px;
+    }
+
+    @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    /* Enhanced Progress Bars - Dark Matte Design */
+    .progress-bar {
+        width: 100%;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+        margin-top: 0.5rem;
+        border: 1px solid rgba(0, 255, 255, 0.2);
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.6), rgba(0, 255, 136, 0.4));
+        border-radius: 3px;
+        transition: width 0.5s ease-in-out;
+        width: var(--progress-width, 0%);
+        box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+    }
+
+    .progress-fill[style*="--progress-width: 0%"] {
+        background: linear-gradient(135deg, rgba(255, 68, 68, 0.6), rgba(255, 68, 68, 0.4));
+        box-shadow: 0 0 8px rgba(255, 68, 68, 0.3);
+    }
+
+    /* Responsive Enhancements - Dark Matte Design */
+    @media (max-width: 768px) {
+        .admin-title {
+            font-size: 2rem;
+        }
+
+        .stats-card-icon {
+            position: relative;
+            top: auto;
+            right: auto;
+            margin-bottom: 1rem;
+        }
+
+        .stats-content {
+            padding-right: 0;
+            text-align: center;
+        }
+
+        .stats-progress {
+            position: relative;
+            bottom: auto;
+            right: auto;
+            margin-top: 1rem;
+        }
+
+        .difficulty-badges {
+            justify-content: center;
+        }
+
+        .admin-dashboard-container {
+            padding: 1rem 0;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+        }
+
+        .card {
+            margin-bottom: 1rem;
+        }
     }
 
     /* Enhanced Analytics Tables - Neon Matte Design - Now using activity-table styling */
@@ -4347,6 +4669,329 @@
             }, 300);
         }
     }
+
+    // Research Metrics Charts - Bab 2 & 3
+    document.addEventListener('DOMContentLoaded', function() {
+        // Q-Value Evolution Chart
+        {% if analytics.qlearning_evolution.q_value_trend %}
+        const qValueCtx = document.getElementById('qValueTrendChart');
+        if (qValueCtx) {
+            const qValueData = {{ analytics.qlearning_evolution.q_value_trend|safe }};
+            
+            new Chart(qValueCtx, {
+                type: 'line',
+                data: {
+                    labels: qValueData.map(d => d.timestamp),
+                    datasets: [{
+                        label: 'Q-Value',
+                        data: qValueData.map(d => d.q_value),
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Reward',
+                        data: qValueData.map(d => d.reward),
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Q-Learning Evolution: Q-Values & Rewards Over Time'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        {% endif %}
+        
+        // State Distribution Chart
+        {% if analytics.state_distribution.state_distribution %}
+        const stateCtx = document.getElementById('stateDistributionChart');
+        if (stateCtx) {
+            const stateData = {{ analytics.state_distribution.state_distribution|safe }};
+            const labels = Object.keys(stateData);
+            const values = Object.values(stateData);
+            
+            new Chart(stateCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Number of Students',
+                        data: values,
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(153, 102, 255, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Student Distribution by Level (State)'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        {% endif %}
+        
+        // Difficulty Distribution Pie Chart
+        const difficultyPieCtx = document.getElementById('difficultyPieChart');
+        if (difficultyPieCtx) {
+            new Chart(difficultyPieCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Easy', 'Medium', 'Hard'],
+                    datasets: [{
+                        data: [
+                            {{ questions_by_difficulty.easy|default:0 }},
+                            {{ questions_by_difficulty.medium|default:0 }},
+                            {{ questions_by_difficulty.hard|default:0 }}
+                        ],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(255, 99, 132, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(255, 99, 132, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        title: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+        
+        // User Comparison Bar Chart (Top 10 by Success Rate)
+        const userComparisonCtx = document.getElementById('userComparisonChart');
+        if (userComparisonCtx) {
+            // Use placeholder data if API not available
+            const renderUserChart = (data) => {
+                new Chart(userComparisonCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.usernames,
+                        datasets: [{
+                            label: 'Success Rate (%)',
+                            data: data.success_rates,
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            };
+            
+            // Try to fetch real data, fallback to placeholder
+            fetch('/api/top-users-success-rate/')
+                .then(response => {
+                    if (!response.ok) throw new Error('API not available');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.usernames && data.usernames.length > 0) {
+                        renderUserChart(data);
+                    } else {
+                        // No users yet, show placeholder
+                        renderUserChart({
+                            usernames: ['No data yet'],
+                            success_rates: [0]
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.log('Using placeholder data for user comparison');
+                    // Show placeholder data
+                    renderUserChart({
+                        usernames: ['No users yet'],
+                        success_rates: [0]
+                    });
+                });
+        }
+        
+        // Load Q-Learning Logs Table
+        loadQLearningLogs();
+    });
+    
+    // Q-Learning Logs Functions
+    let qlogsData = [];
+    let qlogsOffset = 0;
+    const qlogsLimit = 50;
+    
+    function loadQLearningLogs() {
+        const tbody = document.getElementById('qlogTableBody');
+        if (!tbody) return; // Exit if table doesn't exist
+        
+        fetch(`/api/qlearning-logs/?limit=${qlogsLimit}&offset=${qlogsOffset}`)
+            .then(response => {
+                if (!response.ok) throw new Error('API not available');
+                return response.json();
+            })
+            .then(data => {
+                qlogsData = data.logs || [];
+                renderQLearningLogs(qlogsData);
+            })
+            .catch(error => {
+                console.error('Error loading Q-Learning logs:', error);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center text-muted">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No Q-Learning decision logs available yet. Logs will appear as the system makes decisions.
+                        </td>
+                    </tr>
+                `;
+            });
+    }
+    
+    function renderQLearningLogs(logs) {
+        const tbody = document.getElementById('qlogTableBody');
+        
+        if (!logs || logs.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="text-center text-muted">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No logs match the current filters.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        tbody.innerHTML = logs.map(log => `
+            <tr>
+                <td><strong>${log.user}</strong></td>
+                <td><code>${log.state_hash.substring(0, 8)}...</code></td>
+                <td><span class="badge bg-${getActionColor(log.action_chosen)}">${log.action_chosen}</span></td>
+                <td><span class="badge bg-${log.decision_type === 'exploration' ? 'warning' : 'success'}">${log.decision_type}</span></td>
+                <td>${log.q_value_chosen.toFixed(3)}</td>
+                <td>${log.best_q_value.toFixed(3)}</td>
+                <td>${log.is_optimal ? '<i class="fas fa-check text-success"></i>' : '<i class="fas fa-times text-danger"></i>'}</td>
+                <td>${log.epsilon_value.toFixed(3)}</td>
+                <td><small>${log.timestamp}</small></td>
+            </tr>
+        `).join('');
+    }
+    
+    function getActionColor(action) {
+        const colors = {
+            'easy': 'success',
+            'medium': 'warning',
+            'hard': 'danger'
+        };
+        return colors[action] || 'secondary';
+    }
+    
+    function filterQLogs() {
+        const searchTerm = document.getElementById('qlogSearch').value.toLowerCase();
+        const decisionFilter = document.getElementById('qlogFilterDecision').value;
+        const optimalFilter = document.getElementById('qlogFilterOptimal').value;
+        
+        let filtered = qlogsData.filter(log => {
+            const matchSearch = !searchTerm || 
+                log.user.toLowerCase().includes(searchTerm) ||
+                log.state_hash.toLowerCase().includes(searchTerm) ||
+                log.action_chosen.toLowerCase().includes(searchTerm);
+            
+            const matchDecision = !decisionFilter || log.decision_type === decisionFilter;
+            const matchOptimal = !optimalFilter || log.is_optimal.toString() === optimalFilter;
+            
+            return matchSearch && matchDecision && matchOptimal;
+        });
+        
+        renderQLearningLogs(filtered);
+    }
+    
+    function resetQLogFilters() {
+        document.getElementById('qlogSearch').value = '';
+        document.getElementById('qlogFilterDecision').value = '';
+        document.getElementById('qlogFilterOptimal').value = '';
+        renderQLearningLogs(qlogsData);
+    }
+    
+    function loadMoreQLogs() {
+        qlogsOffset += qlogsLimit;
+        loadQLearningLogs();
+    }
+    
+    // Add event listeners for filters
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('qlogSearch');
+        const decisionSelect = document.getElementById('qlogFilterDecision');
+        const optimalSelect = document.getElementById('qlogFilterOptimal');
+        
+        if (searchInput) searchInput.addEventListener('input', filterQLogs);
+        if (decisionSelect) decisionSelect.addEventListener('change', filterQLogs);
+        if (optimalSelect) optimalSelect.addEventListener('change', filterQLogs);
+    });
 
 </script>
 {% endblock %}

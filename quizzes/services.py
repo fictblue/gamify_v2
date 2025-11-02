@@ -157,7 +157,13 @@ class QuizService:
     @staticmethod
     def pick_next_question(profile: StudentProfile, epsilon: float = None) -> Optional[Question]:
         """
-        ENHANCED: Pick the next question using Q-Learning with dynamic epsilon.
+        ENHANCED: Pick the next question using Q-Learning with intelligent repetition handling.
+
+        Prioritization:
+        1. Questions user hasn't seen (highest priority)
+        2. Questions user got wrong recently (medium priority)
+        3. Questions user got right but not recently (lower priority)
+        4. Questions user has mastered (lowest priority)
 
         Args:
             profile: StudentProfile instance
@@ -171,45 +177,153 @@ class QuizService:
 
         # Use Q-Learning to choose difficulty (with dynamic epsilon if not provided)
         chosen_difficulty = QLearningEngine.choose_action(
-            profile.user, 
-            state, 
+            profile.user,
+            state,
             epsilon,
             current_difficulty=profile.last_difficulty
         )
 
-        # Get questions of the chosen difficulty that user hasn't seen recently
-        # Avoid repetition by excluding recently attempted questions
-        recent_attempts = AttemptLog.objects.filter(
-            user=profile.user
-        ).order_by('-created_at')[:10].values_list('question_id', flat=True)
+        # Get all questions of the chosen difficulty
+        all_questions = list(Question.objects.filter(difficulty=chosen_difficulty))
 
-        questions = Question.objects.filter(
-            difficulty=chosen_difficulty
-        ).exclude(
-            id__in=recent_attempts
-        )
-
-        # If no unseen questions, allow recent questions
-        if not questions.exists():
-            questions = Question.objects.filter(difficulty=chosen_difficulty)
-
-        if not questions.exists():
-            # Fallback: try other difficulties if chosen difficulty has no questions
+        if not all_questions:
+            # Fallback to other difficulties if chosen difficulty has no questions
             fallback_difficulties = [d for d in QuizService.DIFFICULTY_ACTIONS if d != chosen_difficulty]
             random.shuffle(fallback_difficulties)
 
             for fallback_difficulty in fallback_difficulties:
-                questions = Question.objects.filter(difficulty=fallback_difficulty)
-                if questions.exists():
+                all_questions = list(Question.objects.filter(difficulty=fallback_difficulty))
+                if all_questions:
                     chosen_difficulty = fallback_difficulty
                     break
 
-        if not questions.exists():
-            # No questions available at all
+        if not all_questions:
             return None
 
-        # Return a random question of the chosen difficulty
-        return random.choice(list(questions))
+        # Get user's attempt history for this difficulty
+        user_attempts = AttemptLog.objects.filter(
+            user=profile.user,
+            difficulty_attempted=chosen_difficulty
+        ).select_related('question')
+
+        # Create a scoring system for question selection
+        question_scores = {}
+
+        for question in all_questions:
+            # Get attempts for this specific question
+            question_attempts = user_attempts.filter(question=question)
+            attempt_count = question_attempts.count()
+
+            if attempt_count == 0:
+                # Never seen this question - highest priority
+                question_scores[question] = 100
+            else:
+                # Calculate score based on recent performance
+                recent_attempts = question_attempts.order_by('-created_at')[:3]  # Last 3 attempts
+
+                correct_count = sum(1 for attempt in recent_attempts if attempt.is_correct)
+                recent_accuracy = correct_count / len(recent_attempts) if recent_attempts else 0
+
+                # Base score on accuracy (lower accuracy = higher priority to practice)
+                base_score = (1 - recent_accuracy) * 50
+
+                # Boost score if it's been a while since last attempt
+                if recent_attempts:
+                    days_since_last = (timezone.now() - recent_attempts[0].created_at).days
+                    recency_bonus = min(days_since_last * 2, 30)  # Max 30 point bonus
+                else:
+                    recency_bonus = 20
+
+                # Penalty for too many attempts (diminishing returns)
+                repetition_penalty = min(attempt_count * 5, 20)
+
+                question_scores[question] = base_score + recency_bonus - repetition_penalty
+
+        # Sort questions by score (highest first)
+        sorted_questions = sorted(
+            question_scores.items(),
+            key=lambda x: x[1],
+            reverse=True
+        )
+
+        # Add some randomness to avoid predictable patterns
+        top_questions = [q for q, score in sorted_questions[:3]]  # Top 3 questions
+        if top_questions:
+            return random.choice(top_questions)
+        else:
+            # Fallback to random selection
+            return random.choice(all_questions)
+
+    @staticmethod
+    def calculate_attempt_xp(question: Question, user, is_correct: bool, time_spent: float) -> Dict:
+        """
+        Calculate XP reward considering question repetition and other factors.
+
+        Args:
+            question: Question instance
+            user: User instance
+            is_correct: Whether the answer was correct
+            time_spent: Time spent on question
+
+        Returns:
+            Dict with XP breakdown and metadata
+        """
+        # Count previous attempts for this question by this user
+        previous_attempts = AttemptLog.objects.filter(
+            user=user,
+            question=question
+        ).count()
+
+        # Base XP calculation
+        if is_correct:
+            base_reward = QuizService.BASE_CORRECT_REWARD
+        else:
+            base_reward = QuizService.BASE_INCORRECT_PENALTY
+
+        # Apply repetition penalty (diminishing returns)
+        if previous_attempts == 0:
+            # First attempt - full XP
+            repetition_multiplier = 1.0
+            xp_category = "first_attempt"
+        elif previous_attempts == 1:
+            # Second attempt - 70% XP
+            repetition_multiplier = 0.7
+            xp_category = "second_attempt"
+        elif previous_attempts == 2:
+            # Third attempt - 50% XP
+            repetition_multiplier = 0.5
+            xp_category = "third_attempt"
+        else:
+            # Fourth+ attempts - 30% XP
+            repetition_multiplier = 0.3
+            xp_category = "repeated_attempt"
+
+        # Apply difficulty multiplier
+        difficulty_multiplier = {
+            'easy': 1.0,
+            'medium': 1.5,
+            'hard': 2.0
+        }.get(question.difficulty, 1.0)
+
+        # Apply time bonus (only for first attempts)
+        time_bonus = 0
+        if previous_attempts == 0 and time_spent <= 60:
+            time_bonus = 2.0 - (time_spent / 60.0)
+
+        # Calculate final XP
+        adjusted_base = base_reward * repetition_multiplier * difficulty_multiplier
+        total_xp = adjusted_base + time_bonus
+
+        return {
+            'base_xp': base_reward,
+            'repetition_multiplier': repetition_multiplier,
+            'difficulty_multiplier': difficulty_multiplier,
+            'time_bonus': time_bonus,
+            'final_xp': round(total_xp),
+            'attempt_count': previous_attempts + 1,
+            'xp_category': xp_category,
+            'is_first_attempt': previous_attempts == 0
+        }
 
     @staticmethod
     def record_attempt(
@@ -234,25 +348,24 @@ class QuizService:
             # Determine if answer is correct
             is_correct = QuizService._validate_answer(question, chosen_answer)
 
-            # Calculate base reward
-            if is_correct:
-                base_reward = QuizService.BASE_CORRECT_REWARD
-            else:
-                base_reward = QuizService.BASE_INCORRECT_PENALTY
+            # Calculate XP using new repetition-aware system
+            xp_calculation = QuizService.calculate_attempt_xp(
+                question, profile.user, is_correct, time_spent
+            )
 
             # Store old values for Q-Learning
             old_streak = profile.streak_correct
-            
+
             # Get current state BEFORE updating profile
             current_state = QuizService.state_tuple(profile)
 
-            # Update profile
+            # Update profile with calculated XP
             if is_correct:
                 profile.streak_correct += 1
-                profile.points += base_reward
+                profile.points += xp_calculation['final_xp']
             else:
                 profile.streak_correct = 0
-                profile.points += base_reward  # Allow negative points
+                profile.points += xp_calculation['final_xp']  # Allow negative points
 
             # Update progress based on performance
             progress_increment = 1 if is_correct else 0
@@ -312,16 +425,16 @@ class QuizService:
                     question=question,
                     is_correct=False
                 ).count()
-                
+
                 hint = LevelTransitionPolicy.get_hint_for_question(question, previous_wrong)
-                
+
                 if hint:
                     attempt_log.hint_given = hint
                     attempt_log.save()
 
             # Check if user can level up (XP-based)
             can_level_up, target_level = LevelTransitionPolicy.can_level_up(profile)
-            
+
             # Check if user should level down (performance-based)
             should_level_down, down_level = LevelTransitionPolicy.should_level_down(profile)
 
@@ -336,6 +449,7 @@ class QuizService:
             'hidden_reward_applied': hidden_reward_applied,
             'streak_reward': QuizService.HIDDEN_STREAK_REWARD if hidden_reward_applied else 0,
             'q_reward': q_reward,
+            'xp_calculation': xp_calculation,
             'new_streak': profile.streak_correct,
             'new_points': profile.points,
             'new_progress': profile.progress,

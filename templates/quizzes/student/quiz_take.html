@@ -46,6 +46,35 @@
     overflow: hidden;
     position: relative;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 80vh; /* Prevent card from being too tall */
+    display: flex;
+    flex-direction: column;
+}
+
+.question-card-neon .card-body {
+    flex: 1;
+    overflow-y: auto; /* Make question content scrollable */
+    overflow-x: hidden;
+    padding: 2rem;
+    max-height: calc(80vh - 120px); /* Account for header and buttons */
+    scroll-behavior: smooth;
+}
+
+.question-card-neon .card-footer {
+    background: rgba(0, 0, 0, 0.7);
+    border-top: 2px solid rgba(0, 255, 255, 0.3);
+    padding: 1.5rem 2rem;
+    flex-shrink: 0; /* Don't shrink footer */
+}
+
+/* Enhanced hint box positioning within scrollable card */
+.question-card-neon .hint-box-neon {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.question-card-neon.has-hint .question-content {
+    margin-bottom: 1rem;
 }
 
 .question-card-neon::before {
@@ -221,6 +250,12 @@
     box-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
 }
 
+.option-neon.selected .checkbox-neon {
+    border-color: #00ffff;
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+}
+
 .option-neon.correct {
     border-color: #00ff00;
     background: rgba(0, 255, 0, 0.15);
@@ -259,26 +294,55 @@
     text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
 }
 
-/* Short Answer Input */
-.answer-input-neon {
-    background: rgba(0, 0, 0, 0.7);
-    border: 2px solid rgba(0, 255, 255, 0.4);
-    border-radius: 16px;
-    padding: 1.5rem;
-    color: #ffffff;
-    font-size: 1.2rem;
+/* Checkbox styling - Enhanced clickability */
+.checkbox-neon {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(255, 255, 0, 0.4);
+    border-radius: 8px;
+    padding: 0.5rem;
+    margin-right: 1rem;
     transition: all 0.3s ease;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    cursor: pointer;
+    display: inline-block;
+    min-width: 24px;
+    min-height: 24px;
+    position: relative;
+    user-select: none; /* Prevent text selection */
 }
 
-.answer-input-neon:focus {
-    outline: none;
+.checkbox-neon:hover {
+    border-color: rgba(255, 255, 0, 0.8);
+    background: rgba(255, 255, 0, 0.1);
+    box-shadow: 0 0 15px rgba(255, 255, 0, 0.3);
+    transform: scale(1.1);
+}
+
+.checkbox-neon.checked {
     border-color: #00ffff;
-    background: rgba(0, 255, 255, 0.05);
-    box-shadow: 0 0 40px rgba(0, 255, 255, 0.4);
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+    transform: scale(1.1);
 }
 
-/* Hint Box Animation */
+.checkbox-neon.checked .checkmark {
+    background: rgba(0, 255, 255, 0.3);
+    border-color: #00ffff;
+    opacity: 1;
+}
+
+.checkbox-neon.checked .checkmark::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #00ffff;
+    font-weight: bold;
+    font-size: 12px;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.8);
+}
+
+/* Hint Box Animation - Enhanced Layout */
 .hint-box-neon {
     background: rgba(255, 255, 0, 0.08);
     border: 2px solid rgba(255, 255, 0, 0.5);
@@ -287,9 +351,25 @@
     padding: 1.5rem;
     margin: 1.5rem 0;
     box-shadow: 0 0 30px rgba(255, 255, 0, 0.2);
-    min-height: 120px; /* Prevent layout shift when hint appears */
-    transition: all 0.4s ease;
+    min-height: 120px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     animation: slideInUp 0.4s ease;
+    position: relative;
+    z-index: 10;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+.hint-box-neon.showing {
+    opacity: 1;
+    transform: translateY(0);
+    margin-bottom: 2rem; /* Extra space when hint is visible */
+}
+
+.question-card-neon.has-hint {
+    padding-bottom: 1rem; /* Extra padding when hint is present */
+    margin-bottom: 2rem; /* Extra margin for proper spacing */
 }
 
 @keyframes slideInUp {
@@ -461,33 +541,69 @@
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
 }
 
-/* Responsive Design */
+/* Responsive Design - Enhanced */
 @media (max-width: 768px) {
     .question-card-neon {
         border-radius: 16px;
         margin: 0 0.5rem;
     }
-    
+
     .card-header-neon {
         padding: 1rem 1.5rem;
     }
-    
+
     .question-title {
         font-size: 1.25rem;
     }
-    
+
     .option-neon {
         padding: 1rem 1.25rem;
     }
-    
+
     .stats-card-neon {
         margin-bottom: 1rem;
     }
-    
+
     .xp-feedback-neon {
         right: 15px;
         left: 15px;
         min-width: auto;
+    }
+
+    /* Mobile checkbox improvements */
+    .checkbox-neon {
+        min-width: 32px;
+        min-height: 32px;
+        padding: 0.75rem;
+        margin-right: 0.75rem;
+    }
+
+    .checkbox-neon .checkmark {
+        width: 20px;
+        height: 20px;
+    }
+
+    .checkbox-neon.checked .checkmark::after {
+        font-size: 14px;
+    }
+
+    /* Mobile hint box improvements */
+    .hint-box-neon {
+        margin: 1rem 0;
+        padding: 1rem;
+        border-radius: 12px;
+    }
+
+    .question-card-neon.has-hint .card-body {
+        max-height: calc(70vh - 180px); /* Better mobile spacing */
+    }
+
+    .question-card-neon .card-footer {
+        padding: 1rem 1.5rem; /* Smaller padding on mobile */
+    }
+
+    .question-card-neon.has-hint .question-content {
+        margin-bottom: 0.5rem;
     }
 }
 
@@ -616,82 +732,97 @@
                         </div>
 
                         <div class="card-body" style="padding: 2rem;">
-                            <div class="mb-4">
-                                <p class="question-text-neon">{{ question.text }}</p>
-                                <div class="d-flex flex-wrap gap-2">
-                                    <span class="badge-neon tag">
-                                        <i class="fas fa-tag me-1"></i>
-                                        {{ question.curriculum_tag }}
-                                    </span>
-                                    <span class="badge-neon difficulty-{{ question.difficulty }}">
-                                        <i class="fas fa-chart-line me-1"></i>
-                                        {{ question.get_difficulty_display }}
-                                    </span>
+                            <div class="question-content">
+                                <div class="mb-4">
+                                    <p class="question-text-neon">{{ question.text }}</p>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span class="badge-neon tag">
+                                            <i class="fas fa-tag me-1"></i>
+                                            {{ question.curriculum_tag }}
+                                        </span>
+                                        <span class="badge-neon difficulty-{{ question.difficulty }}">
+                                            <i class="fas fa-chart-line me-1"></i>
+                                            {{ question.get_difficulty_display }}
+                                        </span>
+                                    </div>
                                 </div>
+
+                                <!-- Options (sama seperti sebelumnya) -->
+                                {% if question.format == 'mcq_simple' %}
+                                    <div class="mb-4">
+                                        <h6 style="color: #00ffff; margin-bottom: 1.5rem;">
+                                            <i class="fas fa-list-ul me-2"></i>Choose one answer:
+                                        </h6>
+                                        <div id="optionsContainer">
+                                            {% for key, value in question.options.items %}
+                                                <div class="option-neon" data-option="{{ key }}">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio"
+                                                               name="answer" value="{{ key }}" id="option{{ key }}"
+                                                               style="display: none;">
+                                                        <label class="option-label w-100" for="option{{ key }}" style="cursor: pointer;">
+                                                            <span class="option-key">{{ key }}.</span> {{ value }}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% elif question.format == 'mcq_complex' %}
+                                    <div class="mb-4">
+                                        <h6 style="color: #00ffff; margin-bottom: 1.5rem;">
+                                            <i class="fas fa-check-double me-2"></i>Choose all correct answers:
+                                        </h6>
+                                        <div id="optionsContainer">
+                                            {% for key, value in question.options.items %}
+                                                <div class="option-neon" data-option="{{ key }}">
+                                                    <div class="d-flex align-items-center">
+                                                        <!-- Custom visible checkbox -->
+                                                        <div class="checkbox-neon me-3" data-checkbox="{{ key }}">
+                                                            <div class="checkmark"></div>
+                                                        </div>
+                                                        <!-- Hidden actual checkbox for form submission -->
+                                                        <input class="form-check-input" type="checkbox"
+                                                               name="answer" value="{{ key }}" id="option{{ key }}"
+                                                               style="display: none;">
+                                                        <label class="option-label flex-grow-1" for="option{{ key }}" style="cursor: pointer; margin-bottom: 0;">
+                                                            <span class="option-key">{{ key }}.</span> {{ value }}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% elif question.format == 'short_answer' %}
+                                    <div class="mb-4">
+                                        <h6 style="color: #00ffff; margin-bottom: 1.5rem;">
+                                            <i class="fas fa-keyboard me-2"></i>Type your answer:
+                                        </h6>
+                                        <input type="text" class="form-control answer-input-neon" name="answer"
+                                               id="shortAnswer" placeholder="Enter your answer here..." autocomplete="off">
+                                    </div>
+                                {% endif %}
                             </div>
 
-                            <!-- Options (sama seperti sebelumnya) -->
-                            {% if question.format == 'mcq_simple' %}
-                                <div class="mb-4">
-                                    <h6 style="color: #00ffff; margin-bottom: 1.5rem;">
-                                        <i class="fas fa-list-ul me-2"></i>Choose one answer:
-                                    </h6>
-                                    <div id="optionsContainer">
-                                        {% for key, value in question.options.items %}
-                                            <div class="option-neon" data-option="{{ key }}">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="radio" 
-                                                           name="answer" value="{{ key }}" id="option{{ key }}"
-                                                           style="display: none;">
-                                                    <label class="option-label w-100" for="option{{ key }}" style="cursor: pointer;">
-                                                        <span class="option-key">{{ key }}.</span> {{ value }}
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            {% elif question.format == 'mcq_complex' %}
-                                <div class="mb-4">
-                                    <h6 style="color: #00ffff; margin-bottom: 1.5rem;">
-                                        <i class="fas fa-check-double me-2"></i>Choose all correct answers:
-                                    </h6>
-                                    <div id="optionsContainer">
-                                        {% for key, value in question.options.items %}
-                                            <div class="option-neon" data-option="{{ key }}">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox"
-                                                           name="answer" value="{{ key }}" id="option{{ key }}"
-                                                           style="display: none;">
-                                                    <label class="option-label w-100" for="option{{ key }}" style="cursor: pointer;">
-                                                        <span class="option-key">{{ key }}.</span> {{ value }}
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            {% elif question.format == 'short_answer' %}
-                                <div class="mb-4">
-                                    <h6 style="color: #00ffff; margin-bottom: 1.5rem;">
-                                        <i class="fas fa-keyboard me-2"></i>Type your answer:
-                                    </h6>
-                                    <input type="text" class="form-control answer-input-neon" name="answer"
-                                           id="shortAnswer" placeholder="Enter your answer here..." autocomplete="off">
-                                </div>
-                            {% endif %}
-
-                            <!-- Hint Box -->
-                            <div id="hintBox" class="hint-box-neon" style="display: none; min-height: 120px; opacity: 0; transform: translateY(20px); transition: all 0.4s ease;">
+                            <!-- Hint Box - Enhanced Layout -->
+                            <div id="hintBox" class="hint-box-neon" style="display: none; opacity: 0; transform: translateY(20px);">
                                 <div class="d-flex align-items-start gap-3">
                                     <i class="fas fa-lightbulb hint-icon"></i>
-                                    <div>
-                                        <h6 style="color: #ffff00; margin-bottom: 0.75rem;">💡 Hint</h6>
-                                        <div id="hintContent" style="color: rgba(255, 255, 255, 0.9);"></div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 style="color: #ffff00; margin: 0;">💡 Hint</h6>
+                                            <button type="button" class="btn btn-sm" onclick="scrollToQuestion()"
+                                                    style="background: rgba(0, 255, 255, 0.1); border: 1px solid rgba(0, 255, 255, 0.5); color: #00ffff; padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 6px;">
+                                                <i class="fas fa-eye"></i> View Question
+                                            </button>
+                                        </div>
+                                        <div id="hintContent" style="color: rgba(255, 255, 255, 0.9); line-height: 1.6;"></div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
+                        <div class="card-footer" style="border-top: 2px solid rgba(0, 255, 255, 0.3); padding: 1.5rem 2rem;">
                             <!-- Action Buttons -->
                             <div class="d-flex flex-wrap gap-3 justify-content-center mt-4">
                                 <button type="submit" class="btn btn-neon" id="submitBtn">
@@ -940,15 +1071,36 @@
         {% elif question.format == 'mcq_complex' %}
             document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
                 checkbox.addEventListener('change', function() {
+                    const checkboxDiv = document.querySelector(`[data-checkbox="${this.value}"]`);
+                    if (checkboxDiv) {
+                        checkboxDiv.classList.toggle('checked', this.checked);
+                    }
                     this.closest('.option-neon').classList.toggle('selected', this.checked);
                 });
             });
-            
+
+            // Add direct click handler for checkbox areas
+            document.querySelectorAll('.checkbox-neon').forEach(checkboxDiv => {
+                checkboxDiv.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent event bubbling
+                    const checkbox = document.getElementById(`option${this.dataset.checkbox}`);
+                    if (checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        checkbox.dispatchEvent(new Event('change'));
+                    }
+                });
+            });
+
             document.querySelectorAll('.option-neon').forEach(option => {
                 option.addEventListener('click', function(e) {
-                    if (e.target.tagName !== 'INPUT') {
+                    // Only handle clicks that are not on checkbox or its label
+                    if (!e.target.closest('.checkbox-neon') && e.target.tagName !== 'INPUT') {
                         const checkbox = this.querySelector('input[type="checkbox"]');
+                        const checkboxDiv = this.querySelector('.checkbox-neon');
+
                         checkbox.checked = !checkbox.checked;
+                        checkboxDiv.classList.toggle('checked', checkbox.checked);
+                        this.classList.toggle('selected', checkbox.checked);
                         checkbox.dispatchEvent(new Event('change'));
                     }
                 });
@@ -997,6 +1149,7 @@
                 
                 if (data.is_correct) {
                     showXPFeedback(`+${data.xp_change} XP!`, 'Awesome! 🎉', true);
+                    hideHint(); // Hide hint when answer is correct
                     
                     {% if question.format == 'mcq_simple' %}
                         const correctOption = document.querySelector(`[data-option="${data.correct_answer}"]`);
@@ -1131,21 +1284,85 @@
     function showAutoHint(hintText) {
         const hintBox = document.getElementById('hintBox');
         const hintContent = document.getElementById('hintContent');
+        const questionCard = document.querySelector('.question-card-neon');
+        const questionContent = document.querySelector('.question-content');
+
         hintContent.innerHTML = `<p class="mb-0">${hintText}</p>`;
-        
-        // Smooth animation instead of sudden display change
+
+        // Add proper spacing before showing hint
+        questionCard.classList.add('has-hint');
+
+        // Show hint with improved animation
         hintBox.style.display = 'block';
         setTimeout(() => {
+            hintBox.classList.add('showing');
             hintBox.style.opacity = '1';
             hintBox.style.transform = 'translateY(0)';
-        }, 10);
-        
-        // Smooth scroll to hint box
+        }, 50);
+
+        // Ensure question content is visible by scrolling to top of question if needed
         setTimeout(() => {
-            hintBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const cardBody = questionCard.querySelector('.card-body');
+            if (cardBody.scrollTop > 0) {
+                // If user has scrolled down, smoothly scroll back to show question
+                cardBody.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+
+            // Then scroll hint into view
+            setTimeout(() => {
+                hintBox.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest',
+                    inline: 'nearest'
+                });
+            }, 300);
         }, 100);
     }
-    
+
+    function hideHint() {
+        const hintBox = document.getElementById('hintBox');
+        const questionCard = document.querySelector('.question-card-neon');
+
+        // Remove extra spacing
+        questionCard.classList.remove('has-hint');
+
+        // Hide hint with animation
+        hintBox.classList.remove('showing');
+        hintBox.style.opacity = '0';
+        hintBox.style.transform = 'translateY(20px)';
+
+        setTimeout(() => {
+            hintBox.style.display = 'none';
+        }, 400);
+    }
+
+    function scrollToQuestion() {
+        const questionContent = document.querySelector('.question-content');
+        const cardBody = document.querySelector('.question-card-neon .card-body');
+
+        if (questionContent && cardBody) {
+            // Smooth scroll to top of question
+            cardBody.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+
+            // Highlight question briefly for visual feedback
+            questionContent.style.background = 'rgba(0, 255, 255, 0.1)';
+            questionContent.style.borderRadius = '8px';
+            questionContent.style.padding = '1rem';
+            questionContent.style.transition = 'all 0.3s ease';
+
+            setTimeout(() => {
+                questionContent.style.background = 'transparent';
+                questionContent.style.padding = '0';
+            }, 1500);
+        }
+    }
+
     function requestHint() {
         const hintBtn = document.getElementById('hintBtn');
         hintBtn.disabled = true;
