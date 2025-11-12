@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .api_views import LoginActivityAPI, check_new_logins, QLearningMetricsAPI
 
 app_name = 'qlearning'
 
@@ -17,6 +18,13 @@ urlpatterns = [
     path('export-qlearning-performance-logs/', views.export_qlearning_performance_logs, name='export_qlearning_performance'),
     path('export-global-logs/', views.export_global_logs, name='export_global'),
 
+    # Login Activity API
+    path('api/login-activity/', LoginActivityAPI.as_view(), name='login_activity'),
+    path('api/check-new-logins/', check_new_logins, name='check_new_logins'),
+    
     # Legacy endpoints (for backward compatibility)
     path('api/claim-level/', views.LevelUpClaimView.as_view(), name='api_claim_level'),
+    
+    # Q-Learning Metrics API
+    path('api/metrics/', QLearningMetricsAPI.as_view(), name='qlearning_metrics'),
 ]

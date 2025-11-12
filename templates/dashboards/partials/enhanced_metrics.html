@@ -1,0 +1,503 @@
+<!-- Enhanced Metrics Section -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h3 class="section-title mb-4">
+            <i class="fas fa-chart-network me-2"></i>Enhanced Analytics & Q-Learning Insights
+            <span class="badge bg-primary ms-2">New</span>
+        </h3>
+    </div>
+</div>
+
+<!-- Q-Learning Performance Deep Dive -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card enhanced-card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-brain me-2"></i>Q-Learning Performance Deep Dive
+                </h5>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-3">
+                                    <i class="fas fa-project-diagram me-2"></i>State-Action Matrix
+                                </h6>
+                                <div class="state-action-matrix">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-hover">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th>State/Action</th>
+                                                    <th>Easy</th>
+                                                    <th>Medium</th>
+                                                    <th>Hard</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for state, actions in qlearning_matrix.items %}
+                                                <tr>
+                                                    <td><strong>{{ state }}</strong></td>
+                                                    <td class="text-center">
+                                                        <span class="badge bg-{{ actions.easy.badge }}">
+                                                            {{ actions.easy.value|floatformat:2 }}
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span class="badge bg-{{ actions.medium.badge }}">
+                                                            {{ actions.medium.value|floatformat:2 }}
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span class="badge bg-{{ actions.hard.badge }}">
+                                                            {{ actions.hard.value|floatformat:2 }}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <small class="text-muted">Q-Values for each state-action pair (higher is better)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-3">
+                                    <i class="fas fa-chart-line me-2"></i>Learning Progress
+                                </h6>
+                                <div id="learningProgressChart" style="min-height: 300px;">
+                                    <!-- Chart will be rendered here by Chart.js -->
+                                    <div class="text-center py-5">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="mt-2">Loading learning progress data...</p>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="d-flex justify-content-between">
+                                        <small class="text-muted">Exploration Rate: {{ exploration_rate|floatformat:2 }}%</small>
+                                        <small class="text-muted">Last Updated: <span class="text-primary">Just now</span></small>
+                                    </div>
+                                    <div class="progress mt-2" style="height: 8px;">
+                                        <div class="progress-bar bg-warning" role="progressbar" 
+                                             style="width: {{ exploration_rate }}%" 
+                                             aria-valuenow="{{ exploration_rate }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Distribution -->
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-3">
+                                    <i class="fas fa-chart-pie me-2"></i>Action Distribution by State
+                                </h6>
+                                <div class="row">
+                                    {% for state, distribution in action_distribution.items %}
+                                    <div class="col-md-4">
+                                        <div class="state-distribution">
+                                            <h6 class="text-center mb-3">{{ state }}</h6>
+                                            <div class="progress" style="height: 25px;">
+                                                <div class="progress-bar bg-success" role="progressbar" 
+                                                     style="width: {{ distribution.easy }}%" 
+                                                     title="Easy: {{ distribution.easy }}%">
+                                                    {{ distribution.easy }}%
+                                                </div>
+                                                <div class="progress-bar bg-warning" role="progressbar" 
+                                                     style="width: {{ distribution.medium }}%" 
+                                                     title="Medium: {{ distribution.medium }}%">
+                                                    {{ distribution.medium }}%
+                                                </div>
+                                                <div class="progress-bar bg-danger" role="progressbar" 
+                                                     style="width: {{ distribution.hard }}%" 
+                                                     title="Hard: {{ distribution.hard }}%">
+                                                    {{ distribution.hard }}%
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-between mt-2">
+                                                <small class="text-muted">Easy</small>
+                                                <small class="text-muted">Medium</small>
+                                                <small class="text-muted">Hard</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Engagement & Adaptation Impact -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-user-engagement me-2"></i>User Engagement Metrics
+                </h5>
+                <div class="engagement-metrics mt-4">
+                    <div class="metric-item d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h6 class="mb-1">Daily Active Users</h6>
+                            <small class="text-muted">Last 7 days average</small>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">{{ engagement_metrics.dau }} users</span>
+                    </div>
+                    <div class="metric-item d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h6 class="mb-1">Average Session Duration</h6>
+                            <small class="text-muted">Minutes per session</small>
+                        </div>
+                        <span class="badge bg-info rounded-pill">{{ engagement_metrics.avg_session_duration }} min</span>
+                    </div>
+                    <div class="metric-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Questions Attempted</h6>
+                            <small class="text-muted">Per active user daily</small>
+                        </div>
+                        <span class="badge bg-success rounded-pill">{{ engagement_metrics.questions_per_user }}</span>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <canvas id="engagementTrendChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-chart-line me-2"></i>Adaptation Impact Analysis
+                </h5>
+                <div class="adaptation-impact mt-4">
+                    <div class="impact-metric mb-4">
+                        <h6>Success Rate Before & After Adaptation</h6>
+                        <div class="d-flex align-items-center mt-2">
+                            <div class="text-center me-4">
+                                <div class="percentage-badge bg-light text-dark">
+                                    {{ adaptation_impact.before_adaptation }}%
+                                </div>
+                                <div class="text-muted small">Before</div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="progress" style="height: 30px;">
+                                    <div class="progress-bar bg-danger" 
+                                         style="width: {{ adaptation_impact.before_adaptation }}%">
+                                    </div>
+                                    <div class="progress-bar bg-success" 
+                                         style="width: {{ adaptation_impact.improvement }}%">
+                                        +{{ adaptation_impact.improvement }}%
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center ms-4">
+                                <div class="percentage-badge bg-success">
+                                    {{ adaptation_impact.after_adaptation }}%
+                                </div>
+                                <div class="text-muted small">After</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="impact-details">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="stat-value">{{ adaptation_impact.positive_adaptations }}</div>
+                                <div class="stat-label">Positive</div>
+                                <div class="stat-desc">Improved performance</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-value">{{ adaptation_impact.neutral_adaptations }}</div>
+                                <div class="stat-label">Neutral</div>
+                                <div class="stat-desc">No change</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-value">{{ adaptation_impact.negative_adaptations }}</div>
+                                <div class="stat-label">Negative</div>
+                                <div class="stat-desc">Decreased performance</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6>Adaptation Type Distribution</h6>
+                    <div class="chart-container" style="position: relative; height:200px;">
+                        <canvas id="adaptationTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Feedback & Sentiment Analysis -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-comment-dots me-2"></i>User Feedback & Sentiment Analysis
+                </h5>
+                
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="sentiment-score text-center">
+                            <div class="score-display">
+                                <span class="score-value">{{ sentiment_analysis.overall_score }}</span>
+                                <span class="score-label">/ 5.0</span>
+                            </div>
+                            <div class="sentiment-badge">
+                                {% if sentiment_analysis.sentiment == 'Positive' %}
+                                    <span class="badge bg-success">Positive</span>
+                                {% elif sentiment_analysis.sentiment == 'Negative' %}
+                                    <span class="badge bg-danger">Needs Attention</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Neutral</span>
+                                {% endif %}
+                            </div>
+                            <div class="mt-3">
+                                <small class="text-muted">Based on {{ sentiment_analysis.total_feedback }} feedback entries</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-8">
+                        <div class="sentiment-breakdown">
+                            <h6>Sentiment Distribution</h6>
+                            <div class="progress mt-3" style="height: 25px;">
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                     style="width: {{ sentiment_analysis.positive_pct }}%" 
+                                     title="Positive: {{ sentiment_analysis.positive_pct }}%">
+                                    {{ sentiment_analysis.positive_pct }}%
+                                </div>
+                                <div class="progress-bar bg-warning" role="progressbar" 
+                                     style="width: {{ sentiment_analysis.neutral_pct }}%" 
+                                     title="Neutral: {{ sentiment_analysis.neutral_pct }}%">
+                                    {{ sentiment_analysis.neutral_pct }}%
+                                </div>
+                                <div class="progress-bar bg-danger" role="progressbar" 
+                                     style="width: {{ sentiment_analysis.negative_pct }}%" 
+                                     title="Negative: {{ sentiment_analysis.negative_pct }}%">
+                                    {{ sentiment_analysis.negative_pct }}%
+                                </div>
+                            </div>
+                            
+                            <div class="recent-feedback mt-4">
+                                <h6>Recent Feedback</h6>
+                                <div class="feedback-list">
+                                    {% for feedback in recent_feedback %}
+                                    <div class="feedback-item p-3 mb-2 rounded {% if feedback.sentiment == 'positive' %}bg-success bg-opacity-10{% elif feedback.sentiment == 'negative' %}bg-danger bg-opacity-10{% else %}bg-light{% endif %}">
+                                        <div class="d-flex justify-content-between">
+                                            <strong>{{ feedback.user }}</strong>
+                                            <small class="text-muted">{{ feedback.timestamp|timesince }} ago</small>
+                                        </div>
+                                        <p class="mb-1">{{ feedback.comment }}</p>
+                                        <div>
+                                            {% for i in "12345"|make_list %}
+                                                {% if forloop.counter <= feedback.rating %}
+                                                    <i class="fas fa-star text-warning"></i>
+                                                {% else %}
+                                                    <i class="far fa-star text-muted"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Charts -->
+<script>
+    // Initialize all charts when the document is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Engagement Trend Chart
+        const engagementCtx = document.getElementById('engagementTrendChart').getContext('2d');
+        new Chart(engagementCtx, {
+            type: 'line',
+            data: {
+                labels: {{ engagement_trend.labels|safe }},
+                datasets: [{
+                    label: 'Daily Active Users',
+                    data: {{ engagement_trend.data|safe }},
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#6c757d'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#6c757d'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Adaptation Type Chart
+        const adaptationCtx = document.getElementById('adaptationTypeChart').getContext('2d');
+        new Chart(adaptationCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Difficulty Increase', 'Difficulty Decrease', 'Reward Change', 'No Change'],
+                datasets: [{
+                    data: [
+                        {{ adaptation_types.difficulty_increase }},
+                        {{ adaptation_types.difficulty_decrease }},
+                        {{ adaptation_types.reward_change }},
+                        {{ adaptation_types.no_change }}
+                    ],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(201, 203, 207, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(201, 203, 207, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#6c757d'
+                        }
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+    });
+</script>
+
+<style>
+    /* Additional styles for the enhanced metrics */
+    .state-action-matrix .badge {
+        font-size: 0.8em;
+        padding: 0.35em 0.65em;
+    }
+    
+    .percentage-badge {
+        display: inline-block;
+        padding: 0.5em 1em;
+        border-radius: 50px;
+        font-weight: bold;
+        min-width: 60px;
+    }
+    
+    .stat-value {
+        font-size: 1.8em;
+        font-weight: bold;
+        line-height: 1.2;
+    }
+    
+    .stat-label {
+        font-size: 0.9em;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .stat-desc {
+        font-size: 0.8em;
+        color: #adb5bd;
+    }
+    
+    .sentiment-score .score-value {
+        font-size: 3em;
+        font-weight: bold;
+        color: #0d6efd;
+    }
+    
+    .sentiment-score .score-label {
+        font-size: 1.2em;
+        color: #6c757d;
+    }
+    
+    .feedback-item {
+        transition: all 0.3s ease;
+    }
+    
+    .feedback-item:hover {
+        transform: translateX(5px);
+    }
+    
+    /* Animation for loading */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-out forwards;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .sentiment-score {
+            margin-bottom: 2rem;
+        }
+        
+        .stat-value {
+            font-size: 1.5em;
+        }
+    }
+</style>

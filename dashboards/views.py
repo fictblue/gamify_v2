@@ -1,15 +1,32 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views import View
+from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.views import View
-from django.contrib import messages
-from django.shortcuts import redirect
-from django.db.models import Avg, Count
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
+from django.urls import reverse_lazy, reverse
+from django.db.models import Count, Q, F, Sum, Avg, Max, Min, Case, When, Value, IntegerField
+from django.db.models.functions import TruncDate, TruncHour, TruncDay, TruncWeek, TruncMonth, TruncYear, ExtractWeekDay, ExtractHour
+from django.utils import timezone
+from django.core.paginator import Paginator
+from django.core.serializers.json import DjangoJSONEncoder
 from django.views.decorators.csrf import csrf_exempt
-from accounts.models import StudentProfile, CustomUser
-from quizzes.models import AttemptLog, Question
 import json
+import pandas as pd
+import csv
+from io import StringIO, BytesIO
+import xlsxwriter
+from datetime import datetime, timedelta
+
+from accounts.models import CustomUser, StudentProfile
+from quizzes.models import AttemptLog, Question
+from .export_utils import export_research_data
+from qlearning.models import (
+    QLearningLog, LevelTransitionLog, UserEngagementLog, 
+    SuccessRateLog, ResponseToAdaptationLog, QLearningPerformanceLog, 
+    RewardIncentivesLog, GlobalSystemLog, UserSurveyResponse, 
+    LoginActivityLog, AdaptationEffectivenessLog, QLearningDecisionLog
+)
 
 @method_decorator(login_required, name='dispatch')
 class StudentDashboardView(View):
@@ -120,6 +137,29 @@ class AdminDashboardView(View):
         # Get comprehensive analytics data
         from qlearning.analytics import AnalyticsService
         analytics_data = AnalyticsService.get_comprehensive_dashboard_data()
+        
+        # Get user growth data (last 7 days)
+        today = timezone.now().date()
+        date_range = [today - timedelta(days=i) for i in range(6, -1, -1)]  # Last 7 days
+        
+        user_growth = []
+        for date in date_range:
+            next_day = date + timedelta(days=1)
+            count = CustomUser.objects.filter(
+                date_joined__date__gte=date,
+                date_joined__date__lt=next_day,
+                is_active=True  # Only count active users
+            ).count()
+            user_growth.append(count)
+        
+        # Prepare user growth data for the template
+        user_growth_data = {
+            'labels': [date.strftime('%a') for date in date_range],  # ['Mon', 'Tue', ...]
+            'data': user_growth,  # [5, 8, 12, ...]
+            'total_users': total_students,  # For verification
+            'start_date': date_range[0].strftime('%Y-%m-%d'),
+            'end_date': date_range[-1].strftime('%Y-%m-%d')
+        }
 
         context = {
             'user': request.user,
@@ -142,13 +182,284 @@ class AdminDashboardView(View):
             },
             # Analytics data
             'analytics': analytics_data,
+            'user_growth_data_json': json.dumps(user_growth_data),
         }
 
         return render(request, 'dashboards/admin_dashboard.html', context)
 
 
+import csv
+from io import StringIO
+from django.utils import timezone
+
 @method_decorator(login_required, name='dispatch')
 @method_decorator(csrf_exempt, name='dispatch')
+class UserGrowthDataView(View):
+    """API endpoint to fetch real-time user growth data"""
+    
+    def get(self, request):
+        range_type = request.GET.get('range', 'week')  # week, month, year
+        
+        # Determine date range
+        today = timezone.now().date()
+        
+        if range_type == 'month':
+            days = 30
+            date_format = '%b %d'
+        elif range_type == 'year':
+            days = 365
+            date_format = '%b %Y'
+        else:  # week (default)
+            days = 7
+            date_format = '%a'  # Mon, Tue, etc.
+        
+        # Generate date range
+        date_range = [today - timedelta(days=i) for i in range(days-1, -1, -1)]
+        labels = [date.strftime(date_format) for date in date_range]
+        
+        # Get user counts for each day
+        user_counts = []
+        
+        for date in date_range:
+            next_day = date + timedelta(days=1)
+            count = CustomUser.objects.filter(
+                date_joined__date__gte=date,
+                date_joined__date__lt=next_day,
+                is_active=True
+            ).count()
+            user_counts.append(count)
+            
+        total_users = CustomUser.objects.filter(is_active=True).count()
+        
+        return JsonResponse({
+            'success': True,
+            'data': {
+                'labels': labels,
+                'datasets': [{
+                    'label': 'New Users',
+                    'data': user_counts,
+                    'total_users': total_users,
+                    'start_date': date_range[0].strftime('%Y-%m-%d'),
+                    'end_date': date_range[-1].strftime('%Y-%m-%d')
+                }]
+            }
+        })
+
+
+class ResearchDataExportView(View):
+    """View for exporting research data in various formats"""
+    
+    @method_decorator(login_required)
+    def get(self, request, format='excel'):
+        if not request.user.is_staff:
+            return JsonResponse({'error': 'Permission denied'}, status=403)
+        
+        # Get format from URL or query parameter
+        export_format = request.GET.get('format', format).lower()
+        
+        # Use the export_research_data function
+        from .export_utils import export_research_data
+        
+        try:
+            return export_research_data(export_format)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return JsonResponse({
+                'error': 'Failed to generate export',
+                'details': str(e)
+            }, status=500)
+    
+    def export_excel(self):
+        """Export data to Excel format"""
+        output = BytesIO()
+        
+        # Create a Pandas Excel writer using XlsxWriter as the engine
+        writer = pd.ExcelWriter(output, engine='xlsxwriter')
+        
+        # Get and write each dataset to a different worksheet
+        data = self.get_export_data()
+        
+        for sheet_name, df_data in data.items():
+            if isinstance(df_data, dict):
+                # Convert dict to DataFrame
+                if 'data' in df_data and isinstance(df_data['data'], list):
+                    df = pd.DataFrame(df_data['data'])
+                    df.to_excel(writer, sheet_name=sheet_name[:31], index=False)
+        
+        # Save the Excel file
+        writer.close()
+        output.seek(0)
+        
+        # Create the response
+        response = HttpResponse(
+            output.read(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="research_export_{timezone.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+        return response
+    
+    def export_json(self):
+        """Export data to JSON format"""
+        data = self.get_export_data()
+        response = JsonResponse(data, json_dumps_params={'indent': 2})
+        response['Content-Disposition'] = f'attachment; filename="research_export_{timezone.now().strftime("%Y%m%d_%H%M%S")}.json"'
+        return response
+    
+    def export_csv(self):
+        """Export data to CSV format"""
+        data = self.get_export_data()
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="research_export_{timezone.now().strftime("%Y%m%d_%H%M%S")}.csv"'
+        
+        writer = csv.writer(response)
+        
+        # Write each dataset as a separate section
+        for section, section_data in data.items():
+            if isinstance(section_data, dict) and 'data' in section_data and isinstance(section_data['data'], list):
+                writer.writerow([f'=== {section.upper()} ==='])
+                df = pd.DataFrame(section_data['data'])
+                writer.writerow(df.columns.tolist())  # Write headers
+                for _, row in df.iterrows():
+                    writer.writerow(row.tolist())
+                writer.writerow([])  # Add empty row between sections
+        
+        return response
+    
+    def get_export_data(self):
+        """Get all data for export"""
+        from .export_utils import (
+            get_user_engagement_metrics,
+            get_success_rate_metrics,
+            get_qlearning_performance_metrics,
+            get_adaptation_effectiveness_metrics
+        )
+        
+        # Get the data
+        user_engagement = get_user_engagement_metrics()
+        success_rates = get_success_rate_metrics()
+        qlearning_performance = get_qlearning_performance_metrics()
+        adaptation_effectiveness = get_adaptation_effectiveness_metrics()
+        
+        # Print debug info
+        print("\n=== DEBUG: Export Data ===")
+        print(f"User Engagement: {user_engagement}")
+        print(f"Success Rates: {success_rates}")
+        print(f"Q-Learning Performance: {qlearning_performance}")
+        print(f"Adaptation Effectiveness: {adaptation_effectiveness}")
+        
+        return {
+            'user_engagement': user_engagement,
+            'success_rates': success_rates,
+            'qlearning_performance': qlearning_performance,
+            'adaptation_effectiveness': adaptation_effectiveness,
+            'metadata': {
+                'exported_at': timezone.now().isoformat(),
+                'exported_by': self.request.user.username
+            }
+        }
+    
+    def export_logs_csv(self, log_type):
+        """Export logs in CSV format based on log type"""
+        from qlearning.models import (
+            UserEngagementLog, SuccessRateLog, ResponseToAdaptationLog,
+            QLearningPerformanceLog, LevelTransitionLog, RewardIncentivesLog,
+            GlobalSystemLog, UserSurveyResponse, LoginActivityLog,
+            AdaptationEffectivenessLog, QLearningDecisionLog
+        )
+        
+        # Map log types to their models and fields
+        LOG_MODELS = {
+            # Existing log types
+            'engagement': (UserEngagementLog.objects.all(), [
+                'id', 'user__username', 'session_type', 'timestamp', 
+                'duration_seconds', 'questions_attempted', 'hints_used',
+                'gamification_interactions', 'metadata'
+            ]),
+            'success': (SuccessRateLog.objects.all(), [
+                'id', 'user__username', 'difficulty', 'total_attempts',
+                'correct_attempts', 'average_time_spent', 'accuracy_percentage',
+                'time_window_start', 'time_window_end', 'metadata'
+            ]),
+            'qlearning': (QLearningPerformanceLog.objects.all(), [
+                'id', 'user__username', 'state_hash', 'optimal_action_frequency',
+                'average_q_value', 'q_table_size', 'learning_progress',
+                'timestamp', 'metadata', 'action_distribution', 'snapshot_interval'
+            ]),
+            'transitions': (LevelTransitionLog.objects.all(), [
+                'id', 'user__username', 'transition_type', 'old_level',
+                'new_level', 'timestamp', 'transition_condition', 'performance_metrics'
+            ]),
+            'rewards': (RewardIncentivesLog.objects.all(), [
+                'id', 'user__username', 'reward_type', 'reward_value',
+                'session_continuation', 'timestamp', 'trigger_condition', 'user_reaction'
+            ]),
+            # New log types
+            'surveys': (UserSurveyResponse.objects.all(), [
+                'id', 'user__username', 'survey_type', 'satisfaction_rating',
+                'difficulty_rating', 'engagement_rating', 'feedback_text',
+                'would_continue', 'adaptation_helpful', 'timestamp', 'context_data'
+            ]),
+            'login_activity': (LoginActivityLog.objects.all(), [
+                'id', 'user__username', 'login_timestamp', 'logout_timestamp',
+                'session_duration_seconds', 'ip_address', 'user_agent',
+                'activities_performed'
+            ]),
+            'adaptation_effectiveness': (AdaptationEffectivenessLog.objects.all(), [
+                'id', 'user__username', 'adaptation_event_id', 'success_rate_before',
+                'success_rate_after', 'success_rate_change', 'avg_time_before',
+                'avg_time_after', 'attempts_before', 'attempts_after',
+                'time_efficiency_change', 'continued_session', 'attempts_until_quit',
+                'measurement_window_days', 'timestamp'
+            ]),
+            'qlearning_decisions': (QLearningDecisionLog.objects.all(), [
+                'id', 'user__username', 'state_hash', 'decision_type',
+                'epsilon_value', 'action_chosen', 'q_value_chosen', 'best_q_value',
+                'all_q_values', 'is_optimal', 'timestamp'
+            ])
+        }
+        
+        if log_type not in LOG_MODELS:
+            return JsonResponse({'error': f'Invalid log type: {log_type}'}, status=400)
+        
+        # Get the queryset and fields for this log type
+        queryset, fields = LOG_MODELS[log_type]
+        
+        # Create a file-like buffer to receive CSV data
+        buffer = StringIO()
+        writer = csv.writer(buffer)
+        
+        # Write header
+        writer.writerow([field.replace('__', ' ').replace('_', ' ').title() for field in fields])
+        
+        # Write data rows
+        for item in queryset:
+            row = []
+            for field in fields:
+                # Handle related fields (e.g., user__username)
+                if '__' in field:
+                    obj = item
+                    for part in field.split('__'):
+                        obj = getattr(obj, part, None)
+                        if obj is None:
+                            break
+                    row.append(str(obj) if obj is not None else '')
+                else:
+                    value = getattr(item, field, '')
+                    # Handle datetime fields
+                    if hasattr(value, 'strftime'):
+                        value = value.strftime('%Y-%m-%d %H:%M:%S')
+                    row.append(str(value) if value is not None else '')
+            writer.writerow(row)
+        
+        # Create the response with CSV data
+        buffer.seek(0)
+        response = HttpResponse(buffer, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{log_type}_logs_{timezone.now().strftime("%Y%m%d_%H%M%S")}.csv"'
+        
+        return response
+
+
 class AdminDashboardAjaxView(View):
     """AJAX view for admin dashboard real-time data"""
 

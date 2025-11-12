@@ -586,40 +586,43 @@ class AnalyticsService:
     @staticmethod
     def get_comprehensive_dashboard_data():
         """Get comprehensive data for the admin dashboard"""
-        from django.db.models import Max, Min
+        from django.db.models import Max, Min, Avg, Sum, Count, F, Q, Case, When, IntegerField
+        from django.utils import timezone
+        from datetime import timedelta
 
-        # User engagement metrics
-        recent_sessions = UserEngagementLog.objects.all().order_by('-timestamp')[:50]
+        # User engagement metrics - evaluate immediately to avoid slicing issues
+        recent_sessions = list(UserEngagementLog.objects.all().order_by('-timestamp')[:50])
 
         engagement_summary = {
-            'total_sessions': recent_sessions.count(),
-            'avg_session_duration': recent_sessions.aggregate(Avg('duration_seconds'))['duration_seconds__avg'] or 0,
-            'total_questions_attempted': recent_sessions.aggregate(Sum('questions_attempted'))['questions_attempted__sum'] or 0,
-            'total_hints_used': recent_sessions.aggregate(Sum('hints_used'))['hints_used__sum'] or 0,
+            'total_sessions': len(recent_sessions),
+            'avg_session_duration': sum(s.duration_seconds for s in recent_sessions) / len(recent_sessions) if recent_sessions else 0,
+            'total_questions_attempted': sum(s.questions_attempted for s in recent_sessions),
+            'total_hints_used': sum(s.hints_used for s in recent_sessions),
             'session_types': {}
         }
 
+        session_type_counts = {}
         for session in recent_sessions:
-            engagement_summary['session_types'][session.session_type] = \
-                engagement_summary['session_types'].get(session.session_type, 0) + 1
+            session_type_counts[session.session_type] = session_type_counts.get(session.session_type, 0) + 1
+        engagement_summary['session_types'] = session_type_counts
 
-        # Success rate metrics
-        success_logs = SuccessRateLog.objects.all().order_by('-time_window_end')[:20]
-
+        # Success rate metrics - evaluate immediately
+        success_logs = list(SuccessRateLog.objects.all().order_by('-time_window_end')[:20])
+        
         success_summary = {
-            'total_logs': success_logs.count(),
-            'overall_accuracy': success_logs.aggregate(Avg('accuracy_percentage'))['accuracy_percentage__avg'] or 0,
+            'total_logs': len(success_logs),
+            'overall_accuracy': sum(log.accuracy_percentage for log in success_logs) / len(success_logs) if success_logs else 0,
             'difficulty_breakdown': {}
         }
 
         # Get success rates for all difficulties
         for difficulty in ['easy', 'medium', 'hard']:
-            diff_logs = SuccessRateLog.objects.filter(difficulty=difficulty).order_by('-time_window_end')[:10]
+            diff_logs = list(SuccessRateLog.objects.filter(difficulty=difficulty).order_by('-time_window_end')[:10])
 
-            if diff_logs.exists():
+            if diff_logs:  # If we have logs for this difficulty
                 total_accuracy = sum(log.accuracy_percentage for log in diff_logs)
-                count = diff_logs.count()
-                avg_accuracy = total_accuracy / count
+                count = len(diff_logs)
+                avg_accuracy = total_accuracy / count if count > 0 else 0
 
                 success_summary['difficulty_breakdown'][difficulty] = {
                     'average_accuracy': avg_accuracy,
@@ -627,10 +630,10 @@ class AnalyticsService:
                 }
             else:
                 # Calculate from AttemptLog if no SuccessRateLog exists
-                attempts = AttemptLog.objects.filter(question__difficulty=difficulty)
-                if attempts.exists():
-                    correct_attempts = attempts.filter(is_correct=True).count()
-                    total_attempts = attempts.count()
+                attempts = list(AttemptLog.objects.filter(question__difficulty=difficulty)[:1000])  # Limit to 1000 to avoid memory issues
+                if attempts:  # Check if the list is not empty
+                    correct_attempts = sum(1 for a in attempts if a.is_correct)
+                    total_attempts = len(attempts)
                     accuracy = (correct_attempts / total_attempts * 100) if total_attempts > 0 else 0
 
                     success_summary['difficulty_breakdown'][difficulty] = {
@@ -648,13 +651,13 @@ class AnalyticsService:
         success_summary['medium_accuracy'] = success_summary['difficulty_breakdown'].get('medium', {}).get('average_accuracy', 0)
         success_summary['hard_accuracy'] = success_summary['difficulty_breakdown'].get('hard', {}).get('average_accuracy', 0)
 
-        # Level transition metrics
-        level_transitions = LevelTransitionLog.objects.all().order_by('-timestamp')[:30]
+        # Level transition metrics - evaluate immediately
+        level_transitions = list(LevelTransitionLog.objects.all().order_by('-timestamp')[:30])
 
         transition_summary = {
-            'total_transitions': level_transitions.count(),
-            'level_up_count': LevelTransitionLog.objects.filter(transition_type='level_up_manual').count(),
-            'level_down_count': LevelTransitionLog.objects.filter(transition_type='level_down_auto').count(),
+            'total_transitions': len(level_transitions),
+            'level_up_count': sum(1 for t in level_transitions if t.transition_type == 'level_up_manual'),
+            'level_down_count': sum(1 for t in level_transitions if t.transition_type == 'level_down_auto'),
             'transition_types': {}
         }
 
@@ -663,32 +666,37 @@ class AnalyticsService:
             transition_summary['transition_types'][trans_key] = \
                 transition_summary['transition_types'].get(trans_key, 0) + 1
 
-        # Reward effectiveness metrics
-        reward_logs = RewardIncentivesLog.objects.all().order_by('-timestamp')[:30]
-
+        # Reward effectiveness metrics - evaluate immediately
+        reward_logs = list(RewardIncentivesLog.objects.all().order_by('-timestamp')[:30])
+        total_rewards = len(reward_logs)
+        
         reward_summary = {
-            'total_rewards': reward_logs.count(),
-            'avg_reward_value': reward_logs.aggregate(Avg('reward_value'))['reward_value__avg'] or 0,
+            'total_rewards': total_rewards,
+            'avg_reward_value': sum(r.reward_value for r in reward_logs) / total_rewards if total_rewards > 0 else 0,
             'session_continuation_rate': (
-                RewardIncentivesLog.objects.filter(session_continuation=True).count() / RewardIncentivesLog.objects.count() * 100
-            ) if RewardIncentivesLog.objects.count() > 0 else 0,
+                sum(1 for r in reward_logs if r.session_continuation) / total_rewards * 100
+            ) if total_rewards > 0 else 0,
             'reward_types': {}
         }
 
+        # Count reward types
         for reward in reward_logs:
             reward_summary['reward_types'][reward.reward_type] = \
                 reward_summary['reward_types'].get(reward.reward_type, 0) + 1
 
-        # Q-Learning performance metrics
-        qlearning_logs = QLearningLog.objects.all().order_by('-timestamp')[:50]
-        qtable_entries = QTableEntry.objects.all()
-
+        # Q-Learning performance metrics - evaluate immediately
+        qlearning_logs = list(QLearningLog.objects.all().order_by('-timestamp')[:50])
+        qtable_entries = list(QTableEntry.objects.all()[:1000])  # Limit to 1000 entries to avoid memory issues
+        
+        # Calculate unique users safely
+        unique_users = len({log.user_id for log in qlearning_logs if hasattr(log, 'user_id')}) if qlearning_logs else 0
+        
         # Initialize qlearning_summary with default values for charts
         qlearning_summary = {
-            'total_updates': qlearning_logs.count(),
-            'avg_q_value': 0,
-            'avg_reward': 0,
-            'unique_users': QLearningLog.objects.values('user').distinct().count(),
+            'total_updates': len(qlearning_logs),
+            'avg_q_value': sum(getattr(log, 'q_value_after', 0) for log in qlearning_logs) / len(qlearning_logs) if qlearning_logs else 0,
+            'avg_reward': sum(getattr(log, 'reward', 0) for log in qlearning_logs) / len(qlearning_logs) if qlearning_logs else 0,
+            'unique_users': unique_users,
             'action_distribution': {},
             # Add data for charts
             'qtable': {
@@ -712,10 +720,13 @@ class AnalyticsService:
             'max_state_visits': 78  # Max value for normalization
         }
 
-        if qlearning_logs.exists():
+        # Process Q-learning logs if we have any
+        if qlearning_logs:  # Check if list is not empty
             # Calculate average Q-value from QTableEntry (more accurate)
-            if qtable_entries.exists():
-                qlearning_summary['avg_q_value'] = qtable_entries.aggregate(Avg('q_value'))['q_value__avg'] or 0
+            if qtable_entries:  # Check if list is not empty
+                # Calculate average q_value from the list of entries
+                total_q_value = sum(entry.q_value for entry in qtable_entries if hasattr(entry, 'q_value'))
+                qlearning_summary['avg_q_value'] = total_q_value / len(qtable_entries) if qtable_entries else 0
                 
                 # Get actual Q-table values if available
                 try:
@@ -723,11 +734,10 @@ class AnalyticsService:
                     for i, state in enumerate(qlearning_summary['qtable']['states']):
                         for j, action in enumerate(qlearning_summary['qtable']['actions']):
                             # Try to get actual Q-value from database
-                            entry = qtable_entries.filter(
-                                state_hash__contains=state.lower(),
-                                action=action
-                            ).first()
-                            if entry:
+                            entry = next((e for e in qtable_entries 
+                                       if state.lower() in getattr(e, 'state_hash', '').lower() 
+                                       and getattr(e, 'action', '') == action), None)
+                            if entry and hasattr(entry, 'q_value'):
                                 qlearning_summary['qtable']['values'][i][j] = float(entry.q_value)
                 except Exception as e:
                     print(f"Error processing Q-table: {e}")
@@ -735,41 +745,73 @@ class AnalyticsService:
                 qlearning_summary['avg_q_value'] = 0
 
             # Calculate average reward from QLearningLog
-            qlearning_summary['avg_reward'] = qlearning_logs.aggregate(Avg('reward'))['reward__avg'] or 0
+            total_reward = sum(getattr(log, 'reward', 0) for log in qlearning_logs)
+            qlearning_summary['avg_reward'] = total_reward / len(qlearning_logs) if qlearning_logs else 0
 
             # Action distribution from QLearningLog
             action_counts = {}
             for log in qlearning_logs:
-                action_counts[log.action] = action_counts.get(log.action, 0) + 1
+                action = getattr(log, 'action', None)
+                if action is not None:
+                    action_counts[action] = action_counts.get(action, 0) + 1
             
             # Normalize action counts to get distribution
-            total_actions = sum(action_counts.values()) or 1
-            qlearning_summary['action_distribution'] = {
-                action: (count / total_actions * 100) 
-                for action, count in action_counts.items()
-            }
+            total_actions = sum(action_counts.values())
+            if total_actions > 0:
+                qlearning_summary['action_distribution'] = {
+                    action: (count / total_actions * 100) 
+                    for action, count in action_counts.items()
+                }
+            else:
+                qlearning_summary['action_distribution'] = {}
 
-        # Global system metrics
-        global_logs = GlobalSystemLog.objects.all().order_by('-timestamp')[:10]
+        # Global system metrics - evaluate immediately to list
+        global_logs = list(GlobalSystemLog.objects.all().order_by('-timestamp')[:10])
 
         global_summary = {
-            'total_metrics': global_logs.count(),
+            'total_metrics': len(global_logs),  # Use len() instead of count() on list
             'latest_accuracy': 0,
             'latest_engagement': 0
         }
 
+        # Process logs from the list
         for log in global_logs:
-            if log.metric_type == 'accuracy_global':
-                global_summary['latest_accuracy'] = log.metric_data.get('global_accuracy', 0)
-            elif log.metric_type == 'engagement_daily':
-                global_summary['latest_engagement'] = log.metric_data.get('unique_users', 0)
+            if hasattr(log, 'metric_type') and hasattr(log, 'metric_data'):
+                if log.metric_type == 'accuracy_global':
+                    global_summary['latest_accuracy'] = log.metric_data.get('global_accuracy', 0)
+                elif log.metric_type == 'engagement_daily':
+                    global_summary['latest_engagement'] = log.metric_data.get('unique_users', 0)
 
         # Get new comprehensive metrics
-        login_metrics = AnalyticsService.get_login_frequency_metrics(days=30)
-        adaptation_metrics = AnalyticsService.get_adaptation_effectiveness_metrics()
-        survey_metrics = AnalyticsService.get_survey_feedback_summary()
-        qlearning_evolution = AnalyticsService.get_qlearning_evolution_metrics()
-        state_distribution = AnalyticsService.get_state_distribution_metrics()
+        try:
+            login_metrics = AnalyticsService.get_login_frequency_metrics(days=30)
+        except Exception as e:
+            print(f"Error getting login metrics: {e}")
+            login_metrics = {}
+            
+        try:
+            adaptation_metrics = AnalyticsService.get_adaptation_effectiveness_metrics()
+        except Exception as e:
+            print(f"Error getting adaptation metrics: {e}")
+            adaptation_metrics = {}
+            
+        try:
+            survey_metrics = AnalyticsService.get_survey_feedback_summary()
+        except Exception as e:
+            print(f"Error getting survey metrics: {e}")
+            survey_metrics = {}
+            
+        try:
+            qlearning_evolution = AnalyticsService.get_qlearning_evolution_metrics()
+        except Exception as e:
+            print(f"Error getting Q-learning evolution metrics: {e}")
+            qlearning_evolution = {}
+            
+        try:
+            state_distribution = AnalyticsService.get_state_distribution_metrics()
+        except Exception as e:
+            print(f"Error getting state distribution metrics: {e}")
+            state_distribution = {}
         
         return {
             'engagement': engagement_summary,

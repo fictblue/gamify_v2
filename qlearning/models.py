@@ -610,9 +610,79 @@ class AdaptationEffectivenessLog(models.Model):
         ordering = ['-timestamp']
 
 
+class QLearningState(models.Model):
+    """Represents a state in the Q-Learning system"""
+    STATE_TYPE_CHOICES = [
+        ('initial', 'Initial State'),
+        ('learning', 'Learning State'),
+        ('mastered', 'Mastered State'),
+        ('struggling', 'Struggling State'),
+    ]
+    
+    state_id = models.CharField(max_length=50, unique=True, help_text='Unique identifier for the state')
+    state_type = models.CharField(max_length=20, choices=STATE_TYPE_CHOICES, help_text='Type of learning state')
+    difficulty = models.CharField(max_length=20, help_text='Difficulty level associated with this state')
+    concept = models.CharField(max_length=100, help_text='Learning concept this state represents')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    metadata = models.JSONField(default=dict, help_text='Additional metadata for the state')
+    
+    def __str__(self):
+        return f"{self.state_type.capitalize()} - {self.concept} ({self.difficulty})"
+
+
+class UserLearningState(models.Model):
+    """Tracks a user's current learning state in the Q-Learning system"""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='learning_states'
+    )
+    state = models.ForeignKey(
+        QLearningState,
+        on_delete=models.CASCADE,
+        related_name='user_states'
+    )
+    q_values = models.JSONField(
+        default=dict,
+        help_text='Q-values for each possible action in this state'
+    )
+    visit_count = models.PositiveIntegerField(
+        default=0,
+        help_text='Number of times user has been in this state'
+    )
+    last_visited = models.DateTimeField(
+        auto_now=True,
+        help_text='When user was last in this state'
+    )
+    is_current = models.BooleanField(
+        default=False,
+        help_text='Whether this is the user\'s current state'
+    )
+    metadata = models.JSONField(
+        default=dict,
+        help_text='Additional learning state metadata'
+    )
+    
+    class Meta:
+        unique_together = ['user', 'state']
+        ordering = ['-is_current', '-last_visited']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.state} (Visits: {self.visit_count})"
+    
+    def save(self, *args, **kwargs):
+        # Ensure only one current state per user
+        if self.is_current:
+            UserLearningState.objects.filter(
+                user=self.user, 
+                is_current=True
+            ).exclude(pk=self.pk).update(is_current=False)
+        super().save(*args, **kwargs)
+
+
 class QLearningDecisionLog(models.Model):
     """Track Q-Learning decision making process - Exploration vs Exploitation (Metrik 2.1.4.4)"""
-    
     DECISION_TYPE_CHOICES = [
         ('exploitation', 'Exploitation (Best Q-value)'),
         ('exploration', 'Exploration (Random)'),

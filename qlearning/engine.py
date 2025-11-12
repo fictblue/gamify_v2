@@ -157,8 +157,71 @@ class QLearningEngine:
         except:
             return QLearningEngine.ACTIONS  # Fallback to all actions
 
-    @staticmethod
+    @classmethod
+    def log_decision(
+        cls,
+        user: CustomUser,
+        state_hash: str,
+        decision_type: str,
+        epsilon_value: float,
+        action_chosen: str,
+        q_value_chosen: float,
+        best_q_value: float,
+        all_q_values: dict,
+        is_optimal: bool
+    ) -> None:
+        """
+        Log Q-Learning decision making process
+        """
+        from .models import QLearningDecisionLog
+        try:
+            QLearningDecisionLog.objects.create(
+                user=user,
+                state_hash=state_hash,
+                decision_type=decision_type,
+                epsilon_value=epsilon_value,
+                action_chosen=action_chosen,
+                q_value_chosen=q_value_chosen,
+                best_q_value=best_q_value,
+                all_q_values=all_q_values,
+                is_optimal=is_optimal
+            )
+            print(f"Decision logged: {decision_type} - {action_chosen} (Optimal: {is_optimal})")
+        except Exception as e:
+            print(f"Error logging decision: {e}")
+
+    @classmethod
+    def log_adaptation(
+        cls,
+        user: CustomUser,
+        old_difficulty: str,
+        new_difficulty: str,
+        state_hash: str,
+        reason: str = None
+    ) -> None:
+        """
+        Log an adaptation event when difficulty changes
+        """
+        from .models import ResponseToAdaptationLog
+        if old_difficulty != new_difficulty:
+            try:
+                ResponseToAdaptationLog.objects.create(
+                    user=user,
+                    adaptation_type='difficulty_transition',
+                    old_state={'difficulty': old_difficulty},
+                    new_state={'difficulty': new_difficulty},
+                    adaptation_details={
+                        'reason': reason or 'Automatic difficulty adjustment',
+                        'state_hash': state_hash
+                    }
+                )
+                print(f"Adaptation logged: {old_difficulty} -> {new_difficulty}")
+            except Exception as e:
+                print(f"Error logging adaptation: {e}")
+
+    @classmethod
     def choose_action(
+        cls,
         user: CustomUser, 
         state_tuple: Tuple, 
         epsilon: float = None,
@@ -176,25 +239,93 @@ class QLearningEngine:
         Returns:
             Selected action string
         """
+        print(f"\n=== DEBUG: QLearningEngine.choose_action called ===")
+        print(f"User: {user}, Current difficulty: {current_difficulty}, State tuple: {state_tuple}")
+        
         # Use dynamic epsilon if not provided
         if epsilon is None:
             epsilon = QLearningEngine.get_dynamic_epsilon(user)
+            print(f"Using dynamic epsilon: {epsilon}")
 
         # Get allowed actions with safety constraints
         allowed_actions = QLearningEngine.get_allowed_actions(user, current_difficulty)
+        print(f"Allowed actions: {allowed_actions}")
         
         # If only one action allowed (safety override), return it
         if len(allowed_actions) == 1:
+            print(f"Only one action allowed: {allowed_actions[0]}")
             return allowed_actions[0]
 
         state_hash = QLearningEngine.hash_state(state_tuple)
+        print(f"State hash: {state_hash}")
 
         # Epsilon-greedy action selection
-        if random.random() < epsilon:
-            # ENHANCED EXPLORATION: Choose random from ALLOWED actions only
-            return random.choice(allowed_actions)
+        rand_val = random.random()
+        print(f"Random value: {rand_val}, Epsilon: {epsilon}")
+        
+        if rand_val < epsilon:
+            # EXPLORATION: Choose random from ALLOWED actions
+            chosen_action = random.choice(allowed_actions)
+            decision_type = 'exploration'
+            print(f"EXPLORATION: Chose {chosen_action} randomly from {allowed_actions}")
+            
+            # Get Q-values for logging
+            q_values = {}
+            print("Fetching Q-values for actions:")
+            for action in allowed_actions:
+                try:
+                    entry = QTableEntry.objects.get(
+                        user=user,
+                        state_hash=state_hash,
+                        action=action
+                    )
+                    q_values[action] = entry.q_value
+                    print(f"  - {action}: {entry.q_value} (from DB)")
+                except QTableEntry.DoesNotExist:
+                    q_values[action] = 0.0
+                    print(f"  - {action}: 0.0 (default)")
+            
+            # Find best action and its Q-value
+            best_action = max(q_values, key=q_values.get)
+            best_q_value = q_values[best_action]
+            print(f"Best action: {best_action} (Q-value: {best_q_value})")
+            
+            # Log the exploration decision
+            print("Logging exploration decision...")
+            try:
+                from .models import QLearningDecisionLog
+                print(f"QLearningDecisionLog model: {QLearningDecisionLog}")
+                
+                cls.log_decision(
+                    user=user,
+                    state_hash=state_hash,
+                    decision_type='exploration',
+                    epsilon_value=epsilon,
+                    action_chosen=chosen_action,
+                    q_value_chosen=q_values.get(chosen_action, 0.0),
+                    best_q_value=best_q_value,
+                    all_q_values=q_values,
+                    is_optimal=(chosen_action == best_action)
+                )
+                print("Successfully logged exploration decision")
+            except Exception as e:
+                print(f"ERROR in log_decision: {e}")
+                import traceback
+                traceback.print_exc()
+            
+            # Log adaptation if difficulty changes
+            if current_difficulty and chosen_action != current_difficulty:
+                cls.log_adaptation(
+                    user, 
+                    current_difficulty or 'none', 
+                    chosen_action,
+                    state_hash,
+                    'Exploration (epsilon-greedy)'
+                )
+                
+            return chosen_action
         else:
-            # ENHANCED EXPLOITATION: Choose best action from ALLOWED actions
+            # EXPLOITATION: Choose best action from ALLOWED actions
             q_values = {}
 
             for action in allowed_actions:
@@ -206,15 +337,36 @@ class QLearningEngine:
                     )
                     q_values[action] = entry.q_value
                 except QTableEntry.DoesNotExist:
-                    # If no entry exists, assume Q-value of 0
                     q_values[action] = 0.0
 
-            # Return action with highest Q-value from allowed actions
-            if q_values:
-                return max(q_values, key=q_values.get)
-            else:
-                # Fallback to random allowed action
-                return random.choice(allowed_actions)
+            # Get action with highest Q-value
+            best_action = max(q_values, key=q_values.get)
+            best_q_value = q_values[best_action]
+            
+            # Log the exploitation decision
+            cls.log_decision(
+                user=user,
+                state_hash=state_hash,
+                decision_type='exploitation',
+                epsilon_value=epsilon,
+                action_chosen=best_action,
+                q_value_chosen=best_q_value,
+                best_q_value=best_q_value,
+                all_q_values=q_values,
+                is_optimal=True  # Always optimal in exploitation
+            )
+            
+            # Log adaptation if difficulty changes
+            if current_difficulty and best_action != current_difficulty:
+                cls.log_adaptation(
+                    user,
+                    current_difficulty,
+                    best_action,
+                    state_hash,
+                    'Exploitation (best Q-value)'
+                )
+                
+            return best_action
 
     @staticmethod
     def update_q(

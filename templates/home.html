@@ -4,148 +4,135 @@
 
 {% block content %}
 <!-- Hero Section -->
-<section class="hero-section py-5">
-    <div class="container">
-        <div class="row align-items-center ">
-            <div class="col-lg-6 fade-in">
-                <div class="hero-content">
-                    <div class="hero-badge mb-4">
-                        <span class="badge-pill">
-                            <i class="fas fa-star me-2"></i>AI-Powered Learning Platform
-                        </span>
-                    </div>
-                    <h1 class="hero-title mb-4">
-                        Learn Smarter with
-                        <span class="text-gradient">Adaptive AI</span>
-                    </h1>
-                    <p class="hero-subtitle mb-5">
-                        Experience personalized learning that adapts to your pace. Our AI-powered platform 
-                        adjusts difficulty in real-time, making education engaging and effective.
-                    </p>
+<section class="hero-section">
+    <div class="hero-content-wrapper">
+        <div class="hero-left fade-in">
+            <div class="hero-badge">
+                <i class="fas fa-star"></i>
+                <span>AI-Powered Learning Platform</span>
+            </div>
+            
+            <h1 class="hero-title">
+                Learn Smarter with
+                <span class="text-gradient">Adaptive AI</span>
+            </h1>
+            
+            <p class="hero-subtitle">
+                Experience personalized learning that adapts to your pace. Our AI-powered platform 
+                adjusts difficulty in real-time, making education engaging and effective.
+            </p>
 
-                    <div class="hero-features mb-5">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="feature-item">
-                                    <div class="feature-icon">
-                                        <i class="fas fa-brain"></i>
-                                    </div>
-                                    <div class="feature-content">
-                                        <h6 class="mb-1">AI-Powered</h6>
-                                        <small>Smart difficulty adjustment</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="feature-item">
-                                    <div class="feature-icon">
-                                        <i class="fas fa-trophy"></i>
-                                    </div>
-                                    <div class="feature-content">
-                                        <h6 class="mb-1">Gamified</h6>
-                                        <small>XP, levels & achievements</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="feature-item">
-                                    <div class="feature-icon">
-                                        <i class="fas fa-chart-line"></i>
-                                    </div>
-                                    <div class="feature-content">
-                                        <h6 class="mb-1">Progress Tracking</h6>
-                                        <small>Detailed analytics</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="feature-item">
-                                    <div class="feature-icon">
-                                        <i class="fas fa-mobile-alt"></i>
-                                    </div>
-                                    <div class="feature-content">
-                                        <h6 class="mb-1">Mobile Ready</h6>
-                                        <small>Learn anywhere</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <div class="hero-features">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
                     </div>
-
-                    <div class="hero-buttons">
-                        {% if not user.is_authenticated %}
-                            <a href="{% url 'accounts:register' %}" class="btn btn-gamify btn-lg me-3">
-                                <i class="fas fa-rocket me-2"></i>Start Learning Free
-                            </a>
-                            <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary btn-lg">
-                                <i class="fas fa-sign-in-alt me-2"></i>Login
-                            </a>
-                        {% else %}
-                            {% if user.role == 'student' %}
-                                <a href="{% url 'dashboards:student_dashboard' %}" class="btn btn-gamify btn-lg me-3">
-                                    <i class="fas fa-play me-2"></i>Go To Dashboard
-                                </a>
-                            {% else %}
-                                <a href="{% url 'dashboards:admin_dashboard' %}" class="btn btn-gamify btn-lg me-3">
-                                    <i class="fas fa-cog me-2"></i>Go To Dashboard
-                                </a>
-                            {% endif %}
-                        {% endif %}
+                    <div class="feature-content">
+                        <h6>AI-Powered</h6>
+                        <small>Smart difficulty adjustment</small>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h6>Gamified</h6>
+                        <small>XP, levels & achievements</small>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h6>Progress Tracking</h6>
+                        <small>Detailed analytics</small>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h6>Mobile Ready</h6>
+                        <small>Learn anywhere</small>
                     </div>
                 </div>
             </div>
 
-            <div class="col-lg-6 fade-in">
-                <div class="hero-visual">
-                    <div class="gamify-card dashboard-preview">
-                        <div class="card-header text-center">
-                            <h4 class="mb-0">
-                                <i class="fas fa-chart-pie me-2"></i>
-                                Your Learning Dashboard
-                            </h4>
+            <div class="hero-buttons">
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-hero">
+                        <i class="fas fa-rocket"></i>
+                        <span>Start Learning Free</span>
+                    </a>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-secondary btn-hero">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Login</span>
+                    </a>
+                {% else %}
+                    {% if user.role == 'student' %}
+                        <a href="{% url 'quizzes:student_quiz_list' %}" class="btn btn-primary btn-hero">
+                            <i class="fas fa-play"></i>
+                            <span>Go To Dashboard</span>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'dashboards:admin_dashboard' %}" class="btn btn-primary btn-hero">
+                            <i class="fas fa-cog"></i>
+                            <span>Go To Dashboard</span>
+                        </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="hero-right fade-in-delayed">
+            <div class="dashboard-preview card">
+                <div class="preview-header">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Your Learning Dashboard</span>
+                </div>
+                
+                <div class="preview-body">
+                    <div class="preview-badges">
+                        <div class="preview-badge level">
+                            <i class="fas fa-star"></i>
+                            <span>Level: Intermediate</span>
                         </div>
-                        <div class="card-body text-center">
-                            <div class="mb-4">
-                                <div class="level-badge mb-3">
-                                    <i class="fas fa-star me-1"></i>
-                                    Level: Intermediate
-                                </div>
-                                <div class="streak-badge">
-                                    <i class="fas fa-fire"></i>
-                                    5 Day Streak
-                                </div>
-                            </div>
+                        <div class="preview-badge streak">
+                            <i class="fas fa-fire"></i>
+                            <span>5 Day Streak</span>
+                        </div>
+                    </div>
 
-                            <div class="xp-display mb-4">
-                                <div class="xp-number">2,450</div>
-                                <div class="xp-label">Total Experience Points</div>
-                            </div>
+                    <div class="xp-showcase">
+                        <div class="xp-number">2,450</div>
+                        <div class="xp-label">Total Experience Points</div>
+                    </div>
 
-                            <div class="progress-gamify mb-3">
-                                <div class="progress-bar" style="width: 75%"></div>
-                            </div>
-                            <small class="text-muted d-block mb-4">75% to next level</small>
+                    <div class="progress-showcase">
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-bar-fill" style="width: 75%"></div>
+                        </div>
+                        <small>75% to next level</small>
+                    </div>
 
-                            <div class="row g-3">
-                                <div class="col-4">
-                                    <div class="stat-box">
-                                        <i class="fas fa-trophy fa-2x text-warning"></i>
-                                        <small class="d-block mt-2 fw-semibold">12 Badges</small>
-                                    </div>
-                                </div>
-                                <div class="col-4">
-                                    <div class="stat-box">
-                                        <i class="fas fa-fire fa-2x" style="color: #f59e0b;"></i>
-                                        <small class="d-block mt-2 fw-semibold">5 Day Streak</small>
-                                    </div>
-                                </div>
-                                <div class="col-4">
-                                    <div class="stat-box">
-                                        <i class="fas fa-check-circle fa-2x text-success"></i>
-                                        <small class="d-block mt-2 fw-semibold">85% Accuracy</small>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <i class="fas fa-trophy"></i>
+                            <small>12 Badges</small>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-fire"></i>
+                            <small>5 Day Streak</small>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-check-circle"></i>
+                            <small>85% Accuracy</small>
                         </div>
                     </div>
                 </div>
@@ -154,265 +141,211 @@
     </div>
 </section>
 
-
-
 <!-- Features Section -->
-<section class="features-section py-5">
-    <div class="container">
-        <div class="row">
-            <div class="col-12 text-center mb-5 fade-in">
-                <div class="section-badge mb-3">
-                    <span>Features</span>
-                </div>
-                <h2 class="section-title mb-3">Why Choose GamifyLearn?</h2>
-                <p class="section-subtitle">
-                    Everything you need for an effective learning experience
-                </p>
+<section class="features-section">
+    <div class="section-header">
+        <div class="section-badge">
+            <span>Features</span>
+        </div>
+        <h2 class="section-title">Why Choose GamifyLearn?</h2>
+        <p class="section-subtitle">
+            Everything you need for an effective learning experience
+        </p>
+    </div>
+
+    <div class="features-grid grid grid-3">
+        <div class="card feature-card">
+            <div class="feature-icon-large">
+                <i class="fas fa-robot"></i>
             </div>
+            <h5 class="feature-title">Adaptive AI Learning</h5>
+            <p class="feature-description">
+                Our intelligent system analyzes your performance and automatically adjusts 
+                question difficulty to match your skill level perfectly.
+            </p>
         </div>
 
-        <div class="row g-4">
-            <div class="col-lg-4 col-md-6">
-                <div class="gamify-card feature-card text-center h-100">
-                    <div class="card-body p-4">
-                        <div class="feature-icon-large mb-4">
-                            <i class="fas fa-robot"></i>
-                        </div>
-                        <h5 class="card-title fw-bold mb-3">Adaptive AI Learning</h5>
-                        <p class="card-text text-muted">
-                            Our intelligent system analyzes your performance and automatically adjusts 
-                            question difficulty to match your skill level perfectly.
-                        </p>
-                    </div>
-                </div>
+        <div class="card feature-card">
+            <div class="feature-icon-large">
+                <i class="fas fa-trophy"></i>
             </div>
+            <h5 class="feature-title">Gamification System</h5>
+            <p class="feature-description">
+                Earn XP, level up, and unlock achievements as you progress. 
+                Make learning fun and stay motivated!
+            </p>
+        </div>
 
-            <div class="col-lg-4 col-md-6">
-                <div class="gamify-card feature-card text-center h-100">
-                    <div class="card-body p-4">
-                        <div class="feature-icon-large mb-4">
-                            <i class="fas fa-trophy"></i>
-                        </div>
-                        <h5 class="card-title fw-bold mb-3">Gamification System</h5>
-                        <p class="card-text text-muted">
-                            Earn XP, level up, and unlock achievements as you progress. 
-                            Make learning fun and stay motivated!
-                        </p>
-                    </div>
-                </div>
+        <div class="card feature-card">
+            <div class="feature-icon-large">
+                <i class="fas fa-chart-bar"></i>
             </div>
+            <h5 class="feature-title">Progress Analytics</h5>
+            <p class="feature-description">
+                Track your learning progress with detailed analytics and insights 
+                to optimize your study habits effectively.
+            </p>
+        </div>
 
-            <div class="col-lg-4 col-md-6">
-                <div class="gamify-card feature-card text-center h-100">
-                    <div class="card-body p-4">
-                        <div class="feature-icon-large mb-4">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                        <h5 class="card-title fw-bold mb-3">Progress Analytics</h5>
-                        <p class="card-text text-muted">
-                            Track your learning progress with detailed analytics and insights 
-                            to optimize your study habits effectively.
-                        </p>
-                    </div>
-                </div>
+        <div class="card feature-card">
+            <div class="feature-icon-large">
+                <i class="fas fa-mobile-alt"></i>
             </div>
+            <h5 class="feature-title">Mobile Learning</h5>
+            <p class="feature-description">
+                Learn anywhere, anytime with our responsive design that works 
+                perfectly on all devices and screen sizes.
+            </p>
+        </div>
 
-            <div class="col-lg-4 col-md-6">
-                <div class="gamify-card feature-card text-center h-100">
-                    <div class="card-body p-4">
-                        <div class="feature-icon-large mb-4">
-                            <i class="fas fa-mobile-alt"></i>
-                        </div>
-                        <h5 class="card-title fw-bold mb-3">Mobile Learning</h5>
-                        <p class="card-text text-muted">
-                            Learn anywhere, anytime with our responsive design that works 
-                            perfectly on all devices and screen sizes.
-                        </p>
-                    </div>
-                </div>
+        <div class="card feature-card">
+            <div class="feature-icon-large">
+                <i class="fas fa-lightbulb"></i>
             </div>
+            <h5 class="feature-title">Smart Hints</h5>
+            <p class="feature-description">
+                Get contextual hints when you're stuck, helping you learn 
+                without giving away the answers directly.
+            </p>
+        </div>
 
-            <div class="col-lg-4 col-md-6">
-                <div class="gamify-card feature-card text-center h-100">
-                    <div class="card-body p-4">
-                        <div class="feature-icon-large mb-4">
-                            <i class="fas fa-lightbulb"></i>
-                        </div>
-                        <h5 class="card-title fw-bold mb-3">Smart Hints</h5>
-                        <p class="card-text text-muted">
-                            Get contextual hints when you're stuck, helping you learn 
-                            without giving away the answers directly.
-                        </p>
-                    </div>
-                </div>
+        <div class="card feature-card">
+            <div class="feature-icon-large">
+                <i class="fas fa-graduation-cap"></i>
             </div>
-
-            <div class="col-lg-4 col-md-6">
-                <div class="gamify-card feature-card text-center h-100">
-                    <div class="card-body p-4">
-                        <div class="feature-icon-large mb-4">
-                            <i class="fas fa-graduation-cap"></i>
-                        </div>
-                        <h5 class="card-title fw-bold mb-3">Research-Backed</h5>
-                        <p class="card-text text-muted">
-                            Built on proven educational research and Q-learning algorithms 
-                            for optimal learning outcomes.
-                        </p>
-                    </div>
-                </div>
-            </div>
+            <h5 class="feature-title">Research-Backed</h5>
+            <p class="feature-description">
+                Built on proven educational research and Q-learning algorithms 
+                for optimal learning outcomes.
+            </p>
         </div>
     </div>
 </section>
 
 <!-- Stats Section -->
-<section class="stats-section py-5">
-    <div class="container">
-        <div class="gamify-card">
-            <div class="card-body p-5">
-                <div class="row g-4 text-center">
-                    <div class="col-lg-3 col-md-6">
-                        <div class="stat-item">
-                            <div class="stat-icon mb-3">
-                                <i class="fas fa-question-circle"></i>
-                            </div>
-                            <div class="stat-number">30+</div>
-                            <div class="stat-label">Questions Available</div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="stat-item">
-                            <div class="stat-icon mb-3">
-                                <i class="fas fa-layer-group"></i>
-                            </div>
-                            <div class="stat-number">3</div>
-                            <div class="stat-label">Difficulty Levels</div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="stat-item">
-                            <div class="stat-icon mb-3">
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <div class="stat-number">4</div>
-                            <div class="stat-label">User Progression Levels</div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="stat-item">
-                            <div class="stat-icon mb-3">
-                                <i class="fas fa-infinity"></i>
-                            </div>
-                            <div class="stat-number">∞</div>
-                            <div class="stat-label">Learning Paths</div>
-                        </div>
-                    </div>
+<section class="stats-section">
+    <div class="stats-card card">
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-icon">
+                    <i class="fas fa-question-circle"></i>
                 </div>
+                <div class="stat-number">30+</div>
+                <div class="stat-label">Questions Available</div>
+            </div>
+            
+            <div class="stat-box">
+                <div class="stat-icon">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <div class="stat-number">3</div>
+                <div class="stat-label">Difficulty Levels</div>
+            </div>
+            
+            <div class="stat-box">
+                <div class="stat-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="stat-number">4</div>
+                <div class="stat-label">User Progression Levels</div>
+            </div>
+            
+            <div class="stat-box">
+                <div class="stat-icon">
+                    <i class="fas fa-infinity"></i>
+                </div>
+                <div class="stat-number">∞</div>
+                <div class="stat-label">Learning Paths</div>
             </div>
         </div>
     </div>
 </section>
 
 <!-- How It Works Section -->
-<section class="how-it-works-section py-5">
-    <div class="container">
-        <div class="row">
-            <div class="col-12 text-center mb-5">
-                <div class="section-badge mb-3">
-                    <span>Process</span>
-                </div>
-                <h2 class="section-title mb-3">How It Works</h2>
-                <p class="section-subtitle">
-                    Start your learning journey in four simple steps
-                </p>
-            </div>
+<section class="how-it-works-section">
+    <div class="section-header">
+        <div class="section-badge">
+            <span>Process</span>
         </div>
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-subtitle">
+            Start your learning journey in four simple steps
+        </p>
+    </div>
 
-        <div class="row g-4">
-            <div class="col-lg-3 col-md-6">
-                <div class="step-card">
-                    <div class="step-number">1</div>
-                    <div class="step-icon mb-3">
-                        <i class="fas fa-user-plus"></i>
-                    </div>
-                    <h5 class="step-title mb-2">Sign Up</h5>
-                    <p class="step-description">Create your free account in seconds</p>
-                </div>
+    <div class="steps-grid grid grid-4">
+        <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-icon">
+                <i class="fas fa-user-plus"></i>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="step-card">
-                    <div class="step-number">2</div>
-                    <div class="step-icon mb-3">
-                        <i class="fas fa-sliders-h"></i>
-                    </div>
-                    <h5 class="step-title mb-2">Take Assessment</h5>
-                    <p class="step-description">AI determines your starting level</p>
-                </div>
+            <h5 class="step-title">Sign Up</h5>
+            <p class="step-description">Create your free account in seconds</p>
+        </div>
+        
+        <div class="step-card">
+            <div class="step-number">2</div>
+            <div class="step-icon">
+                <i class="fas fa-sliders-h"></i>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="step-card">
-                    <div class="step-number">3</div>
-                    <div class="step-icon mb-3">
-                        <i class="fas fa-book-reader"></i>
-                    </div>
-                    <h5 class="step-title mb-2">Start Learning</h5>
-                    <p class="step-description">Practice with adaptive quizzes</p>
-                </div>
+            <h5 class="step-title">Take Assessment</h5>
+            <p class="step-description">AI determines your starting level</p>
+        </div>
+        
+        <div class="step-card">
+            <div class="step-number">3</div>
+            <div class="step-icon">
+                <i class="fas fa-book-reader"></i>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="step-card">
-                    <div class="step-number">4</div>
-                    <div class="step-icon mb-3">
-                        <i class="fas fa-trophy"></i>
-                    </div>
-                    <h5 class="step-title mb-2">Level Up</h5>
-                    <p class="step-description">Earn XP and achievements</p>
-                </div>
+            <h5 class="step-title">Start Learning</h5>
+            <p class="step-description">Practice with adaptive quizzes</p>
+        </div>
+        
+        <div class="step-card">
+            <div class="step-number">4</div>
+            <div class="step-icon">
+                <i class="fas fa-trophy"></i>
             </div>
+            <h5 class="step-title">Level Up</h5>
+            <p class="step-description">Earn XP and achievements</p>
         </div>
     </div>
 </section>
 
 <!-- CTA Section -->
-<section class="cta-section py-5">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 text-center">
-                <div class="gamify-card cta-card">
-                    <div class="card-body p-5">
-                        <div class="cta-icon mb-4">
-                            <i class="fas fa-rocket"></i>
-                        </div>
-                        <h2 class="cta-title mb-4">Ready to Transform Your Learning?</h2>
-                        <p class="cta-subtitle mb-4">
-                            Join learners who are already experiencing personalized, AI-powered education.
-                        </p>
+<section class="cta-section">
+    <div class="cta-card card">
+        <div class="cta-icon">
+            <i class="fas fa-rocket"></i>
+        </div>
+        <h2 class="cta-title">Ready to Transform Your Learning?</h2>
+        <p class="cta-subtitle">
+            Join learners who are already experiencing personalized, AI-powered education.
+        </p>
 
-                        {% if not user.is_authenticated %}
-                            <div class="cta-buttons">
-                                <a href="{% url 'accounts:register' %}" class="btn btn-gamify btn-lg me-3">
-                                    <i class="fas fa-rocket me-2"></i>Get Started Free
-                                </a>
-                                <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary btn-lg">
-                                    <i class="fas fa-sign-in-alt me-2"></i>Login
-                                </a>
-                            </div>
-                        {% else %}
-                            <div class="cta-buttons">
-                                {% if user.role == 'student' %}
-                                    <a href="{% url 'quizzes:student_quiz_list' %}" class="btn btn-gamify btn-lg">
-                                        <i class="fas fa-play me-2"></i>Continue Your Journey
-                                    </a>
-                                {% else %}
-                                    <a href="{% url 'quizzes:admin_quiz_list' %}" class="btn btn-gamify btn-lg">
-                                        <i class="fas fa-cog me-2"></i>Manage Platform
-                                    </a>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+        <div class="cta-buttons">
+            {% if not user.is_authenticated %}
+                <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-cta">
+                    <i class="fas fa-rocket"></i>
+                    <span>Get Started Free</span>
+                </a>
+                <a href="{% url 'accounts:login' %}" class="btn btn-secondary btn-cta">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Login</span>
+                </a>
+            {% else %}
+                {% if user.role == 'student' %}
+                    <a href="{% url 'quizzes:student_quiz_list' %}" class="btn btn-primary btn-cta">
+                        <i class="fas fa-play"></i>
+                        <span>Continue Your Journey</span>
+                    </a>
+                {% else %}
+                    <a href="{% url 'admin:index' %}" class="btn btn-primary btn-cta">
+                        <i class="fas fa-cog"></i>
+                        <span>Manage Platform</span>
+                    </a>
+                {% endif %}
+            {% endif %}
         </div>
     </div>
 </section>
@@ -421,639 +354,500 @@
 
 {% block extra_head %}
 <style>
+    /* ============================================
+       HOME PAGE SPECIFIC STYLES
+       ============================================ */
+
     /* Hero Section */
     .hero-section {
-        padding-top: 100px;
-        min-height: 100vh;
+        padding: 80px 32px 120px;
+        min-height: calc(100vh - var(--navbar-height));
+        display: flex;
+        align-items: center;
     }
 
-    .hero-badge .badge-pill {
-        background: rgba(0, 255, 255, 0.08);
-        padding: 0.5rem 1.2rem;
+    .hero-content-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 64px;
+        align-items: center;
+        max-width: 1400px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .hero-left {
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--primary-bg);
+        color: var(--primary);
+        padding: 12px 24px;
         border-radius: 50px;
-        color: #00ffff;
         font-size: 0.875rem;
         font-weight: 600;
-        border: 2px solid rgba(0, 255, 255, 0.2);
-        display: inline-block;
-        box-shadow: 0 0 12px rgba(0, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
-        text-shadow: 0 0 6px rgba(0, 255, 255, 0.3);
+        border: 2px solid var(--primary);
+        width: fit-content;
+        box-shadow: 0 4px 12px rgba(88, 204, 2, 0.2);
     }
 
     .hero-title {
         font-size: 3.5rem;
         font-weight: 800;
-        color: #ffffff;
-        line-height: 1.2;
-        text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        color: var(--text-primary);
+        line-height: 1.1;
+        margin: 0;
     }
 
     .text-gradient {
-        background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
     }
 
     .hero-subtitle {
         font-size: 1.125rem;
-        color: rgba(255, 255, 255, 0.85);
+        color: var(--text-secondary);
         line-height: 1.7;
-        text-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
+        margin: 0;
+    }
+
+    .hero-features {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
     }
 
     .feature-item {
-        padding: 1rem;
-        border-radius: 12px;
-        background: rgba(0, 0, 0, 0.85);
-        border: 2px solid rgba(0, 255, 255, 0.2);
-        transition: all var(--transition-base);
         display: flex;
         align-items: center;
-        gap: 1rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 12px rgba(0, 255, 255, 0.08);
-        backdrop-filter: blur(10px);
+        gap: 12px;
+        padding: 16px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-light);
+        border-radius: 12px;
+        transition: all var(--transition-fast);
     }
 
     .feature-item:hover {
-        border-color: rgba(0, 255, 255, 0.4);
-        box-shadow: 0 4px 16px rgba(0, 255, 255, 0.15), 0 0 20px rgba(255, 0, 255, 0.08);
-        background: rgba(0, 255, 255, 0.03);
+        background: var(--bg-tertiary);
+        border-color: var(--primary);
         transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
     }
 
-    .feature-item .feature-icon {
-        width: 44px;
-        height: 44px;
-        background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
-        border-radius: 10px;
+    .feature-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
+        color: white;
         font-size: 1.25rem;
-        color: #000000;
         flex-shrink: 0;
-        box-shadow: 0 0 12px rgba(0, 255, 255, 0.3);
-        text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
     }
 
     .feature-content h6 {
-        color: #ffffff;
-        font-weight: 600;
         font-size: 0.938rem;
-        margin: 0;
-        text-shadow: 0 0 4px rgba(255, 255, 255, 0.15);
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 4px 0;
     }
 
     .feature-content small {
-        color: rgba(255, 255, 255, 0.6);
         font-size: 0.813rem;
-        text-shadow: 0 0 2px rgba(255, 255, 255, 0.08);
+        color: var(--text-secondary);
     }
 
-    .btn-outline-primary {
-        border: 2px solid rgba(0, 255, 255, 0.4);
-        color: #00ffff;
-        background: rgba(0, 0, 0, 0.85);
-        text-shadow: 0 0 6px rgba(0, 255, 255, 0.3);
-        backdrop-filter: blur(10px);
+    .hero-buttons {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
     }
 
-    .btn-outline-primary:hover {
-        background: rgba(0, 255, 255, 0.08);
-        border-color: rgba(0, 255, 255, 0.6);
-        color: #00ffff;
-        box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-        transform: translateY(-2px);
+    .btn-hero {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 32px;
+        font-size: 1rem;
+    }
+
+    /* Dashboard Preview */
+    .hero-right {
+        position: relative;
     }
 
     .dashboard-preview {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-light);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: var(--shadow-xl);
         transition: all var(--transition-smooth);
-        border: 2px solid rgba(0, 255, 255, 0.25);
-        background: rgba(0, 0, 0, 0.95);
-        backdrop-filter: blur(15px);
     }
 
     .dashboard-preview:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 255, 255, 0.15);
-        border-color: rgba(0, 255, 255, 0.5);
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
     }
 
-    .level-badge {
-        display: inline-block;
-        background: rgba(0, 255, 0, 0.08);
-        color: #00ff00;
-        padding: 0.5rem 1rem;
+    .preview-header {
+        padding: 20px 24px;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-light);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .preview-header i {
+        color: var(--primary);
+        font-size: 1.25rem;
+    }
+
+    .preview-body {
+        padding: 32px 24px;
+    }
+
+    .preview-badges {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .preview-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
         border-radius: 50px;
         font-size: 0.875rem;
         font-weight: 600;
-        border: 2px solid rgba(0, 255, 0, 0.2);
-        box-shadow: 0 0 12px rgba(0, 255, 0, 0.2);
-        text-shadow: 0 0 6px rgba(0, 255, 0, 0.3);
     }
 
-    .streak-badge {
-        display: inline-block;
-        background: rgba(255, 255, 0, 0.08);
-        color: #ffff00;
-        padding: 0.5rem 1rem;
-        border-radius: 50px;
-        font-size: 0.875rem;
-        font-weight: 600;
-        margin-left: 0.5rem;
-        border: 2px solid rgba(255, 255, 0, 0.2);
-        box-shadow: 0 0 12px rgba(255, 255, 0, 0.2);
-        text-shadow: 0 0 6px rgba(255, 255, 0, 0.3);
+    .preview-badge.level {
+        background: var(--primary-bg);
+        color: var(--primary);
+        border: 2px solid var(--primary);
     }
 
-    .xp-display {
-        background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
-        padding: 1.5rem;
-        border-radius: 12px;
-        color: #000000;
-        border: 3px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-        text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    .preview-badge.streak {
+        background: var(--secondary-bg);
+        color: var(--secondary);
+        border: 2px solid var(--secondary);
+    }
+
+    .xp-showcase {
+        text-align: center;
+        margin-bottom: 24px;
     }
 
     .xp-number {
-        font-size: 2.5rem;
+        font-size: 3rem;
         font-weight: 800;
-        color: #000000;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1;
+        margin-bottom: 8px;
     }
 
     .xp-label {
         font-size: 0.875rem;
-        opacity: 0.9;
-        color: #000000;
+        color: var(--text-secondary);
+        font-weight: 600;
     }
 
-    .stat-box {
-        padding: 1rem;
-        border-radius: 10px;
-        transition: all var(--transition-base);
-        background: rgba(0, 0, 0, 0.85);
-        border: 2px solid rgba(0, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
+    .progress-showcase {
+        margin-bottom: 24px;
+        text-align: center;
     }
 
-    .stat-box:hover {
-        background: rgba(0, 255, 255, 0.03);
-        border-color: rgba(0, 255, 255, 0.4);
+    .progress-bar-wrapper {
+        height: 12px;
+        background: var(--bg-tertiary);
+        border-radius: 6px;
+        overflow: hidden;
+        margin-bottom: 8px;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        border-radius: 6px;
+        transition: width 1s ease;
+    }
+
+    .progress-showcase small {
+        font-size: 0.813rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .stats-grid .stat-item {
+        text-align: center;
+        padding: 16px;
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        transition: all var(--transition-fast);
+    }
+
+    .stats-grid .stat-item:hover {
+        background: var(--bg-tertiary);
         transform: scale(1.05);
-        box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+    }
+
+    .stats-grid .stat-item i {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+    }
+
+    .stats-grid .stat-item:nth-child(1) i {
+        color: var(--accent-yellow);
+    }
+
+    .stats-grid .stat-item:nth-child(2) i {
+        color: var(--accent-orange);
+    }
+
+    .stats-grid .stat-item:nth-child(3) i {
+        color: var(--success);
+    }
+
+    .stats-grid .stat-item small {
+        font-size: 0.813rem;
+        font-weight: 600;
+        color: var(--text-secondary);
     }
 
     /* Sections */
+    .features-section,
+    .stats-section,
+    .how-it-works-section,
+    .cta-section {
+        padding: 80px 32px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 64px;
+    }
+
+    .section-badge {
+        margin-bottom: 16px;
+    }
+
     .section-badge span {
-        background: rgba(0, 255, 255, 0.08);
-        padding: 0.4rem 1rem;
+        display: inline-block;
+        background: var(--primary-bg);
+        color: var(--primary);
+        padding: 8px 20px;
         border-radius: 50px;
-        color: #00ffff;
         font-size: 0.875rem;
         font-weight: 600;
-        border: 2px solid rgba(0, 255, 255, 0.2);
-        box-shadow: 0 0 12px rgba(0, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
-        text-shadow: 0 0 6px rgba(0, 255, 255, 0.3);
+        border: 2px solid var(--primary);
     }
 
     .section-title {
         font-size: 2.5rem;
         font-weight: 800;
-        color: #ffffff;
-        text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        color: var(--text-primary);
+        margin: 0 0 16px 0;
     }
 
     .section-subtitle {
         font-size: 1.125rem;
-        color: rgba(255, 255, 255, 0.7);
-        text-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
-    }
-
-    /* Feature Cards */
-    .feature-icon-large {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
-        border-radius: 16px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2.5rem;
-        color: #000000;
-        margin: 0 auto;
-        transition: all var(--transition-smooth);
-        box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-        text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-        border: 3px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .feature-card:hover .feature-icon-large {
-        background: linear-gradient(135deg, #ffffff 0%, #00ffff 100%);
-        color: #000000;
-        transform: scale(1.1) rotate(-5deg);
-        box-shadow: 0 0 25px rgba(0, 255, 255, 0.4), 0 0 40px rgba(255, 0, 255, 0.2);
-        border-color: rgba(255, 255, 255, 0.4);
-    }
-
-    /* Stats */
-    .stat-item {
-        transition: all var(--transition-base);
-        background: rgba(0, 0, 0, 0.85);
-        border-radius: 16px;
-        padding: 1.5rem;
-        border: 2px solid rgba(0, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
-    }
-
-    .stat-item:hover {
-        transform: translateY(-4px);
-        background: rgba(0, 255, 255, 0.03);
-        border-color: rgba(0, 255, 255, 0.4);
-        box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
-    }
-
-    .stat-icon {
-        width: 60px;
-        height: 60px;
-        background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
-        border-radius: 12px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        color: #000000;
-        font-size: 1.5rem;
-        margin: 0 auto;
-        transition: all var(--transition-smooth);
-        box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-        text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-        border: 3px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .stat-number {
-        font-size: 3rem;
-        font-weight: 800;
-        color: #00ffff;
-        text-shadow: 0 0 12px rgba(0, 255, 255, 0.3);
-    }
-
-    .stat-label {
-        font-size: 0.938rem;
-        color: rgba(255, 255, 255, 0.7);
-        font-weight: 500;
-        text-shadow: 0 0 6px rgba(255, 255, 255, 0.15);
-    }
-
-    /* Steps */
-    .step-card {
-        background: rgba(0, 0, 0, 0.85);
-        border: 2px solid rgba(0, 255, 255, 0.2);
-        border-radius: 16px;
-        padding: 2rem;
-        text-align: center;
-        position: relative;
-        transition: all var(--transition-smooth);
-        backdrop-filter: blur(10px);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 12px rgba(0, 255, 255, 0.08);
-    }
-
-    .step-card:hover {
-        border-color: rgba(0, 255, 255, 0.4);
-        box-shadow: 0 4px 16px rgba(0, 255, 255, 0.15), 0 0 20px rgba(255, 0, 255, 0.08);
-        background: rgba(0, 255, 255, 0.03);
-        transform: translateY(-8px) scale(1.02);
-    }
-
-    .step-number {
-        position: absolute;
-        top: -15px;
-        right: 20px;
-        width: 40px;
-        height: 40px;
-        background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #000000;
-        font-size: 1.25rem;
-        font-weight: 700;
-        box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-        border: 3px solid rgba(255, 255, 255, 0.2);
-        text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-    }
-
-    .step-icon {
-        color: #00ffff;
-        font-size: 2.5rem;
-        text-shadow: 0 0 12px rgba(0, 255, 255, 0.3);
-    }
-
-    .step-title {
-        color: #ffffff;
-        font-weight: 700;
-        text-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
-    }
-
-    .step-description {
-        color: rgba(255, 255, 255, 0.7);
-        text-shadow: 0 0 4px rgba(255, 255, 255, 0.08);
-    }
-
-    /* CTA */
-    .cta-card {
-        position: relative;
-        overflow: hidden;
-        background: rgba(0, 0, 0, 0.95);
-        border: 2px solid rgba(0, 255, 255, 0.25);
-        backdrop-filter: blur(15px);
-    }
-
-    .cta-icon {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto;
-        box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-        border: 3px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .cta-icon i {
-        font-size: 2.5rem;
-        color: #000000;
-        text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-    }
-
-    .cta-title {
-        font-size: 2rem;
-        font-weight: 800;
-        color: #ffffff;
-        text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-    }
-
-    .cta-subtitle {
-        font-size: 1.125rem;
-        color: rgba(255, 255, 255, 0.7);
-        text-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
-    }
-
-    /* Footer */
-    .footer-section {
-        background: rgba(0, 0, 0, 0.95);
-        color: rgba(255, 255, 255, 0.8);
-        margin-top: auto;
-        padding-top: 3rem;
-        padding-bottom: 2rem;
-        width: 100%;
-        flex-shrink: 0;
-        border-top: 2px solid rgba(0, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
-        text-shadow: 0 0 4px rgba(255, 255, 255, 0.08);
-    }
-
-    .footer-brand {
-        font-size: 1.5rem;
-        font-weight: 800;
-        color: #00ffff;
-        text-shadow: 0 0 12px rgba(0, 255, 255, 0.3);
-    }
-
-    .footer-description {
-        line-height: 1.7;
-        color: rgba(255, 255, 255, 0.6);
-        text-shadow: 0 0 4px rgba(255, 255, 255, 0.08);
-    }
-
-    .social-links {
-        display: flex;
-        gap: 0.75rem;
-    }
-
-    .social-link {
-        width: 40px;
-        height: 40px;
-        background: rgba(0, 255, 255, 0.08);
-        border: 2px solid rgba(0, 255, 255, 0.2);
-        border-radius: 10px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        color: #00ffff;
-        font-size: 1.125rem;
-        transition: all var(--transition-base);
-        text-decoration: none;
-        box-shadow: 0 0 8px rgba(0, 255, 255, 0.15);
-    }
-
-    .social-link:hover {
-        background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
-        border-color: rgba(0, 255, 255, 0.6);
-        color: #000000;
-        transform: translateY(-3px) scale(1.1);
-        box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-    }
-
-    .footer-title {
-        font-size: 1rem;
-        font-weight: 700;
-        color: #00ffff;
-        text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
-    }
-
-    .footer-links {
-        list-style: none;
-        padding: 0;
+        color: var(--text-secondary);
         margin: 0;
     }
 
-    .footer-links li {
-        margin-bottom: 0.625rem;
+    /* Feature Cards */
+    .features-grid {
+        margin-top: 48px;
     }
 
-    .footer-links a {
-        color: rgba(255, 255, 255, 0.7);
-        text-decoration: none;
-        transition: all var(--transition-base);
-        font-size: 0.938rem;
-        text-shadow: 0 0 4px rgba(255, 255, 255, 0.08);
-    }
-
-    .footer-links a:hover {
-        color: #00ffff;
-        padding-left: 4px;
-        text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
-    }
-
-    .footer-bottom {
-        border-top: 1px solid rgba(0, 255, 255, 0.2);
-        color: rgba(255, 255, 255, 0.5);
-        text-shadow: 0 0 4px rgba(255, 255, 255, 0.08);
-    }
-
-    /* Responsive */
-    @media (max-width: 992px) {
-        .hero-title {
-            font-size: 3rem;
-        }
-
-        .section-title {
-            font-size: 2rem;
-        }
-
-        .cta-title {
-            font-size: 1.75rem;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .hero-section {
-            padding-top: 80px;
-            text-align: center;
-        }
-
-        .hero-title {
-            font-size: 2.5rem;
-        }
-
-        .hero-subtitle {
-            font-size: 1rem;
-        }
-
-        .feature-item {
-            flex-direction: column;
-            text-align: center;
-        }
-
-        .hero-buttons .btn {
-            display: block;
-            width: 100%;
-            margin-bottom: 1rem;
-        }
-
-        .hero-buttons .btn:last-child {
-            margin-bottom: 2rem;
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-        }
-
-        .section-title {
-            font-size: 1.75rem;
-        }
-
-        .cta-title {
-            font-size: 1.5rem;
-        }
-
-        .cta-buttons .btn {
-            display: block;
-            width: 100%;
-            margin-bottom: 1rem;
-        }
-
-        .cta-buttons .btn:last-child {
-            margin-bottom: 0;
-        }
-    }
-
-    /* Animations */
-    @keyframes fadeIn {
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @keyframes slideInLeft {
-        from {
-            opacity: 0;
-            transform: translateX(-30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    @keyframes slideInRight {
-        from {
-            opacity: 0;
-            transform: translateX(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    @keyframes scaleIn {
-        from {
-            opacity: 0;
-            transform: scale(0.8);
-        }
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
-
-    @keyframes ctaRotate {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-
-    /* Enhanced Animations */
     .feature-card {
+        text-align: center;
+        padding: 40px 32px;
         transition: all var(--transition-smooth);
     }
 
     .feature-card:hover {
-        transform: translateY(-8px) scale(1.02);
+        transform: translateY(-8px);
+    }
+
+    .feature-icon-large {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        margin: 0 auto 24px;
+        transition: all var(--transition-smooth);
+    }
+
+    .feature-card:hover .feature-icon-large {
+        transform: scale(1.1) rotate(-5deg);
+    }
+
+    .feature-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 12px 0;
+    }
+
+    .feature-description {
+        font-size: 0.938rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* Stats Section */
+    .stats-card {
+        padding: 48px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 32px;
+    }
+
+    .stat-box {
+        text-align: center;
+        transition: all var(--transition-fast);
+    }
+
+    .stat-box:hover {
+        transform: translateY(-4px);
+    }
+
+    .stat-box .stat-icon {
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        color: white;
+        margin: 0 auto 16px;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        line-height: 1;
+        margin-bottom: 8px;
+    }
+
+    .stat-label {
+        font-size: 0.938rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+    }
+
+    /* Steps */
+    .steps-grid {
+        margin-top: 48px;
     }
 
     .step-card {
+        text-align: center;
+        padding: 40px 24px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-light);
+        border-radius: 16px;
+        position: relative;
         transition: all var(--transition-smooth);
     }
 
     .step-card:hover {
-        transform: translateY(-12px) scale(1.02);
+        background: var(--bg-tertiary);
+        border-color: var(--primary);
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-lg);
     }
 
-    /* Enhanced Stats Animation */
-    .stat-number.animated {
-        animation: countUp 2s ease-out forwards;
+    .step-number {
+        position: absolute;
+        top: -16px;
+        right: 24px;
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.125rem;
+        font-weight: 800;
+        box-shadow: var(--shadow-md);
     }
 
-    @keyframes countUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+    .step-icon {
+        font-size: 2.5rem;
+        color: var(--primary);
+        margin-bottom: 16px;
     }
 
-    /* Enhanced CTA Card */
+    .step-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 8px 0;
+    }
+
+    .step-description {
+        font-size: 0.938rem;
+        color: var(--text-secondary);
+        margin: 0;
+    }
+
+    /* CTA Section */
+    .cta-section {
+        padding: 80px 32px;
+    }
+
     .cta-card {
+        text-align: center;
+        padding: 80px 48px;
+        background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+        border: 2px solid var(--primary);
         position: relative;
         overflow: hidden;
-        transition: all var(--transition-smooth);
     }
 
     .cta-card::before {
@@ -1063,145 +857,303 @@
         left: -50%;
         width: 200%;
         height: 200%;
-        background: radial-gradient(circle, rgba(99, 102, 241, 0.03), transparent);
+        background: radial-gradient(circle, rgba(88, 204, 2, 0.1), transparent);
         animation: ctaRotate 20s linear infinite;
-        opacity: 0;
-        transition: opacity 0.3s ease;
+        pointer-events: none;
     }
 
-    .cta-card:hover::before {
-        opacity: 1;
+    @keyframes ctaRotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
     }
 
-    .cta-card:hover {
-        transform: translateY(-8px);
-        box-shadow: var(--shadow-xl);
-    }
-
-    /* Enhanced CTA Buttons */
-    .cta-buttons .btn {
-        position: relative;
-        overflow: hidden;
-        transition: all var(--transition-smooth);
-        font-weight: 600;
-        letter-spacing: 0.025em;
-    }
-
-    .cta-buttons .btn::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        background: rgba(255, 255, 255, 0.15);
+    .cta-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
         border-radius: 50%;
-        transform: translate(-50%, -50%);
-        transition: width 0.6s, height 0.6s;
-    }
-
-    .cta-buttons .btn:active::before {
-        width: 300px;
-        height: 300px;
-    }
-
-    /* Clean Animation Classes */
-    .animate-fade-in-up {
-        animation: fadeInUp 0.8s ease-out forwards;
-    }
-
-    .animate-slide-in-left {
-        animation: slideInLeft 0.8s ease-out forwards;
-    }
-
-    .animate-slide-in-right {
-        animation: slideInRight 0.8s ease-out forwards;
-    }
-
-    .animate-scale-in {
-        animation: scaleIn 0.6s ease-out forwards;
-    }
-
-    /* Subtle pulse for hero elements */
-    .hero-badge {
-        animation: subtlePulse 3s ease-in-out infinite;
-    }
-
-    @keyframes subtlePulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-    }
-
-    /* Shimmer effect for stats */
-    .stat-item {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        margin: 0 auto 24px;
+        box-shadow: var(--shadow-lg);
         position: relative;
-        overflow: hidden;
+        z-index: 1;
     }
 
-    .stat-item::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
-        transition: left 0.8s;
+    .cta-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin: 0 0 16px 0;
+        position: relative;
+        z-index: 1;
     }
 
-    .stat-item:hover::after {
-        left: 100%;
+    .cta-subtitle {
+        font-size: 1.125rem;
+        color: var(--text-secondary);
+        margin: 0 0 32px 0;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        position: relative;
+        z-index: 1;
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 32px;
+        font-size: 1rem;
+    }
+
+    /* Animations */
+    .fade-in {
+        animation: fadeIn 0.8s ease;
+    }
+
+    .fade-in-delayed {
+        animation: fadeIn 0.8s ease 0.2s both;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .hero-content-wrapper {
+            grid-template-columns: 1fr;
+            gap: 48px;
+        }
+
+        .hero-title {
+            font-size: 2.75rem;
+        }
+
+        .features-grid,
+        .steps-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-section {
+            padding: 40px 16px 80px;
+        }
+
+        .hero-left {
+            gap: 24px;
+        }
+
+        .hero-title {
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .hero-badge {
+            margin: 0 auto;
+        }
+
+        .hero-features {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-buttons {
+            flex-direction: column;
+        }
+
+        .hero-buttons .btn-hero {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .features-section,
+        .stats-section,
+        .how-it-works-section,
+        .cta-section {
+            padding: 60px 16px;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+        }
+
+        .section-subtitle {
+            font-size: 1rem;
+        }
+
+        .features-grid,
+        .steps-grid,
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        .cta-card {
+            padding: 48px 24px;
+        }
+
+        .cta-title {
+            font-size: 1.75rem;
+        }
+
+        .cta-subtitle {
+            font-size: 1rem;
+        }
+
+        .cta-buttons {
+            flex-direction: column;
+        }
+
+        .cta-buttons .btn-cta {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .stats-grid .stat-item {
+            padding: 20px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .hero-title {
+            font-size: 1.75rem;
+        }
+
+        .xp-number {
+            font-size: 2.25rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+        }
+
+        .preview-badges {
+            flex-direction: column;
+        }
+
+        .stats-grid .stat-item {
+            grid-column: 1 / -1;
+        }
     }
 </style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    // Optimized scroll animations
+    // ============================================
+    // HOME PAGE INTERACTIONS
+    // ============================================
+    
     document.addEventListener('DOMContentLoaded', function() {
         // Intersection Observer for scroll animations
         const observerOptions = {
             threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
+            rootMargin: '0px 0px -100px 0px'
         };
 
-        const observer = new IntersectionObserver((entries) => {
+        const fadeObserver = new IntersectionObserver((entries) => {
             entries.forEach((entry, index) => {
                 if (entry.isIntersecting) {
                     setTimeout(() => {
                         entry.target.style.opacity = '1';
                         entry.target.style.transform = 'translateY(0)';
                     }, index * 100);
-                    observer.unobserve(entry.target);
+                    fadeObserver.unobserve(entry.target);
                 }
             });
         }, observerOptions);
 
-        // Enhanced scroll animations with staggered effects
-        const cards = document.querySelectorAll('.feature-card, .step-card');
-        cards.forEach((card, index) => {
+        // Animate feature cards
+        const featureCards = document.querySelectorAll('.feature-card');
+        featureCards.forEach((card, index) => {
             card.style.opacity = '0';
             card.style.transform = 'translateY(30px)';
             card.style.transition = `all 0.6s ease ${index * 0.1}s`;
-            observer.observe(card);
+            fadeObserver.observe(card);
         });
 
-        // Enhanced stats animation with better easing
+        // Animate step cards
+        const stepCards = document.querySelectorAll('.step-card');
+        stepCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = `all 0.6s ease ${index * 0.1}s`;
+            fadeObserver.observe(card);
+        });
+
+        // Animate stat boxes
+        const statBoxes = document.querySelectorAll('.stat-box');
+        statBoxes.forEach((box, index) => {
+            box.style.opacity = '0';
+            box.style.transform = 'scale(0.8)';
+            box.style.transition = `all 0.6s ease ${index * 0.1}s`;
+            
+            const statObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'scale(1)';
+                            
+                            // Animate numbers
+                            const numberEl = entry.target.querySelector('.stat-number');
+                            if (numberEl && !numberEl.textContent.includes('∞')) {
+                                animateNumber(numberEl);
+                            }
+                        }, index * 100);
+                        statObserver.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+            
+            statObserver.observe(box);
+        });
+
+        // Number animation function
         function animateNumber(element) {
             const text = element.textContent;
-            if (text.includes('∞')) return;
-
             const endValue = parseInt(text.replace('+', ''));
-            const duration = 1500; // Faster animation
+            const duration = 1500;
             let startTimestamp = null;
 
             const step = (timestamp) => {
                 if (!startTimestamp) startTimestamp = timestamp;
                 const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-
-                // Better easing function
-                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-                const currentValue = Math.floor(easeOutQuart * endValue);
+                
+                // Ease out cubic
+                const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+                const currentValue = Math.floor(easeOutCubic * endValue);
 
                 element.textContent = currentValue + (text.includes('+') ? '+' : '');
 
@@ -1213,31 +1165,51 @@
             requestAnimationFrame(step);
         }
 
-        // Enhanced button interactions
-        document.querySelectorAll('.btn-gamify').forEach(button => {
-            button.addEventListener('mousedown', function() {
-                this.style.transform = 'translateY(1px) scale(0.98)';
-            });
+        // Animate XP number in dashboard preview
+        const xpNumber = document.querySelector('.xp-number');
+        if (xpNumber) {
+            const xpObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateNumber(entry.target);
+                        xpObserver.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+            
+            xpObserver.observe(xpNumber);
+        }
 
-            button.addEventListener('mouseup', function() {
-                this.style.transform = 'translateY(-2px) scale(1.02)';
-            });
+        // Animate progress bar
+        const progressBar = document.querySelector('.progress-bar-fill');
+        if (progressBar) {
+            const progressObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const targetWidth = entry.target.style.width;
+                        entry.target.style.width = '0%';
+                        setTimeout(() => {
+                            entry.target.style.width = targetWidth;
+                        }, 300);
+                        progressObserver.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+            
+            progressObserver.observe(progressBar);
+        }
 
-            button.addEventListener('mouseleave', function() {
-                this.style.transform = '';
-            });
-        });
+        // Hero badge animation
+        const heroBadge = document.querySelector('.hero-badge');
+        if (heroBadge) {
+            setTimeout(() => {
+                heroBadge.style.animation = 'subtlePulse 3s ease-in-out infinite';
+            }, 1000);
+        }
 
-        // Enhanced CTA Button Interactions
-        document.querySelectorAll('.cta-buttons .btn').forEach(button => {
+        // Add ripple effect to all buttons
+        document.querySelectorAll('.btn').forEach(button => {
             button.addEventListener('click', function(e) {
-                // Add visual feedback for button click
-                this.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    this.style.transform = '';
-                }, 150);
-
-                // Add ripple effect for CTA buttons
                 const ripple = document.createElement('span');
                 const rect = this.getBoundingClientRect();
                 const size = Math.max(rect.width, rect.height);
@@ -1251,75 +1223,185 @@
                     top: ${y}px;
                     position: absolute;
                     border-radius: 50%;
-                    background: rgba(255, 255, 255, 0.6);
+                    background: rgba(255, 255, 255, 0.5);
                     transform: scale(0);
                     animation: ripple 0.6s ease-out;
                     pointer-events: none;
-                    z-index: 1;
                 `;
 
                 this.style.position = 'relative';
+                this.style.overflow = 'hidden';
                 this.appendChild(ripple);
+
                 setTimeout(() => ripple.remove(), 600);
             });
         });
 
-        // Add entrance animations to key elements
-        const heroBadge = document.querySelector('.hero-badge');
-        if (heroBadge) {
-            heroBadge.style.opacity = '0';
-            heroBadge.style.transform = 'scale(0.8)';
-            setTimeout(() => {
-                heroBadge.style.transition = 'all 0.6s ease';
-                heroBadge.style.opacity = '1';
-                heroBadge.style.transform = 'scale(1)';
-            }, 500);
+        // Dashboard preview hover effect
+        const dashboardPreview = document.querySelector('.dashboard-preview');
+        if (dashboardPreview) {
+            dashboardPreview.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+
+            dashboardPreview.addEventListener('mouseleave', function() {
+                this.style.transform = '';
+            });
         }
 
-        // Animate CTA section on scroll
-        const ctaObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-fade-in-up');
-                    ctaObserver.unobserve(entry.target);
+        // Feature items hover effect
+        document.querySelectorAll('.feature-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                const icon = this.querySelector('.feature-icon');
+                if (icon) {
+                    icon.style.transform = 'rotate(-5deg) scale(1.1)';
                 }
             });
-        }, { threshold: 0.3 });
 
-        const ctaSection = document.querySelector('.cta-section');
-        if (ctaSection) {
-            ctaSection.style.opacity = '0';
-            ctaSection.style.transform = 'translateY(30px)';
-            ctaObserver.observe(ctaSection);
+            item.addEventListener('mouseleave', function() {
+                const icon = this.querySelector('.feature-icon');
+                if (icon) {
+                    icon.style.transform = '';
+                }
+            });
+        });
+
+        // CTA card animation
+        const ctaCard = document.querySelector('.cta-card');
+        if (ctaCard) {
+            const ctaObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animation = 'fadeIn 0.8s ease';
+                        ctaObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.3 });
+            
+            ctaObserver.observe(ctaCard);
         }
 
-        // Enhanced smooth scrolling for internal links
+        // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+                const href = this.getAttribute('href');
+                if (href !== '#' && href !== '#main-content') {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        const navbarHeight = document.querySelector('.navbar').offsetHeight;
+                        const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 20;
+                        
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
                 }
             });
+        });
+
+        // Parallax effect for hero section (subtle)
+        let ticking = false;
+        
+        function updateParallax() {
+            const scrolled = window.pageYOffset;
+            const heroRight = document.querySelector('.hero-right');
+            
+            if (heroRight && scrolled < window.innerHeight) {
+                heroRight.style.transform = `translateY(${scrolled * 0.1}px)`;
+            }
+            
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', function() {
+            if (!ticking) {
+                window.requestAnimationFrame(updateParallax);
+                ticking = true;
+            }
+        }, { passive: true });
+
+        // Add subtle animation to step numbers
+        document.querySelectorAll('.step-number').forEach(number => {
+            number.addEventListener('mouseenter', function() {
+                this.style.animation = 'spin 0.6s ease';
+            });
+
+            number.addEventListener('animationend', function() {
+                this.style.animation = '';
+            });
+        });
+
+        // Stats shimmer effect on hover
+        document.querySelectorAll('.stat-box').forEach(box => {
+            box.addEventListener('mouseenter', function() {
+                const shimmer = document.createElement('div');
+                shimmer.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+                    pointer-events: none;
+                    z-index: 1;
+                    animation: shimmer 0.8s ease;
+                `;
+                
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(shimmer);
+                
+                setTimeout(() => shimmer.remove(), 800);
+            });
+        });
+
+        // Add floating animation to dashboard preview stats
+        const statsItems = document.querySelectorAll('.stats-grid .stat-item');
+        statsItems.forEach((item, index) => {
+            const delay = index * 0.2;
+            item.style.animation = `float 3s ease-in-out ${delay}s infinite`;
         });
     });
 
     // Add ripple animation CSS
-    if (!document.querySelector('#ripple-animation')) {
-        style.id = 'ripple-animation';
-        style.textContent = `
-            @keyframes ripple {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
             }
-        `;
-        document.head.appendChild(style);
-    }
+        }
+
+        @keyframes subtlePulse {
+            0%, 100% { 
+                transform: scale(1); 
+            }
+            50% { 
+                transform: scale(1.05); 
+            }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes shimmer {
+            to { left: 100%; }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    `;
+    document.head.appendChild(style);
 </script>
 {% endblock %}

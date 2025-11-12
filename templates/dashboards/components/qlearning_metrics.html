@@ -1,0 +1,311 @@
+{% load static %}
+
+<!-- Q-Learning Metrics Section -->
+<div class="qlearning-metrics-section" style="padding: 1.5rem 0; width: 100%;">
+    <!-- Local Font Awesome CSS -->
+    <link rel="stylesheet" href="{% static 'vendor/font-awesome/css/all.min.css' %}">
+    <!-- Time Range Selector -->
+    <div class="time-range-selector mb-4" style="width: 100%;">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <h3 class="section-title mb-0">
+                <i class="fas fa-chart-line me-2"></i>Analisis Q-Learning
+            </h3>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-primary time-range-btn active" data-days="7">7 Hari</button>
+                <button type="button" class="btn btn-outline-primary time-range-btn" data-days="30">30 Hari</button>
+                <button type="button" class="btn btn-outline-primary time-range-btn" data-days="90">90 Hari</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid Layout for Charts -->
+    <style>
+        /* Reset some default styles */
+        .qlearning-metrics-section *,
+        .qlearning-metrics-section *::before,
+        .qlearning-metrics-section *::after {
+            box-sizing: border-box;
+        }
+
+        /* Grid container */
+        .chart-grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Grid items */
+        .chart-grid-item {
+            width: 100%;
+            min-width: 0; /* Prevents flex items from overflowing */
+        }
+
+        /* Cards */
+        .chart-grid-item .card {
+            height: 100%;
+            margin: 0;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Responsive breakpoints */
+        @media (max-width: 1199.98px) {
+            .chart-grid-container {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .chart-grid-item .card {
+                margin-bottom: 16px;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .chart-grid-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Ensure charts are responsive */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            min-height: 300px;
+        }
+
+        .chart-container canvas {
+            max-width: 100%;
+            height: auto !important;
+        }
+    </style>
+    
+    <div class="chart-grid-container">
+        <!-- Metrik 2.1.4.1: Keterlibatan Pengguna -->
+        <div class="chart-grid-item">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-users me-2"></i>2.1.4.1 Keterlibatan Pengguna
+                        <small class="text-muted d-block mt-1">Frekuensi interaksi dan durasi penggunaan</small>
+                    </h5>
+                    <div class="chart-container">
+                        <canvas id="engagementChart"></canvas>
+                    </div>
+                    <div class="mt-2 small text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Menampilkan frekuensi login, jumlah soal diselesaikan, dan durasi sesi belajar
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Metrik 2.1.4.2: Tingkat Keberhasilan -->
+        <div class="chart-grid-item">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-trophy me-2"></i>2.1.4.2 Tingkat Keberhasilan
+                        <small class="text-muted d-block mt-1">Akurasi dan penyelesaian tantangan</small>
+                    </h5>
+                    <div class="chart-container">
+                        <canvas id="successRateChart"></canvas>
+                    </div>
+                    <div class="mt-2 small text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Menampilkan persentase jawaban benar dan tingkat penyelesaian tantangan
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrik 2.1.4.3: Respon Terhadap Adaptasi -->
+        <div class="chart-grid-item">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-exchange-alt me-2"></i>2.1.4.3 Respon Adaptasi
+                        <small class="text-muted d-block mt-1">Efektivitas perubahan tantangan</small>
+                    </h5>
+                    <div class="chart-container">
+                        <canvas id="adaptationResponseChart"></canvas>
+                    </div>
+                    <div class="mt-2 small text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Menampilkan perubahan performa sebelum dan sesudah adaptasi
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Metrik 2.1.4.4: Kinerja Algoritma Q-Learning -->
+        <div class="chart-grid-item">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-brain me-2"></i>2.1.4.4 Kinerja Q-Learning
+                        <small class="text-muted d-block mt-1">Evolusi nilai Q dan keputusan</small>
+                    </h5>
+                    <div class="chart-container">
+                        <canvas id="qLearningPerformanceChart"></canvas>
+                    </div>
+                    <div class="mt-2 small text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Menampilkan perkembangan nilai Q dan pola keputusan algoritma
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bagian Kedua: Analisis Mendalam -->
+    <div class="chart-grid-container mt-4">
+        <!-- Analisis State (3.1.1.a) -->
+        <div class="chart-grid-item">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-sitemap me-2"></i>3.1.1.a Analisis State
+                        <small class="text-muted d-block mt-1">Distribusi level kemampuan pengguna</small>
+                    </h5>
+                    <div class="chart-container">
+                        <canvas id="userStateChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Analisis Action (3.1.1.b) -->
+        <div class="chart-grid-item">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-tasks me-2"></i>3.1.1.b Analisis Action
+                        <small class="text-muted d-block mt-1">Distribusi tingkat kesulitan yang diberikan</small>
+                    </h5>
+                    <div class="chart-container">
+                        <canvas id="actionDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <!-- Bagian Ketiga: Reward & Validasi -->
+    <div class="chart-grid-container mt-4">
+        <!-- Analisis Reward (3.1.1.c) -->
+        <div class="chart-grid-item">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-star me-2"></i>3.1.1.c Analisis Reward
+                        <small class="text-muted d-block mt-1">Distribusi reward yang diberikan</small>
+                    </h5>
+                    <div class="chart-container">
+                        <canvas id="rewardAnalysisChart"></canvas>
+                    </div>
+                    <div class="mt-2 small text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Menampilkan pola pemberian reward berdasarkan respon pengguna
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Q-Table Analysis (3.1.1.d) -->
+        <div class="chart-grid-item">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-table me-2"></i>3.1.1.d Analisis Q-Table
+                        <small class="text-muted d-block mt-1">Visualisasi nilai Q terpilih</small>
+                    </h5>
+                    <div class="chart-container">
+                        <canvas id="qTableHeatmap"></canvas>
+                    </div>
+                    <div class="mt-2 small text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Heatmap nilai Q untuk state dan action yang berbeda
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Validasi & Umpan Balik -->
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">
+                <i class="fas fa-clipboard-check me-2"></i>3.1.2 Validasi & Umpan Balik
+                <small class="text-muted d-block mt-1">Hasil validasi ahli dan respon pengguna</small>
+            </h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <canvas id="expertValidationChart"></canvas>
+                    </div>
+                    <p class="small text-muted mt-2">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Hasil validasi kelayakan sistem oleh ahli
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <canvas id="userFeedbackChart"></canvas>
+                    </div>
+                    <p class="small text-muted mt-2">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Respon pengguna terhadap pengalaman belajar
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Load Chart.js and plugins with specific versions for compatibility -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0/dist/chartjs-plugin-annotation.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@1.1.1/dist/chartjs-chart-matrix.min.js"></script>
+
+<!-- Initialize plugins and load dashboard -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            // Register plugins with Chart.js
+            if (typeof Chart !== 'undefined') {
+                // Register annotation plugin if available
+                if (typeof ChartAnnotation !== 'undefined') {
+                    Chart.register(ChartAnnotation);
+                }
+                
+                // Register matrix plugin if available
+                if (typeof ChartMatrix !== 'undefined') {
+                    Chart.register(ChartMatrix);
+                }
+                
+                console.log('Chart.js and plugins initialized successfully');
+            } else {
+                console.error('Chart.js not loaded');
+            }
+            
+            // Load the dashboard script dynamically
+            const script = document.createElement('script');
+            script.src = '{% static 'js/qlearning-dashboard.js' %}';
+            script.onload = function() {
+                console.log('Dashboard script loaded successfully');
+            };
+            script.onerror = function() {
+                console.error('Failed to load dashboard script');
+            };
+            document.body.appendChild(script);
+            
+        } catch (error) {
+            console.error('Error initializing charts:', error);
+        }
+    });
+</script>
