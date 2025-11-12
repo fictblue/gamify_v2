@@ -20,3 +20,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+from gamify_ai.wsgi import application
+app = application

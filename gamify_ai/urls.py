@@ -26,10 +26,10 @@ app_name = 'gamify_ai'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
-    path('accounts/', include('accounts.urls')),
-    path('dashboard/', include('dashboards.urls')),
-    path('quizzes/', include('quizzes.urls')),
-    path('qlearning/', include('qlearning.urls')),
+    path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
+    path('dashboard/', include(('dashboards.urls', 'dashboards'), namespace='dashboards')),
+    path('quizzes/', include(('quizzes.urls', 'quizzes'), namespace='quizzes')),
+    path('qlearning/', include(('qlearning.urls', 'qlearning'), namespace='qlearning')),
     
     # API endpoints for admin dashboard
     path('api/top-users-success-rate/', top_users_success_rate, name='api_top_users'),
