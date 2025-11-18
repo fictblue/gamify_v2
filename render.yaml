@@ -1,18 +1,13 @@
 services:
   - type: web
-    name: gamify-ai
+    name: gamify
     env: python
-    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput"
-    startCommand: "gunicorn gamify_ai.wsgi:application --log-file -"
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn gamify_ai.wsgi
     envVars:
+      - key: SECRET_KEY
+        generateValue: true
       - key: PYTHON_VERSION
-        value: 3.13.7
-      - key: DISABLE_COLLECTSTATIC
-        value: 0
-      - key: DEBUG
-        value: "False"
-      # Add these environment variables in Render's dashboard:
-      # - SECRET_KEY: Your Django secret key
-      # - DATABASE_URL: Your database connection string
-      # - REDIS_URL: Your Redis connection string (if using Redis)
-      # - ALLOWED_HOSTS: Your domain(s)
+        value: 3.12.0
+    staticPublishPath: staticfiles

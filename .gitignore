@@ -235,3 +235,5 @@ Desktop.ini
 
 # Project specific ignores
 # Add any project-specific files to ignore here
+
+.vercel
