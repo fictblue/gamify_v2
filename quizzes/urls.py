@@ -16,4 +16,7 @@ urlpatterns = [
     path('student/get-next/', views.get_next_question, name='get_next_question'),
     path('student/hint/<int:question_id>/', views.get_question_hint, name='get_question_hint'),
     path('submit/', views.submit_answer, name='submit_answer'),
+
+    # Debug URLs
+    path('debug/user-constraints/', views.debug_user_constraints, name='debug_user_constraints'),
 ]

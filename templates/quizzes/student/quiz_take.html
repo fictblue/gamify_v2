@@ -924,79 +924,217 @@
 </div>
 
 <script>
-    // ========================================
-    // SESSION STORAGE MANAGEMENT
-    // ========================================
-    const SessionManager = {
-        SESSION_KEY: 'quiz_session_stats',
-        SESSION_START_KEY: 'quiz_session_start',
-        
-        // Initialize or get existing session
-        init() {
-            if (!this.getSessionStart()) {
-                this.setSessionStart(Date.now());
-            }
-            return this.getStats();
-        },
-        
-        // Get session stats from localStorage
-        getStats() {
-            const stored = localStorage.getItem(this.SESSION_KEY);
-            if (stored) {
-                return JSON.parse(stored);
-            }
-            return { correct: 0, wrong: 0, total: 0, questions: [] };
-        },
-        
-        // Save stats to localStorage
-        saveStats(stats) {
-            localStorage.setItem(this.SESSION_KEY, JSON.stringify(stats));
-        },
-        
-        // Update stats after answer
-        updateStats(isCorrect, questionId) {
-            const stats = this.getStats();
+    
+// ========================================
+// ENHANCED SESSION STORAGE - DUAL METRICS
+// ========================================
+const SessionManager = {
+    SESSION_KEY: 'quiz_session_stats',
+    SESSION_START_KEY: 'quiz_session_start',
+    
+    // Initialize or get existing session
+    init() {
+        if (!this.getSessionStart()) {
+            this.setSessionStart(Date.now());
+        }
+        return this.getStats();
+    },
+    
+    // Get session stats from localStorage
+    getStats() {
+        const stored = localStorage.getItem(this.SESSION_KEY);
+        if (stored) {
+            return JSON.parse(stored);
+        }
+        return { 
+            // Success Rate Metrics (Motivational)
+            success_correct: 0,
+            success_wrong: 0,
+            success_total: 0,
             
-            // Prevent duplicate counting for same question
-            if (!stats.questions.includes(questionId)) {
-                stats.questions.push(questionId);
-                stats.total++;
+            // First-Try Accuracy Metrics (Learning Analytics)
+            first_try_correct: 0,
+            first_try_wrong: 0,
+            first_try_total: 0,
+            
+            // Attempt-based Accuracy Metrics (Detailed Analytics)
+            total_attempts: 0,
+            correct_attempts: 0,
+            
+            // Question tracking
+            questions: {} 
+        };
+    },
+    
+    // Save stats to localStorage
+    saveStats(stats) {
+        localStorage.setItem(this.SESSION_KEY, JSON.stringify(stats));
+    },
+    
+    // Get question status
+    getQuestionStatus(questionId) {
+        const stats = this.getStats();
+        return stats.questions[questionId] || null;
+    },
+    
+    // Mark question as in-progress
+    setQuestionInProgress(questionId) {
+        const stats = this.getStats();
+        if (!stats.questions[questionId]) {
+            stats.questions[questionId] = {
+                status: 'in_progress',
+                attempts: 1,
+                first_attempt_correct: false,
+                final_result: null,
+                total_attempts: 1
+            };
+        } else {
+            stats.questions[questionId].attempts++;
+            stats.questions[questionId].total_attempts++;
+        }
+        
+        // Track attempt-based metrics
+        stats.total_attempts++;
+        
+        this.saveStats(stats);
+    },
+    
+    // Update stats with FINAL outcome (Dual Metrics)
+    updateStats(isCorrect, questionId, attemptNumber = 1) {
+        const stats = this.getStats();
+        const questionStatus = stats.questions[questionId];
+        
+        // Check if this is the FINAL outcome for this question
+        if (!questionStatus || questionStatus.final_result === null) {
+            
+            if (!questionStatus) {
+                // New question - completed in one attempt
+                stats.questions[questionId] = {
+                    status: 'completed',
+                    attempts: attemptNumber,
+                    first_attempt_correct: (attemptNumber === 1 && isCorrect),
+                    final_result: isCorrect,
+                    total_attempts: attemptNumber
+                };
                 
+                // Update SUCCESS RATE (Binary - did they eventually succeed?)
+                stats.success_total++;
                 if (isCorrect) {
-                    stats.correct++;
+                    stats.success_correct++;
                 } else {
-                    stats.wrong++;
+                    stats.success_wrong++;
                 }
                 
-                this.saveStats(stats);
+                // Update FIRST-TRY ACCURACY (Performance - first attempt only)
+                stats.first_try_total++;
+                if (attemptNumber === 1 && isCorrect) {
+                    stats.first_try_correct++;
+                } else if (attemptNumber === 1 && !isCorrect) {
+                    stats.first_try_wrong++;
+                } else {
+                    // Not first try - count as wrong for first-try metric
+                    stats.first_try_wrong++;
+                }
+                
+                // Update ATTEMPT-BASED ACCURACY
+                stats.total_attempts += (attemptNumber - (questionStatus?.total_attempts || 0));
+                if (isCorrect) {
+                    stats.correct_attempts++;
+                }
+                
+            } else if (questionStatus.status === 'in_progress') {
+                // Question was in progress, now completed
+                questionStatus.status = 'completed';
+                questionStatus.final_result = isCorrect;
+                questionStatus.attempts = attemptNumber;
+                questionStatus.first_attempt_correct = false; // Already failed first try
+                
+                // Update SUCCESS RATE
+                stats.success_total++;
+                if (isCorrect) {
+                    stats.success_correct++;
+                } else {
+                    stats.success_wrong++;
+                }
+                
+                // FIRST-TRY ACCURACY already counted when first marked in-progress
+                // (was counted as wrong)
+                
+                // Update ATTEMPT-BASED ACCURACY
+                if (isCorrect) {
+                    stats.correct_attempts++;
+                }
+                stats.total_attempts++; // Final attempt
             }
             
-            return stats;
-        },
-        
-        // Clear session (when quiz ends)
-        clearSession() {
-            localStorage.removeItem(this.SESSION_KEY);
-            localStorage.removeItem(this.SESSION_START_KEY);
-        },
-        
-        // Get session start time
-        getSessionStart() {
-            return localStorage.getItem(this.SESSION_START_KEY);
-        },
-        
-        // Set session start time
-        setSessionStart(timestamp) {
-            localStorage.setItem(this.SESSION_START_KEY, timestamp.toString());
-        },
-        
-        // Calculate total session duration
-        getSessionDuration() {
-            const start = parseInt(this.getSessionStart() || Date.now());
-            const now = Date.now();
-            return Math.floor((now - start) / 1000); // in seconds
+            this.saveStats(stats);
+            
+        } else if (isCorrect && questionStatus.final_result === false) {
+            // EDGE CASE: Question was marked wrong, but now correct
+            // (shouldn't happen with auto-advance, but handle it)
+            stats.success_wrong--;
+            stats.success_correct++;
+            questionStatus.final_result = true;
+            questionStatus.status = 'completed';
+            
+            this.saveStats(stats);
+            console.log(`✅ Question ${questionId} updated: wrong → correct`);
         }
-    };
+        
+        return stats;
+    },
+    
+    // Clear session
+    clearSession() {
+        localStorage.removeItem(this.SESSION_KEY);
+        localStorage.removeItem(this.SESSION_START_KEY);
+    },
+    
+    // Get session start time
+    getSessionStart() {
+        return localStorage.getItem(this.SESSION_START_KEY);
+    },
+    
+    // Set session start time
+    setSessionStart(timestamp) {
+        localStorage.setItem(this.SESSION_START_KEY, timestamp.toString());
+    },
+    
+    // Calculate total session duration
+    getSessionDuration() {
+        const start = parseInt(this.getSessionStart() || Date.now());
+        const now = Date.now();
+        return Math.floor((now - start) / 1000);
+    },
+    
+    // NEW: Get accuracy breakdown
+    getAccuracyBreakdown() {
+        const stats = this.getStats();
+        
+        return {
+            // Success Rate (Motivational - shown to students)
+            success_rate: stats.success_total > 0 
+                ? Math.round((stats.success_correct / stats.success_total) * 100) 
+                : 0,
+            success_correct: stats.success_correct,
+            success_total: stats.success_total,
+            
+            // First-Try Accuracy (Learning - for Q-Learning & analytics)
+            first_try_accuracy: stats.first_try_total > 0 
+                ? Math.round((stats.first_try_correct / stats.first_try_total) * 100) 
+                : 0,
+            first_try_correct: stats.first_try_correct,
+            first_try_total: stats.first_try_total,
+            
+            // Attempt-Based Accuracy (Detailed - for teacher dashboard)
+            attempt_accuracy: stats.total_attempts > 0 
+                ? Math.round((stats.correct_attempts / stats.total_attempts) * 100) 
+                : 0,
+            correct_attempts: stats.correct_attempts,
+            total_attempts: stats.total_attempts,
+        };
+    }
+};
     
     // ========================================
     // QUIZ STATE
@@ -1011,16 +1149,40 @@
     // ========================================
     // UI UPDATE FUNCTIONS
     // ========================================
-    function updateSessionStats() {
-        document.getElementById('correctCount').textContent = sessionStats.correct;
-        document.getElementById('wrongCount').textContent = sessionStats.wrong;
-        document.getElementById('totalQuestions').textContent = sessionStats.total;
+    // ========================================
+// UPDATED UI DISPLAY FUNCTIONS
+// ========================================
+function updateSessionStats() {
+    const breakdown = SessionManager.getAccuracyBreakdown();
+    const stats = SessionManager.getStats();
+    
+    // Display SUCCESS RATE (Motivational - primary display)
+    document.getElementById('correctCount').textContent = stats.success_correct;
+    document.getElementById('wrongCount').textContent = stats.success_wrong;
+    document.getElementById('totalQuestions').textContent = stats.success_total;
+    
+    // Display SUCCESS RATE as main accuracy
+    document.getElementById('accuracy').textContent = `${breakdown.success_rate}%`;
+    
+    // OPTIONAL: Show first-try accuracy in smaller text (if you want to display it)
+    const accuracyElement = document.getElementById('accuracy');
+    if (accuracyElement && breakdown.first_try_accuracy !== breakdown.success_rate) {
+        // Add tooltip or small text showing first-try accuracy
+        accuracyElement.title = `First-try accuracy: ${breakdown.first_try_accuracy}%`;
         
-        const accuracy = sessionStats.total > 0 
-            ? Math.round((sessionStats.correct / sessionStats.total) * 100) 
-            : 0;
-        document.getElementById('accuracy').textContent = `${accuracy}%`;
+        // Or add small badge below main accuracy
+        let firstTryBadge = document.getElementById('firstTryBadge');
+        if (!firstTryBadge) {
+            firstTryBadge = document.createElement('div');
+            firstTryBadge.id = 'firstTryBadge';
+            firstTryBadge.style.fontSize = '0.75rem';
+            firstTryBadge.style.opacity = '0.7';
+            firstTryBadge.style.marginTop = '0.25rem';
+            accuracyElement.parentElement.appendChild(firstTryBadge);
+        }
+        firstTryBadge.textContent = `(${breakdown.first_try_accuracy}% first-try)`;
     }
+}
     
     function updateSessionDuration() {
         const duration = SessionManager.getSessionDuration();
@@ -1109,108 +1271,233 @@
     });
     
     // ========================================
-    // FORM SUBMISSION
-    // ========================================
-    document.getElementById('quizForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-    
-        const submitBtn = document.getElementById('submitBtn');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="loading-neon me-2"></span>Checking...';
-    
-        const formData = new FormData(this);
-        formData.set('time_spent', timeSpent);
-        formData.set('wrong_attempts', wrongAttempts);
-    
-        {% if question.format == 'mcq_complex' %}
-            const selectedOptions = [];
-            document.querySelectorAll('input[name="answer"]:checked').forEach(cb => {
-                selectedOptions.push(cb.value);
-            });
-            if (selectedOptions.length > 0) {
-                formData.set('answer', JSON.stringify(selectedOptions));
-            }
-        {% endif %}
-    
-        fetch('{% url "quizzes:submit_answer" %}', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Update session stats in localStorage
-                sessionStats = SessionManager.updateStats(data.is_correct, CURRENT_QUESTION_ID);
+// UPDATED FORM SUBMISSION (Dual Metrics)
+// ========================================
+document.getElementById('quizForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="loading-neon me-2"></span>Checking...';
+
+    const formData = new FormData(this);
+    formData.set('time_spent', timeSpent);
+    formData.set('wrong_attempts', wrongAttempts);
+
+    {% if question.format == 'mcq_complex' %}
+        const selectedOptions = [];
+        document.querySelectorAll('input[name="answer"]:checked').forEach(cb => {
+            selectedOptions.push(cb.value);
+        });
+        if (selectedOptions.length > 0) {
+            formData.set('answer', JSON.stringify(selectedOptions));
+        }
+    {% endif %}
+
+    fetch('{% url "quizzes:submit_answer" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            
+            if (data.is_correct) {
+                // ========================================
+                // CORRECT ANSWER - Update both metrics
+                // ========================================
+                sessionStats = SessionManager.updateStats(
+                    true, 
+                    CURRENT_QUESTION_ID, 
+                    data.current_attempt
+                );
                 updateSessionStats();
                 
-                if (data.is_correct) {
-                    showXPFeedback(`+${data.xp_change} XP!`, 'Awesome! 🎉', true);
-                    hideHint(); // Hide hint when answer is correct
-                    
-                    {% if question.format == 'mcq_simple' %}
-                        const correctOption = document.querySelector(`[data-option="${data.correct_answer}"]`);
-                        if (correctOption) correctOption.classList.add('correct');
-                    {% endif %}
-    
-                    if (window.RobotCompanion) {
-                        RobotCompanion.showAchievement('Correct!', 'Great job! 🎉', 'completion');
+                // Get accuracy breakdown for feedback
+                const breakdown = SessionManager.getAccuracyBreakdown();
+                
+                // Show XP feedback with accuracy info
+                let subtextMessage = data.current_attempt === 1 
+                    ? 'Perfect! First try! 🎉' 
+                    : `Correct on attempt ${data.current_attempt}/${data.max_attempts}`;
+                
+                // Add first-try accuracy to subtext if different from success rate
+                if (breakdown.first_try_accuracy !== breakdown.success_rate) {
+                    subtextMessage += ` (First-try: ${breakdown.first_try_accuracy}%)`;
+                }
+                
+                showXPFeedback(
+                    `+${data.xp_change} XP!`,
+                    subtextMessage,
+                    true,
+                    data.xp_calculation
+                );
+                
+                hideHint();
+                
+                {% if question.format == 'mcq_simple' %}
+                    const correctOption = document.querySelector(`[data-option="${data.correct_answer}"]`);
+                    if (correctOption) {
+                        correctOption.classList.add('correct');
+                        correctOption.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     }
-    
-                    setTimeout(() => getNextQuestion(), 2000);
-                    
-                } else {
-                    wrongAttempts++;
-                    document.getElementById('wrongAttempts').value = wrongAttempts;
-    
-                    if (data.xp_change < 0) {
-                        showXPFeedback(`${data.xp_change} XP`, 'Try again!', false);
-                    }
-    
-                    {% if question.format == 'mcq_simple' %}
-                        const selectedOption = document.querySelector('input[name="answer"]:checked');
-                        if (selectedOption) {
-                            selectedOption.closest('.option-neon').classList.add('incorrect');
-                        }
-                    {% endif %}
-    
-                    if (data.show_hint) {
-                        showAutoHint(`💡 Attempt ${wrongAttempts}/${MAX_ATTEMPTS}. Think carefully!`);
-                    }
-    
-                    if (wrongAttempts >= MAX_ATTEMPTS) {
-                        setTimeout(() => {
-                            if (confirm('Maximum attempts reached. Move to next question?')) {
-                                getNextQuestion();
-                            }
-                        }, 2000);
+                {% endif %}
+
+                if (window.RobotCompanion) {
+                    if (data.current_attempt === 1) {
+                        RobotCompanion.showAchievement('Perfect!', 'First try! 🎉', 'completion');
                     } else {
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Try Again';
-                        
-                        setTimeout(() => {
-                            document.querySelectorAll('.option-neon.incorrect').forEach(opt => {
-                                opt.classList.remove('incorrect');
-                            });
-                        }, 2000);
+                        RobotCompanion.showAchievement('Correct!', 'Great persistence! 💪', 'completion');
                     }
                 }
+
+                setTimeout(() => getNextQuestion(), 2000);
+                
             } else {
-                alert('Error: ' + (data.error || 'Something went wrong'));
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Answer';
+                // ========================================
+                // WRONG ANSWER
+                // ========================================
+                wrongAttempts++;
+                document.getElementById('wrongAttempts').value = wrongAttempts;
+                
+                // Mark as in-progress (counts for first-try metric)
+                SessionManager.setQuestionInProgress(CURRENT_QUESTION_ID);
+
+                if (data.xp_change < 0) {
+                    showXPFeedback(
+                        `${data.xp_change} XP`,
+                        `Attempt ${data.current_attempt}/${data.max_attempts}`,
+                        false,
+                        data.xp_calculation
+                    );
+                }
+
+                {% if question.format == 'mcq_simple' %}
+                    const selectedOption = document.querySelector('input[name="answer"]:checked');
+                    if (selectedOption) {
+                        const wrongOption = selectedOption.closest('.option-neon');
+                        wrongOption.classList.add('incorrect');
+                        
+                        setTimeout(() => {
+                            wrongOption.classList.remove('incorrect');
+                        }, 2000);
+                    }
+                {% endif %}
+
+                // Progressive hint system
+                if (data.show_hint && data.hint_data) {
+                    const hintLevel = data.hint_data.level;
+                    const hintText = data.hint_data.text;
+                    
+                    let hintIcon = '💡';
+                    let hintTitle = 'Hint';
+                    
+                    if (hintLevel === 'answer') {
+                        hintIcon = '📚';
+                        hintTitle = 'Answer Revealed';
+                    } else if (hintLevel === 'detailed') {
+                        hintIcon = '🎯';
+                        hintTitle = 'Detailed Hint';
+                    } else if (hintLevel === 'specific') {
+                        hintIcon = '🔍';
+                        hintTitle = 'Specific Hint';
+                    }
+                    
+                    const fullHintHtml = `
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 style="color: #ffff00; margin: 0;">
+                                ${hintIcon} ${hintTitle}
+                                <small style="opacity: 0.7; margin-left: 0.5rem;">
+                                    (Attempt ${data.current_attempt}/${data.max_attempts})
+                                </small>
+                            </h6>
+                            <button type="button" class="btn btn-sm" onclick="scrollToQuestion()"
+                                    style="background: rgba(0, 255, 255, 0.1); border: 1px solid rgba(0, 255, 255, 0.5); color: #00ffff; padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 6px;">
+                                <i class="fas fa-eye"></i> View Question
+                            </button>
+                        </div>
+                        <div style="color: rgba(255, 255, 255, 0.9); line-height: 1.6;">
+                            ${hintText}
+                        </div>
+                        ${data.retry_message ? `
+                        <div class="mt-3 p-2" style="background: rgba(0, 255, 255, 0.1); border-left: 3px solid #00ffff; border-radius: 4px;">
+                            <small style="color: #00ffff; font-weight: 600;">
+                                ${data.retry_message}
+                            </small>
+                        </div>
+                        ` : ''}
+                    `;
+                    
+                    showAutoHint(fullHintHtml);
+                }
+
+                // Auto-advance or allow retry
+                if (data.should_advance) {
+                    // Max attempts - count as wrong (final outcome)
+                    sessionStats = SessionManager.updateStats(
+                        false, 
+                        CURRENT_QUESTION_ID, 
+                        data.current_attempt
+                    );
+                    updateSessionStats();
+                    
+                    console.log('Max attempts reached, counting as wrong and auto-advancing...');
+                    
+                    if (data.explanation && data.hint_data && data.hint_data.level !== 'answer') {
+                        showAutoHint(`
+                            <h6 style="color: #ff6b6b; margin-bottom: 1rem;">
+                                ❌ Maximum Attempts Reached
+                            </h6>
+                            <div style="color: rgba(255, 255, 255, 0.9); line-height: 1.6;">
+                                <p><strong>Correct Answer:</strong> ${
+                                    data.correct_answer || data.correct_answers?.join(', ') || 'See explanation'
+                                }</p>
+                                ${data.explanation ? `<p><strong>Explanation:</strong> ${data.explanation}</p>` : ''}
+                                <p class="mt-3" style="color: #00ffff;">
+                                    <i class="fas fa-forward me-2"></i>Moving to next question...
+                                </p>
+                            </div>
+                        `);
+                    }
+                    
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-forward me-2"></i>Moving to Next...';
+                    
+                    setTimeout(() => {
+                        getNextQuestion();
+                    }, 3000);
+                    
+                } else {
+                    // Allow retry
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<i class="fas fa-redo me-2"></i>Try Again (${wrongAttempts}/${data.max_attempts})`;
+                    
+                    if (window.RobotCompanion) {
+                        RobotCompanion.showAchievement(
+                            'Keep Trying!',
+                            `${data.max_attempts - wrongAttempts} attempts left`,
+                            'progress'
+                        );
+                    }
+                }
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Network error. Please try again.');
+        } else {
+            alert('Error: ' + (data.error || 'Something went wrong'));
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Answer';
-        });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Network error. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Answer';
     });
+});
     
     // ========================================
     // NAVIGATION FUNCTIONS
@@ -1247,23 +1534,29 @@
         }
     }
     
-    function endQuiz() {
-        const stats = SessionManager.getStats();
-        const duration = SessionManager.getSessionDuration();
-        const minutes = Math.floor(duration / 60);
-        
-        const message = `Session Summary:\n\n` +
-                       `✅ Correct: ${stats.correct}\n` +
-                       `❌ Wrong: ${stats.wrong}\n` +
-                       `📊 Total: ${stats.total}\n` +
-                       `⏱️ Duration: ${minutes} minutes\n\n` +
-                       `End this session?`;
-        
-        if (confirm(message)) {
-            SessionManager.clearSession();
-            window.location.href = '{% url "quizzes:student_quiz_list" %}';
-        }
+    // ========================================
+// NEW: Enhanced End Quiz Summary
+// ========================================
+function endQuiz() {
+    const breakdown = SessionManager.getAccuracyBreakdown();
+    const stats = SessionManager.getStats();
+    const duration = SessionManager.getSessionDuration();
+    const minutes = Math.floor(duration / 60);
+    
+    const message = `📊 Session Summary:\n\n` +
+                   `✅ Questions Completed: ${stats.success_correct}/${stats.success_total}\n` +
+                   `❌ Wrong: ${stats.success_wrong}\n` +
+                   `📈 Success Rate: ${breakdown.success_rate}%\n` +
+                   `🎯 First-Try Accuracy: ${breakdown.first_try_accuracy}%\n` +
+                   `📝 Total Attempts: ${breakdown.total_attempts}\n` +
+                   `⏱️ Duration: ${minutes} minutes\n\n` +
+                   `End this session?`;
+    
+    if (confirm(message)) {
+        SessionManager.clearSession();
+        window.location.href = '{% url "quizzes:student_quiz_list" %}';
     }
+}
     
     // ========================================
     // UTILITY FUNCTIONS

@@ -1,0 +1,1002 @@
+[
+  {
+    "model": "quizzes.question",
+    "pk": 1,
+    "fields": {
+      "text": "Choose the correct form of the verb: The students _____ their homework every day.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "do",
+        "B": "does",
+        "C": "did",
+        "D": "doing"
+      },
+      "answer_key": "A",
+      "curriculum_tag": "Grammar - Present Simple",
+      "explanation": "The verb 'do' is correct because the subject 'students' is plural, so we use the base form of the verb in present simple tense.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 2,
+    "fields": {
+      "text": "Complete the sentence: She _____ to school by bus yesterday.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "go",
+        "B": "went",
+        "C": "goes",
+        "D": "going"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Past Simple",
+      "explanation": "The verb 'went' is correct because we need the past simple form for an action that happened yesterday.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 3,
+    "fields": {
+      "text": "Choose the correct preposition: They arrived _____ the airport at 8 PM.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "to",
+        "B": "at",
+        "C": "in",
+        "D": "on"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Prepositions",
+      "explanation": "The preposition 'at' is used with specific locations like 'the airport'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 4,
+    "fields": {
+      "text": "Select the correct plural form: one child, two _____.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "childs",
+        "B": "childrens",
+        "C": "children",
+        "D": "childes"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Plurals",
+      "explanation": "The correct plural form of 'child' is 'children', which is an irregular plural form in English.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 5,
+    "fields": {
+      "text": "Choose the correct word: I have _____ apples in my bag.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "a",
+        "B": "an",
+        "C": "some",
+        "D": "any"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Quantifiers",
+      "explanation": "'Some' is used in positive statements with plural countable nouns like 'apples'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 6,
+    "fields": {
+      "text": "Choose the correct form of 'to be' for this sentence: My brother and I _____ going to the mall.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "am",
+        "B": "is",
+        "C": "are",
+        "D": "be"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - To Be",
+      "explanation": "'Are' is the correct form of 'to be' for the subject 'My brother and I' (we).",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 7,
+    "fields": {
+      "text": "What is the opposite of 'expensive'?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "cheap",
+        "B": "big",
+        "C": "small",
+        "D": "long"
+      },
+      "answer_key": "A",
+      "curriculum_tag": "Vocabulary - Adjectives",
+      "explanation": "The opposite of 'expensive' (mahal) is 'cheap' (murah).",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 8,
+    "fields": {
+      "text": "Complete the sentence: She _____ her teeth every morning.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "brush",
+        "B": "brushes",
+        "C": "brushing",
+        "D": "brushed"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Present Simple",
+      "explanation": "With 'she', we add -es to the verb in present simple tense: 'brushes'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 9,
+    "fields": {
+      "text": "Which word is a noun?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "beautiful",
+        "B": "quickly",
+        "C": "happiness",
+        "D": "running"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Parts of Speech",
+      "explanation": "'Happiness' is a noun (kata benda) that names a feeling or state of being.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 10,
+    "fields": {
+      "text": "Choose the correct spelling:",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "Accomodation",
+        "B": "Acommodation",
+        "C": "Acomodation",
+        "D": "Accommodation"
+      },
+      "answer_key": "D",
+      "curriculum_tag": "Spelling",
+      "explanation": "The correct spelling is 'accommodation' with double 'c' and double 'm'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 11,
+    "fields": {
+      "text": "What is the past tense of 'buy'?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "buyed",
+        "B": "bought",
+        "C": "buying",
+        "D": "buys"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Past Simple",
+      "explanation": "The past tense of 'buy' is 'bought'. It's an irregular verb.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 12,
+    "fields": {
+      "text": "Choose the correct word: There are _____ books on the table.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "a",
+        "B": "an",
+        "C": "some",
+        "D": "any"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Quantifiers",
+      "explanation": "'Some' is used in positive statements with plural countable nouns like 'books'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 13,
+    "fields": {
+      "text": "Which sentence is correct?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "She don't like apples.",
+        "B": "She doesn't likes apples.",
+        "C": "She doesn't like apples.",
+        "D": "She don't likes apples."
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Present Simple Negative",
+      "explanation": "With 'she', we use 'doesn't' (not don't) and the base form of the verb 'like' (not likes).",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 14,
+    "fields": {
+      "text": "What is the comparative form of 'big'?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "biger",
+        "B": "bigger",
+        "C": "biggest",
+        "D": "more big"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Comparatives",
+      "explanation": "For one-syllable adjectives like 'big', we add -er for the comparative form: 'bigger'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 15,
+    "fields": {
+      "text": "Choose the correct word: I'm going to the _____ to buy some medicine.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "bakery",
+        "B": "pharmacy",
+        "C": "library",
+        "D": "supermarket"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Vocabulary - Places",
+      "explanation": "A 'pharmacy' is where you buy medicine. The other options sell different things.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 16,
+    "fields": {
+      "text": "Which word is a pronoun?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "run",
+        "B": "happy",
+        "C": "she",
+        "D": "quickly"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Pronouns",
+      "explanation": "'She' is a pronoun that can replace a female subject in a sentence.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 17,
+    "fields": {
+      "text": "What is the plural of 'mouse' (the animal)?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "mouses",
+        "B": "mices",
+        "C": "mice",
+        "D": "mouse"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Irregular Plurals",
+      "explanation": "The plural of 'mouse' is 'mice'. It's an irregular plural form.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 18,
+    "fields": {
+      "text": "Choose the correct word: I usually have breakfast _____ 7 o'clock.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "in",
+        "B": "on",
+        "C": "at",
+        "D": "by"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Prepositions of Time",
+      "explanation": "We use 'at' with specific times, like 'at 7 o'clock'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 19,
+    "fields": {
+      "text": "Which sentence is in the present continuous tense?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "I eat breakfast every day.",
+        "B": "I ate breakfast an hour ago.",
+        "C": "I am eating breakfast now.",
+        "D": "I will eat breakfast later."
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Present Continuous",
+      "explanation": "'I am eating' is in the present continuous tense, used for actions happening now.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 20,
+    "fields": {
+      "text": "What is the opposite of 'always'?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "sometimes",
+        "B": "usually",
+        "C": "never",
+        "D": "often"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Vocabulary - Adverbs of Frequency",
+      "explanation": "'Never' is the opposite of 'always'. 'Always' means 100% of the time, 'never' means 0%.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 21,
+    "fields": {
+      "text": "Choose the correct word: There isn't _____ milk in the fridge.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "some",
+        "B": "any",
+        "C": "a",
+        "D": "an"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Quantifiers",
+      "explanation": "We use 'any' in negative sentences with uncountable nouns like 'milk'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 22,
+    "fields": {
+      "text": "What is the past tense of 'go'?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "goed",
+        "B": "gone",
+        "C": "went",
+        "D": "going"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Past Simple",
+      "explanation": "The past tense of 'go' is 'went'. It's an irregular verb.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 23,
+    "fields": {
+      "text": "Choose the correct word: I have _____ apple in my bag.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "a",
+        "B": "an",
+        "C": "some",
+        "D": "any"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Articles",
+      "explanation": "We use 'an' before words that start with a vowel sound, like 'apple'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 24,
+    "fields": {
+      "text": "What is the plural of 'tooth'?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "tooths",
+        "B": "teeth",
+        "C": "toothes",
+        "D": "tooth"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Irregular Plurals",
+      "explanation": "The plural of 'tooth' is 'teeth'. It's an irregular plural form.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 25,
+    "fields": {
+      "text": "Choose the correct word: She is _____ than her sister.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "tall",
+        "B": "taller",
+        "C": "tallest",
+        "D": "more tall"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Comparatives",
+      "explanation": "We use 'taller' (comparative form) when comparing two people or things.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 26,
+    "fields": {
+      "text": "What is the opposite of 'happy'?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "sad",
+        "B": "angry",
+        "C": "tired",
+        "D": "bored"
+      },
+      "answer_key": "A",
+      "curriculum_tag": "Vocabulary - Adjectives",
+      "explanation": "The opposite of 'happy' is 'sad'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 27,
+    "fields": {
+      "text": "Choose the correct word: I _____ TV when the phone rang.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "watch",
+        "B": "watched",
+        "C": "was watching",
+        "D": "am watching"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Past Continuous",
+      "explanation": "We use past continuous (was/were + verb-ing) for actions that were in progress when another action happened.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 28,
+    "fields": {
+      "text": "What is the opposite of 'hot'?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "warm",
+        "B": "cold",
+        "C": "cool",
+        "D": "freezing"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Vocabulary - Adjectives",
+      "explanation": "The opposite of 'hot' is 'cold'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 29,
+    "fields": {
+      "text": "Choose the correct word: I have lived here _____ 2010.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "for",
+        "B": "since",
+        "C": "from",
+        "D": "in"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Prepositions",
+      "explanation": "We use 'since' with a point in time (e.g., 2010, Monday, last week) when using present perfect tense.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 30,
+    "fields": {
+      "text": "What is the past participle of 'eat'?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "eated",
+        "B": "ate",
+        "C": "eaten",
+        "D": "eating"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Past Participles",
+      "explanation": "The past participle of 'eat' is 'eaten'. It's an irregular verb.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 31,
+    "fields": {
+      "text": "Choose the correct word: She can _____ the piano very well.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "play",
+        "B": "plays",
+        "C": "playing",
+        "D": "played"
+      },
+      "answer_key": "A",
+      "curriculum_tag": "Grammar - Modal Verbs",
+      "explanation": "After modal verbs like 'can', we use the base form of the verb (without 'to').",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 32,
+    "fields": {
+      "text": "What is the plural of 'person'?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "persons",
+        "B": "people",
+        "C": "peoples",
+        "D": "person"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Irregular Plurals",
+      "explanation": "The plural of 'person' is 'people'. It's an irregular plural form.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 33,
+    "fields": {
+      "text": "Choose the correct word: I _____ my homework yet.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "didn't finish",
+        "B": "haven't finished",
+        "C": "don't finish",
+        "D": "am not finishing"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Present Perfect",
+      "explanation": "We use present perfect (have/has + past participle) with 'yet' to talk about unfinished actions.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 34,
+    "fields": {
+      "text": "What is the opposite of 'cheap'?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "expensive",
+        "B": "small",
+        "C": "big",
+        "D": "long"
+      },
+      "answer_key": "A",
+      "curriculum_tag": "Vocabulary - Adjectives",
+      "explanation": "The opposite of 'cheap' (murah) is 'expensive' (mahal).",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 35,
+    "fields": {
+      "text": "Choose the correct word: I have known her _____ three years.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "for",
+        "B": "since",
+        "C": "from",
+        "D": "in"
+      },
+      "answer_key": "A",
+      "curriculum_tag": "Grammar - Prepositions",
+      "explanation": "We use 'for' with a period of time (e.g., three years, two days) when using present perfect tense.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 36,
+    "fields": {
+      "text": "What is the past tense of 'see'?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "seed",
+        "B": "saw",
+        "C": "seen",
+        "D": "seeing"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Past Simple",
+      "explanation": "The past tense of 'see' is 'saw'. It's an irregular verb.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 37,
+    "fields": {
+      "text": "Choose the correct word: She is the _____ student in the class.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "smart",
+        "B": "smarter",
+        "C": "smartest",
+        "D": "more smart"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Superlatives",
+      "explanation": "We use the superlative form 'smartest' when comparing one person or thing with a whole group.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 38,
+    "fields": {
+      "text": "What is the opposite of 'young'?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "old",
+        "B": "big",
+        "C": "tall",
+        "D": "long"
+      },
+      "answer_key": "A",
+      "curriculum_tag": "Vocabulary - Adjectives",
+      "explanation": "The opposite of 'young' is 'old'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 39,
+    "fields": {
+      "text": "Choose the correct word: I _____ to the cinema last night.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "go",
+        "B": "goes",
+        "C": "went",
+        "D": "gone"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Past Simple",
+      "explanation": "We use the past simple form 'went' to talk about completed actions in the past.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 40,
+    "fields": {
+      "text": "What is the plural of 'knife'?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "knifes",
+        "B": "knives",
+        "C": "knive",
+        "D": "knif"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Irregular Plurals",
+      "explanation": "The plural of 'knife' is 'knives'. For words ending in -f or -fe, we change -f/-fe to -ves in the plural.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 41,
+    "fields": {
+      "text": "Choose the correct word: She _____ a book when I called her.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "read",
+        "B": "reads",
+        "C": "was reading",
+        "D": "is reading"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Past Continuous",
+      "explanation": "We use past continuous (was/were + verb-ing) for actions that were in progress when another action happened.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 42,
+    "fields": {
+      "text": "What is the opposite of 'fast'?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "slow",
+        "B": "quick",
+        "C": "big",
+        "D": "small"
+      },
+      "answer_key": "A",
+      "curriculum_tag": "Vocabulary - Adjectives",
+      "explanation": "The opposite of 'fast' is 'slow'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 43,
+    "fields": {
+      "text": "Choose the correct word: I _____ to the market every Sunday.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "go",
+        "B": "goes",
+        "C": "going",
+        "D": "went"
+      },
+      "answer_key": "A",
+      "curriculum_tag": "Grammar - Present Simple",
+      "explanation": "We use the base form 'go' with 'I' in the present simple tense.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 44,
+    "fields": {
+      "text": "What is the past participle of 'write'?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "writed",
+        "B": "wrote",
+        "C": "written",
+        "D": "writing"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Past Participles",
+      "explanation": "The past participle of 'write' is 'written'. It's an irregular verb.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 45,
+    "fields": {
+      "text": "Choose the correct word: She _____ speak three languages.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "can",
+        "B": "cans",
+        "C": "can to",
+        "D": "canning"
+      },
+      "answer_key": "A",
+      "curriculum_tag": "Grammar - Modal Verbs",
+      "explanation": "'Can' is a modal verb that doesn't change form and is followed by the base form of the main verb.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 46,
+    "fields": {
+      "text": "What is the plural of 'foot'?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "foots",
+        "B": "feet",
+        "C": "feets",
+        "D": "foot"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Irregular Plurals",
+      "explanation": "The plural of 'foot' is 'feet'. It's an irregular plural form.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 47,
+    "fields": {
+      "text": "Choose the correct word: I have _____ finished my homework.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "just",
+        "B": "yet",
+        "C": "already",
+        "D": "still"
+      },
+      "answer_key": "A",
+      "curriculum_tag": "Grammar - Adverbs",
+      "explanation": "We use 'just' with present perfect to talk about very recent actions.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 48,
+    "fields": {
+      "text": "What is the opposite of 'light' (adjective)?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "dark",
+        "B": "heavy",
+        "C": "big",
+        "D": "small"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Vocabulary - Adjectives",
+      "explanation": "The opposite of 'light' (ringan) is 'heavy' (berat).",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 49,
+    "fields": {
+      "text": "Choose the correct word: She has lived here _____ she was a child.",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "for",
+        "B": "since",
+        "C": "from",
+        "D": "in"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Prepositions",
+      "explanation": "We use 'since' with a point in time (e.g., she was a child) when using present perfect tense.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 50,
+    "fields": {
+      "text": "What is the past tense of 'take'?",
+      "difficulty": "easy",
+      "format": "mcq_simple",
+      "options": {
+        "A": "taked",
+        "B": "took",
+        "C": "taken",
+        "D": "taking"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Past Simple",
+      "explanation": "The past tense of 'take' is 'took'. It's an irregular verb.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  }
+]

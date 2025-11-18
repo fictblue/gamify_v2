@@ -1,0 +1,749 @@
+/* Admin Quiz Form Styles - DuoLingo & BentoGrid Design */
+
+:root {
+    /* Primary Colors - DuoLingo Inspired */
+    --primary: #58cc02;
+    --primary-hover: #4bad00;
+    --primary-light: #89e219;
+    --primary-lighter: #d7ffb8;
+    --primary-dark: #3a8a0b;
+    
+    /* Accent Colors */
+    --accent-blue: #1cb0f6;
+    --accent-blue-light: #a3e4ff;
+    --accent-orange: #ff9600;
+    --accent-pink: #ff4b7d;
+    --accent-purple: #ce82ff;
+    --accent-yellow: #ffc800;
+    
+    /* Semantic Colors */
+    --success: #58cc02;
+    --success-light: #d7ffb8;
+    --warning: #ffc800;
+    --danger: #ff4b4b;
+    --info: #1cb0f6;
+    --info-light: #a3e4ff;
+    
+    /* Neutrals */
+    --gray-50: #fafafa;
+    --gray-100: #f5f5f5;
+    --gray-200: #e5e5e5;
+    --gray-300: #d4d4d4;
+    --gray-400: #a3a3a3;
+    --gray-500: #737373;
+    --gray-600: #525252;
+    --gray-700: #404040;
+    --gray-800: #262626;
+    --gray-900: #171717;
+    
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 24px;
+    --radius-full: 9999px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+    --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.2);
+    
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-theme: 200ms ease-in-out;
+}
+
+/* Light Theme */
+:root[data-theme="light"],
+:root:not([data-theme]) {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-tertiary: #f1f3f5;
+    --text-primary: #171717;
+    --text-secondary: #525252;
+    --text-tertiary: #737373;
+    --border-primary: #e5e5e5;
+    --border-secondary: #d4d4d4;
+    --card-bg: #ffffff;
+    --card-hover: #fafafa;
+    --input-bg: #ffffff;
+    --input-border: #d4d4d4;
+    --input-focus-bg: #ffffff;
+}
+
+/* Dark Theme */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --bg-primary: #0a0a0a;
+        --bg-secondary: #171717;
+        --bg-tertiary: #262626;
+        --text-primary: #fafafa;
+        --text-secondary: #d4d4d4;
+        --text-tertiary: #a3a3a3;
+        --border-primary: #404040;
+        --border-secondary: #525252;
+        --card-bg: #171717;
+        --card-hover: #262626;
+        --input-bg: #262626;
+        --input-border: #404040;
+        --input-focus-bg: #2d2d2d;
+        
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+        --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
+        --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.7);
+    }
+}
+
+:root[data-theme="dark"] {
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #171717;
+    --bg-tertiary: #262626;
+    --text-primary: #fafafa;
+    --text-secondary: #d4d4d4;
+    --text-tertiary: #a3a3a3;
+    --border-primary: #404040;
+    --border-secondary: #525252;
+    --card-bg: #171717;
+    --card-hover: #262626;
+    --input-bg: #262626;
+    --input-border: #404040;
+    --input-focus-bg: #2d2d2d;
+    
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
+    --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.7);
+}
+
+/* Base Container */
+.quiz-form-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--spacing-xl) var(--spacing-md);
+    min-height: 100vh;
+    
+    transition: background-color var(--transition-theme);
+}
+
+/* Breadcrumb - BentoGrid Style */
+.breadcrumb {
+    background: var(--card-bg);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--border-primary);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--spacing-xl);
+    transition: background-color var(--transition-theme),
+                border-color var(--transition-theme);
+}
+
+.breadcrumb-item a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color var(--transition-base);
+    font-weight: 500;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--primary);
+}
+
+.breadcrumb-item.active {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Main Card - Hero Style */
+.gamify-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+    border: 2px solid var(--border-primary);
+    margin-bottom: var(--spacing-2xl);
+    transition: background-color var(--transition-theme),
+                border-color var(--transition-theme);
+}
+
+/* Hero Header */
+.gamify-card .card-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    padding: var(--spacing-2xl);
+    border-bottom: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.gamify-card .card-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -30%;
+    width: 150%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%);
+    animation: pulse 4s ease-in-out infinite;
+}
+
+.gamify-card .card-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, 
+        var(--accent-blue) 0%,
+        var(--accent-purple) 50%,
+        var(--accent-pink) 100%);
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    50% { transform: scale(1.1) rotate(5deg); opacity: 0.8; }
+}
+
+.gamify-card .card-header h2 {
+    color: white;
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.gamify-card .card-header p {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1rem;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* Card Body - BentoGrid Layout */
+.gamify-card .card-body {
+    padding: var(--spacing-2xl);
+    background: var(--bg-secondary);
+    transition: background-color var(--transition-theme);
+}
+
+/* BentoGrid Form Sections */
+.form-section {
+    padding: 0;
+    background: transparent;
+    border: none;
+    margin-bottom: var(--spacing-xl);
+}
+
+.section-header {
+    background: linear-gradient(135deg, var(--card-bg), var(--bg-tertiary));
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--spacing-lg);
+    border: 2px solid var(--border-primary);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+    transition: background-color var(--transition-theme),
+                border-color var(--transition-theme);
+}
+
+.section-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--primary), var(--accent-blue));
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    transition: color var(--transition-theme);
+}
+
+.section-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: var(--spacing-xs) 0 0 0;
+    transition: color var(--transition-theme);
+}
+
+/* BentoGrid Form Fields */
+.mb-4 {
+    background: var(--card-bg);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--border-primary);
+    box-shadow: var(--shadow-sm);
+    transition: background-color var(--transition-theme),
+                border-color var(--transition-theme),
+                transform var(--transition-base),
+                box-shadow var(--transition-base);
+}
+
+.mb-4:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.mb-4:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(88, 204, 2, 0.1), var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+/* Form Labels */
+.form-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+    transition: color var(--transition-theme);
+}
+
+.form-label i {
+    font-size: 1.1rem;
+}
+
+/* Form Controls */
+.form-control,
+.form-select {
+    padding: var(--spacing-md);
+    background: var(--input-bg);
+    border: 2px solid var(--input-border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    transition: background-color var(--transition-theme),
+                border-color var(--transition-base),
+                color var(--transition-theme),
+                box-shadow var(--transition-base);
+    font-family: inherit;
+    width: 100%;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background: var(--input-focus-bg);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(88, 204, 2, 0.1);
+    outline: none;
+}
+
+/* Textarea Specific */
+.question-textarea,
+.modern-textarea {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.6;
+}
+
+.json-editor {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    background: var(--bg-tertiary);
+    transition: background-color var(--transition-theme);
+}
+
+/* Select Dropdown */
+.modern-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23737373'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--spacing-md) center;
+    background-size: 1.25rem;
+    padding-right: 2.75rem;
+    cursor: pointer;
+}
+
+/* Form Text */
+.form-text {
+    color: var(--text-tertiary);
+    font-size: 0.85rem;
+    margin-top: var(--spacing-sm);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+    transition: color var(--transition-theme);
+}
+
+.form-text code {
+    background: var(--primary-lighter);
+    color: var(--primary-dark);
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+}
+
+/* BentoGrid Options Preview */
+#optionsSection {
+    background: var(--card-bg);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--border-primary);
+    box-shadow: var(--shadow-sm);
+    transition: background-color var(--transition-theme),
+                border-color var(--transition-theme);
+}
+
+.options-preview {
+    padding: var(--spacing-lg);
+    background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
+    border: 2px dashed var(--primary);
+    border-radius: var(--radius-lg);
+    transition: background-color var(--transition-theme),
+                border-color var(--transition-theme);
+    position: relative;
+    overflow: hidden;
+}
+
+.options-preview::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(88, 204, 2, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.preview-label {
+    color: var(--text-secondary);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-md);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.75rem;
+    transition: color var(--transition-theme);
+}
+
+.preview-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.option-badge {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--card-bg);
+    color: var(--text-primary);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-base),
+                box-shadow var(--transition-base);
+}
+
+.option-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.preview-content em {
+    color: var(--text-tertiary);
+    font-size: 0.9rem;
+    transition: color var(--transition-theme);
+}
+
+/* BentoGrid Row Layout */
+.row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.col-md-6 {
+    width: 100%;
+}
+
+/* Action Buttons - BentoGrid Style */
+.action-buttons {
+    margin-top: var(--spacing-2xl);
+    padding: var(--spacing-xl);
+    background: linear-gradient(135deg, var(--card-bg), var(--bg-tertiary));
+    border-radius: var(--radius-xl);
+    border: 2px solid var(--border-primary);
+    box-shadow: var(--shadow-lg);
+    transition: background-color var(--transition-theme),
+                border-color var(--transition-theme);
+}
+
+.action-buttons .row {
+    gap: var(--spacing-lg);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+/* Button Styles */
+.btn-submit {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: transform var(--transition-base),
+                box-shadow var(--transition-base);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+.btn-submit::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width var(--transition-base), height var(--transition-base);
+}
+
+.btn-submit:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-2xl);
+}
+
+.btn-submit:hover::before {
+    width: 400px;
+    height: 400px;
+}
+
+.btn-submit:active {
+    transform: translateY(-1px);
+}
+
+.btn-cancel {
+    background: var(--card-bg);
+    color: var(--text-secondary);
+    border: 2px solid var(--border-secondary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color var(--transition-base),
+                border-color var(--transition-base),
+                color var(--transition-base),
+                transform var(--transition-base);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-cancel:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Button Loading State */
+.btn-loading {
+    display: none;
+}
+
+.btn-submit.loading .btn-text {
+    display: none;
+}
+
+.btn-submit.loading .btn-loading {
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+/* Focus States Enhancement */
+.form-control:focus,
+.form-select:focus {
+    transform: translateY(-1px);
+}
+
+/* Validation States */
+.form-control:invalid:not(:placeholder-shown) {
+    border-color: var(--danger);
+}
+
+.form-control:valid:not(:placeholder-shown) {
+    border-color: var(--success);
+}
+
+/* Icons Colors */
+.text-primary {
+    color: var(--primary) !important;
+}
+
+.text-success {
+    color: var(--success) !important;
+}
+
+.text-info {
+    color: var(--info) !important;
+}
+
+.text-danger {
+    color: var(--danger) !important;
+}
+
+.text-muted {
+    color: var(--text-tertiary) !important;
+    transition: color var(--transition-theme);
+}
+
+.text-white {
+    color: white !important;
+}
+
+.text-white-50 {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Performance Optimization */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .quiz-form-container {
+        padding: var(--spacing-lg) var(--spacing-sm);
+    }
+    
+    .gamify-card .card-body {
+        padding: var(--spacing-lg);
+    }
+    
+    .gamify-card .card-header h2 {
+        font-size: 1.75rem;
+    }
+    
+    .row {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .gamify-card .card-header {
+        padding: var(--spacing-xl) var(--spacing-lg);
+    }
+    
+    .gamify-card .card-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .section-title {
+        font-size: 1.1rem;
+    }
+    
+    .mb-4 {
+        padding: var(--spacing-md);
+    }
+    
+    .action-buttons {
+        padding: var(--spacing-lg);
+    }
+    
+    .action-buttons .row {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+}
+
+@media (max-width: 576px) {
+    .breadcrumb {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 0.85rem;
+    }
+    
+    .gamify-card .card-body {
+        padding: var(--spacing-md);
+    }
+    
+    .section-header {
+        padding: var(--spacing-md);
+    }
+    
+    .btn-submit,
+    .btn-cancel {
+        font-size: 0.9rem;
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+}

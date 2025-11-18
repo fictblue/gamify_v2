@@ -1,0 +1,752 @@
+[
+  {
+    "model": "quizzes.question",
+    "pk": 31,
+    "fields": {
+      "text": "Fill in the blank with the correct verb form (one word only): If he _____ (study) harder, he would have passed the exam.",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "had studied",
+      "curriculum_tag": "Grammar - Third Conditional",
+      "explanation": "Use 'had + past participle' (had studied) for third conditional sentences about past hypothetical situations.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 32,
+    "fields": {
+      "text": "Change this sentence to passive voice (one word only for the verb): 'The committee is considering your application.' (Use 'being' in your answer)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "being considered",
+      "curriculum_tag": "Grammar - Passive Voice",
+      "explanation": "The passive form requires 'be' + past participle. For present continuous, use 'is being considered'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 33,
+    "fields": {
+      "text": "Correct the verb in this sentence (one word only): 'Neither of the students have completed their assignment.' (Change 'have' to...?)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "has",
+      "curriculum_tag": "Grammar - Subject-Verb Agreement",
+      "explanation": "'Neither' is singular, so it requires the singular verb 'has' instead of 'have'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 34,
+    "fields": {
+      "text": "Combine these sentences using 'which' or 'that' (one word only): 'The book was very interesting. I read it yesterday.' (Use: book ____ I read)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "that",
+      "curriculum_tag": "Grammar - Relative Clauses",
+      "explanation": "Use 'that' or 'which' to combine the sentences. Both are correct, but 'that' is more common in defining clauses.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 35,
+    "fields": {
+      "text": "Replace 'In spite of the fact that' with one word that means the same: '___ it was raining, we went for a walk.'",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "Although",
+      "curriculum_tag": "Vocabulary - Conjunctions",
+      "explanation": "'Although' is a more concise way to express contrast, meaning the same as 'in spite of the fact that'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 36,
+    "fields": {
+      "text": "Rewrite this sentence in the passive voice (one word only for the verb): 'Someone should have told him the truth.' (Use: He should have ____)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "been told",
+      "curriculum_tag": "Grammar - Passive Voice",
+      "explanation": "The passive form of modal perfect is 'modal + have been + past participle'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 37,
+    "fields": {
+      "text": "Complete the third conditional (one word only): 'If she ____ (leave) earlier, she wouldn't have missed the train.'",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "had left",
+      "curriculum_tag": "Grammar - Third Conditional",
+      "explanation": "The third conditional requires 'had + past participle' in the if-clause.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 38,
+    "fields": {
+      "text": "Change to reported speech (one word only): 'I will help you tomorrow,' she said. (Use: She said she ____ help me the next day.)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "would",
+      "curriculum_tag": "Grammar - Reported Speech",
+      "explanation": "'Will' changes to 'would' in reported speech when the reporting verb is in the past tense.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 39,
+    "fields": {
+      "text": "Complete with the correct form of 'wish' (one word only): 'I wish I ____ (know) the answer to this question.' (past simple)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "knew",
+      "curriculum_tag": "Grammar - Wishes and Regrets",
+      "explanation": "Use past simple after 'wish' to express a present regret.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 40,
+    "fields": {
+      "text": "Complete the mixed conditional (one word only): 'If I ____ (be) more careful, I wouldn't be in trouble now.' (past perfect)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "had been",
+      "curriculum_tag": "Grammar - Mixed Conditionals",
+      "explanation": "This mixed conditional uses past perfect in the if-clause to show a past action affecting the present.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 41,
+    "fields": {
+      "text": "Complete the inversion (one word only): 'Never before ____ I seen such a beautiful sunset.' (auxiliary verb)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "have",
+      "curriculum_tag": "Grammar - Inversion",
+      "explanation": "Negative adverbials at the beginning of a sentence require subject-auxiliary inversion.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 42,
+    "fields": {
+      "text": "Complete with the correct form of 'used to' (one word only): 'I ____ (be) afraid of the dark when I was a child.' (past state)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "used",
+      "curriculum_tag": "Grammar - Used to/Would",
+      "explanation": "'Used to' describes past states or habits that are no longer true.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 43,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'By next year, I ____ (work) here for ten years.' (future perfect continuous)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "will have been working",
+      "curriculum_tag": "Grammar - Future Perfect Continuous",
+      "explanation": "Future perfect continuous shows an action continuing up to a point in the future.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 44,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'If only I ____ (listen) to your advice yesterday.' (past perfect)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "had listened",
+      "curriculum_tag": "Grammar - Wishes and Regrets",
+      "explanation": "'If only' with past perfect expresses regret about the past.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 45,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'I'd rather you ____ (not tell) anyone about this.' (past simple for present/future meaning)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "didn't tell",
+      "curriculum_tag": "Grammar - Would Rather/Prefer",
+      "explanation": "'Would rather' is followed by past simple when talking about preferences for other people's actions.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 46,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'It's high time we ____ (leave) if we want to catch the train.' (past simple for present/future meaning)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "left",
+      "curriculum_tag": "Grammar - It's Time/High Time",
+      "explanation": "'It's (high) time' is followed by past simple to say that something should be done now or in the future.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 47,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'I'd rather you ____ (not smoke) in here.' (past simple for present/future meaning)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "didn't smoke",
+      "curriculum_tag": "Grammar - Would Rather/Prefer",
+      "explanation": "'Would rather' is followed by past simple when talking about preferences for other people's actions.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 48,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'I wish I ____ (not eat) so much last night.' (past perfect for past regret)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "hadn't eaten",
+      "curriculum_tag": "Grammar - Wishes and Regrets",
+      "explanation": "Use past perfect after 'wish' to express regret about the past.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 49,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'If he ____ (ask) me, I would have helped him.' (past perfect in third conditional)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "had asked",
+      "curriculum_tag": "Grammar - Third Conditional",
+      "explanation": "The third conditional requires 'had + past participle' in the if-clause.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 50,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'By the time you arrive, I ____ (finish) all my work.' (future perfect)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "will have finished",
+      "curriculum_tag": "Grammar - Future Perfect",
+      "explanation": "Future perfect shows that an action will be completed before a specific time in the future.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 51,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'I'd rather you ____ (not tell) anyone about our conversation.' (past simple for present/future meaning)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "didn't tell",
+      "curriculum_tag": "Grammar - Would Rather/Prefer",
+      "explanation": "'Would rather' is followed by past simple when talking about preferences for other people's actions.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 52,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'If I ____ (be) you, I would accept the job offer.' (past simple for present/future meaning)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "were",
+      "curriculum_tag": "Grammar - Second Conditional",
+      "explanation": "The second conditional uses past simple in the if-clause to talk about hypothetical situations in the present or future.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 53,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'I wish I ____ (can) speak French fluently.' (past simple for present meaning)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "could",
+      "curriculum_tag": "Grammar - Wishes and Regrets",
+      "explanation": "Use 'could' after 'wish' to talk about ability in the present.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 54,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'By the end of this year, I ____ (work) here for five years.' (future perfect)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "will have worked",
+      "curriculum_tag": "Grammar - Future Perfect",
+      "explanation": "Future perfect shows that an action will be completed before a specific time in the future.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 55,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'If I ____ (know) about the traffic, I would have left earlier.' (past perfect in third conditional)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "had known",
+      "curriculum_tag": "Grammar - Third Conditional",
+      "explanation": "The third conditional requires 'had + past participle' in the if-clause.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 56,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'I wish you ____ (stop) making that noise!' (would for annoying habits)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "would stop",
+      "curriculum_tag": "Grammar - Wishes and Regrets",
+      "explanation": "Use 'would' after 'wish' to talk about things we would like other people to do or stop doing.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 57,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'If only I ____ (not forget) my keys this morning!' (past perfect for past regret)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "hadn't forgotten",
+      "curriculum_tag": "Grammar - Wishes and Regrets",
+      "explanation": "'If only' with past perfect expresses regret about the past.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 58,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'By the time we get there, the movie ____ (already/start).' (future perfect)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "will have already started",
+      "curriculum_tag": "Grammar - Future Perfect",
+      "explanation": "Future perfect shows that an action will be completed before a specific time in the future.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 59,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'I'd rather you ____ (not mention) this to anyone else.' (past simple for present/future meaning)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "didn't mention",
+      "curriculum_tag": "Grammar - Would Rather/Prefer",
+      "explanation": "'Would rather' is followed by past simple when talking about preferences for other people's actions.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 60,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'If he had studied harder, he ____ (pass) the exam.' (would have + past participle)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "would have passed",
+      "curriculum_tag": "Grammar - Third Conditional",
+      "explanation": "The third conditional uses 'would have + past participle' in the main clause.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 61,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'I wish I ____ (not have) to work tomorrow.' (past simple for present meaning)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "didn't have",
+      "curriculum_tag": "Grammar - Wishes and Regrets",
+      "explanation": "Use past simple after 'wish' to talk about present situations we would like to be different.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 62,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'By next month, she ____ (live) in Paris for ten years.' (future perfect continuous)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "will have been living",
+      "curriculum_tag": "Grammar - Future Perfect Continuous",
+      "explanation": "Future perfect continuous shows an action continuing up to a point in the future.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 63,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'If only I ____ (know) the answer to that question!' (past simple for present meaning)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "knew",
+      "curriculum_tag": "Grammar - Wishes and Regrets",
+      "explanation": "'If only' with past simple expresses a wish for a different present situation.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 64,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'I'd rather we ____ (go) to the cinema than stay at home tonight.' (past simple for present/future meaning)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "went",
+      "curriculum_tag": "Grammar - Would Rather/Prefer",
+      "explanation": "'Would rather' is followed by past simple when talking about preferences.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 65,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'By the time you read this, I ____ (already/leave).' (future perfect)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "will have already left",
+      "curriculum_tag": "Grammar - Future Perfect",
+      "explanation": "Future perfect shows that an action will be completed before a specific time in the future.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 66,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'If I ____ (be) you, I would take that job.' (past simple for present/future meaning)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "were",
+      "curriculum_tag": "Grammar - Second Conditional",
+      "explanation": "The second conditional uses past simple in the if-clause to talk about hypothetical situations in the present or future.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 67,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'I wish I ____ (can) speak Japanese fluently.' (past simple for present meaning)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "could",
+      "curriculum_tag": "Grammar - Wishes and Regrets",
+      "explanation": "Use 'could' after 'wish' to talk about ability in the present.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 68,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'By the end of next month, I ____ (work) here for twenty years.' (future perfect)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "will have worked",
+      "curriculum_tag": "Grammar - Future Perfect",
+      "explanation": "Future perfect shows that an action will be completed before a specific time in the future.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 69,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'If I ____ (know) about the party, I would have come.' (past perfect in third conditional)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "had known",
+      "curriculum_tag": "Grammar - Third Conditional",
+      "explanation": "The third conditional requires 'had + past participle' in the if-clause.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 70,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'I wish you ____ (stop) interrupting me!' (would for annoying habits)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "would stop",
+      "curriculum_tag": "Grammar - Wishes and Regrets",
+      "explanation": "Use 'would' after 'wish' to talk about things we would like other people to do or stop doing.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 71,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'If only I ____ (not eat) so much at dinner.' (past perfect for past regret)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "hadn't eaten",
+      "curriculum_tag": "Grammar - Wishes and Regrets",
+      "explanation": "'If only' with past perfect expresses regret about the past.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 72,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'By the time we arrive, the concert ____ (already/start).' (future perfect)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "will have already started",
+      "curriculum_tag": "Grammar - Future Perfect",
+      "explanation": "Future perfect shows that an action will be completed before a specific time in the future.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 73,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'I'd rather you ____ (not tell) anyone about what happened.' (past simple for present/future meaning)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "didn't tell",
+      "curriculum_tag": "Grammar - Would Rather/Prefer",
+      "explanation": "'Would rather' is followed by past simple when talking about preferences for other people's actions.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 74,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'If I ____ (be) you, I would accept their offer.' (past simple for present/future meaning)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "were",
+      "curriculum_tag": "Grammar - Second Conditional",
+      "explanation": "The second conditional uses past simple in the if-clause to talk about hypothetical situations in the present or future.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 75,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'I wish I ____ (can) play the piano like you.' (past simple for present meaning)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "could",
+      "curriculum_tag": "Grammar - Wishes and Regrets",
+      "explanation": "Use 'could' after 'wish' to talk about ability in the present.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 76,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'By the end of next year, we ____ (complete) the project.' (future perfect)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "will have completed",
+      "curriculum_tag": "Grammar - Future Perfect",
+      "explanation": "Future perfect shows that an action will be completed before a specific time in the future.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 77,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'If she ____ (study) harder, she would have passed the exam.' (past perfect in third conditional)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "had studied",
+      "curriculum_tag": "Grammar - Third Conditional",
+      "explanation": "The third conditional requires 'had + past participle' in the if-clause.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 78,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'I wish you ____ (stop) being so pessimistic!' (would for annoying habits)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "would stop",
+      "curriculum_tag": "Grammar - Wishes and Regrets",
+      "explanation": "Use 'would' after 'wish' to talk about things we would like other people to do or stop doing.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 79,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'If only I ____ (not spend) all my money on clothes last week.' (past perfect for past regret)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "hadn't spent",
+      "curriculum_tag": "Grammar - Wishes and Regrets",
+      "explanation": "'If only' with past perfect expresses regret about the past.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 80,
+    "fields": {
+      "text": "Complete with the correct form of the verb (one word only): 'By the time you get this message, I ____ (already/leave) the office.' (future perfect)",
+      "difficulty": "hard",
+      "format": "short_answer",
+      "options": {},
+      "answer_key": "will have already left",
+      "curriculum_tag": "Grammar - Future Perfect",
+      "explanation": "Future perfect shows that an action will be completed before a specific time in the future.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  }
+]

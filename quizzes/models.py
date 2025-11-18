@@ -81,6 +81,10 @@ class AttemptLog(models.Model):
         default=False,
         help_text='Whether the answer was correct'
     )
+    is_first_attempt = models.BooleanField(
+        default=True,
+        help_text='Whether this was the first attempt at this question'
+    )
     difficulty_attempted = models.CharField(
         max_length=20,
         choices=Question.DIFFICULTY_CHOICES,

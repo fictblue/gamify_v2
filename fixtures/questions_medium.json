@@ -1,0 +1,1003 @@
+[
+  {
+    "model": "quizzes.question",
+    "pk": 16,
+    "fields": {
+      "text": "Which of the following are parts of speech? (Select all that apply)",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "Noun",
+        "B": "Adjective",
+        "C": "Preposition",
+        "D": "Conjunction",
+        "E": "All of the above"
+      },
+      "answer_key": ["A", "B", "C", "D"],
+      "curriculum_tag": "Grammar - Parts of Speech",
+      "explanation": "All options A through D are parts of speech. Option E is incorrect because it suggests these are the only parts of speech, but there are others like verbs and adverbs.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 17,
+    "fields": {
+      "text": "Identify the correct sentence structure:",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "She quickly ran to the store, bought some milk, and then went home.",
+        "B": "She quickly ran to the store bought some milk and then went home.",
+        "C": "She quickly ran to the store, and bought some milk, and then went home.",
+        "D": "She quickly ran to the store, and bought some milk and then went home."
+      },
+      "answer_key": "A",
+      "curriculum_tag": "Grammar - Sentence Structure",
+      "explanation": "Option A correctly uses commas to separate items in a series and maintains parallel structure.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 18,
+    "fields": {
+      "text": "Choose the correct verb form: If I _____ you, I would apologize immediately.",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "am",
+        "B": "was",
+        "C": "were",
+        "D": "have been"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Conditionals",
+      "explanation": "'Were' is used in the second conditional for hypothetical situations, even with 'I'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 19,
+    "fields": {
+      "text": "Select the sentence with correct punctuation:",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "The meeting is scheduled for Monday, June 5th at 2:00 PM; please be on time.",
+        "B": "The meeting is scheduled for Monday, June 5th at 2:00 PM, please be on time.",
+        "C": "The meeting is scheduled for Monday, June 5th at 2:00 PM please be on time.",
+        "D": "The meeting is scheduled for Monday June 5th at 2:00 PM; please be on time."
+      },
+      "answer_key": "A",
+      "curriculum_tag": "Grammar - Punctuation",
+      "explanation": "Option A correctly uses a semicolon to join two related independent clauses.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 20,
+    "fields": {
+      "text": "Identify the type of sentence: Although it was raining, we decided to go for a walk.",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "Simple sentence",
+        "B": "Compound sentence",
+        "C": "Complex sentence",
+        "D": "Compound-complex sentence"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Sentence Types",
+      "explanation": "This is a complex sentence because it contains one independent clause and one dependent clause.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 21,
+    "fields": {
+      "text": "Identify and correct the error: She don't like coffee.",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "She doesn't likes coffee.",
+        "B": "She don't likes coffee.",
+        "C": "She doesn't like coffee.",
+        "D": "No error"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Subject-Verb Agreement",
+      "explanation": "The correct form is 'doesn't like' because 'she' is third person singular and requires 'does' for negative present simple.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 22,
+    "fields": {
+      "text": "Combine these sentences using 'although': It was raining. We went to the park.",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "Although it was raining, we went to the park.",
+        "B": "We went to the park although it was raining.",
+        "C": "It was raining, although we went to the park.",
+        "D": "Both A and B are correct"
+      },
+      "answer_key": "D",
+      "curriculum_tag": "Grammar - Conjunctions",
+      "explanation": "Both A and B are grammatically correct ways to combine the sentences using 'although', with the dependent clause either at the beginning or end of the sentence.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 23,
+    "fields": {
+      "text": "Which sentence is in the passive voice?",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "The teacher gave us homework.",
+        "B": "We were given homework by the teacher.",
+        "C": "The homework is on the desk.",
+        "D": "We have finished our homework."
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Passive Voice",
+      "explanation": "The sentence 'We were given homework by the teacher' is in passive voice because the subject receives the action (were given) rather than performing it.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 24,
+    "fields": {
+      "text": "Choose the correct verb form: If I _____ you, I would study harder for the test.",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "am",
+        "B": "was",
+        "C": "were",
+        "D": "will be"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Second Conditional",
+      "explanation": "In second conditional sentences (unreal or hypothetical situations), we use 'were' for all subjects in the 'if' clause, even with 'I' and 'he/she/it'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 25,
+    "fields": {
+      "text": "Which words are adverbs in this sentence? 'He quickly ran to the store yesterday.'",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "quickly, store",
+        "B": "ran, store",
+        "C": "quickly, yesterday",
+        "D": "he, to"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Parts of Speech",
+      "explanation": "'Quickly' describes how he ran (adverb of manner) and 'yesterday' tells when he ran (adverb of time).",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 26,
+    "fields": {
+      "text": "Choose the sentence with the correct word order:",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "Always she is late for school.",
+        "B": "She is always late for school.",
+        "C": "She always is late for school.",
+        "D": "She is late always for school."
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Word Order",
+      "explanation": "The adverb of frequency 'always' should come after the verb 'to be' in simple present tense.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 27,
+    "fields": {
+      "text": "Which sentence uses the present perfect continuous tense correctly?",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "I have been working here since 2020.",
+        "B": "I worked here since 2020.",
+        "C": "I am working here since 2020.",
+        "D": "I work here since 2020."
+      },
+      "answer_key": "A",
+      "curriculum_tag": "Grammar - Present Perfect Continuous",
+      "explanation": "The present perfect continuous is used with 'have/has been + present participle' to talk about actions that started in the past and continue to the present.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 28,
+    "fields": {
+      "text": "Identify the type of conditional in this sentence: 'If it rains tomorrow, we will cancel the picnic.'",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "Zero conditional",
+        "B": "First conditional",
+        "C": "Second conditional",
+        "D": "Third conditional"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Conditionals",
+      "explanation": "This is a first conditional, which is used for real and possible situations in the future. The structure is: If + present simple, will + base verb.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 29,
+    "fields": {
+      "text": "Choose the correct relative pronoun: 'The book _____ I borrowed from the library is very interesting.'",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "who",
+        "B": "which",
+        "C": "where",
+        "D": "when"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Relative Clauses",
+      "explanation": "'Which' is used to refer to things (the book), while 'who' is for people, 'where' for places, and 'when' for time.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 30,
+    "fields": {
+      "text": "Which sentence is punctuated correctly?",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "I need to buy eggs, milk, bread, and cheese.",
+        "B": "I need to buy eggs, milk, bread and cheese.",
+        "C": "I need to buy eggs milk, bread, and cheese.",
+        "D": "I need to buy, eggs, milk, bread and cheese."
+      },
+      "answer_key": "A",
+      "curriculum_tag": "Grammar - Punctuation",
+      "explanation": "The Oxford comma (the comma before 'and' in a list) is used here, which is a matter of style but helps prevent ambiguity.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 31,
+    "fields": {
+      "text": "Choose the correct form of the verb: 'By the time we arrived, the movie _____.' (to start)",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "started",
+        "B": "had started",
+        "C": "has started",
+        "D": "was starting"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Past Perfect",
+      "explanation": "The past perfect (had + past participle) is used to show that one past action (the movie starting) happened before another past action (our arrival).",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 32,
+    "fields": {
+      "text": "Which sentence uses the correct order of adjectives?",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "She bought a beautiful blue silk dress.",
+        "B": "She bought a blue beautiful silk dress.",
+        "C": "She bought a silk beautiful blue dress.",
+        "D": "She bought a blue silk beautiful dress."
+      },
+      "answer_key": "A",
+      "curriculum_tag": "Grammar - Adjective Order",
+      "explanation": "The correct order is opinion (beautiful) + color (blue) + material (silk) + noun (dress).",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 33,
+    "fields": {
+      "text": "Choose the correct tag question: 'You've seen that movie, _____?",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "have you",
+        "B": "haven't you",
+        "C": "didn't you",
+        "D": "don't you"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Tag Questions",
+      "explanation": "The main clause is positive ('You've seen'), so the tag should be negative ('haven't you'). We use the same auxiliary verb as in the main clause.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 34,
+    "fields": {
+      "text": "Which sentence uses 'used to' correctly?",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "I use to play tennis when I was younger.",
+        "B": "I used to played tennis when I was younger.",
+        "C": "I used to play tennis when I was younger.",
+        "D": "I was used to play tennis when I was younger."
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Used to",
+      "explanation": "'Used to' is followed by the base form of the verb to talk about past habits or states that are no longer true.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 35,
+    "fields": {
+      "text": "Choose the correct form: 'I wish I _____ how to swim when I was younger.'",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "learned",
+        "B": "had learned",
+        "C": "have learned",
+        "D": "would learn"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Wishes and Regrets",
+      "explanation": "We use 'had + past participle' (past perfect) after 'wish' to talk about regrets about the past.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 36,
+    "fields": {
+      "text": "Which sentence contains a non-defining relative clause?",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "The book which is on the table is mine.",
+        "B": "The book, which is on the table, is mine.",
+        "C": "The book that is on the table is mine.",
+        "D": "The book is on the table and it's mine."
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Relative Clauses",
+      "explanation": "A non-defining relative clause adds extra information and is separated by commas. It can be removed without changing the essential meaning of the sentence.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 37,
+    "fields": {
+      "text": "Choose the correct form: 'By next year, I _____ English for five years.'",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "will study",
+        "B": "will be studying",
+        "C": "will have been studying",
+        "D": "will have studied"
+      },
+      "answer_key": "C",
+      "curriculum_tag": "Grammar - Future Perfect Continuous",
+      "explanation": "We use the future perfect continuous to talk about the duration of an action that will be in progress before a specific time in the future.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 38,
+    "fields": {
+      "text": "Which sentence is in the subjunctive mood?",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "If I was rich, I would travel the world.",
+        "B": "If I were rich, I would travel the world.",
+        "C": "If I am rich, I will travel the world.",
+        "D": "I was rich and traveled the world."
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Subjunctive Mood",
+      "explanation": "The subjunctive mood uses 'were' instead of 'was' for all subjects in hypothetical or contrary-to-fact situations.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 39,
+    "fields": {
+      "text": "Choose the correct form: 'I'd rather you _____ that again.'",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "don't do",
+        "B": "didn't do",
+        "C": "won't do",
+        "D": "haven't done"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Would Rather",
+      "explanation": "After 'would rather', we use the past simple to talk about preferences regarding other people's actions.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 40,
+    "fields": {
+      "text": "Which sentence contains a dangling modifier?",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "Running to catch the bus, my bag fell open.",
+        "B": "While I was running to catch the bus, my bag fell open.",
+        "C": "My bag fell open while I was running to catch the bus.",
+        "D": "As I ran to catch the bus, my bag fell open."
+      },
+      "answer_key": "A",
+      "curriculum_tag": "Grammar - Modifiers",
+      "explanation": "In sentence A, the phrase 'Running to catch the bus' incorrectly modifies 'my bag' instead of 'I', creating a dangling modifier.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 41,
+    "fields": {
+      "text": "Choose the correct form: 'If he _____ the train, he would be here by now.'",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "caught",
+        "B": "had caught",
+        "C": "would catch",
+        "D": "has caught"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Third Conditional",
+      "explanation": "This is a third conditional (unreal past condition), which uses 'if + past perfect, would have + past participle'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 42,
+    "fields": {
+      "text": "Which sentence is an example of reported speech?",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "'I will call you tomorrow,' she said.",
+        "B": "She said that she would call me the next day.",
+        "C": "Will you call me tomorrow?",
+        "D": "She calls me every day."
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Reported Speech",
+      "explanation": "Reported speech reports what someone said without using their exact words, often with verb tense changes and time expression adjustments.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 43,
+    "fields": {
+      "text": "Choose the correct form: 'I'm looking forward to _____ you at the party.'",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "see",
+        "B": "seeing",
+        "C": "saw",
+        "D": "have seen"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Gerunds and Infinitives",
+      "explanation": "After the phrase 'looking forward to', we use a gerund (verb+ing).",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 44,
+    "fields": {
+      "text": "Which sentence uses the correct article?",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "She is a honest person.",
+        "B": "She is an honest person.",
+        "C": "She is the honest person.",
+        "D": "She is honest person."
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Articles",
+      "explanation": "We use 'an' before words that begin with a vowel sound. 'Honest' starts with a silent 'h', so it sounds like it starts with a vowel.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 45,
+    "fields": {
+      "text": "Choose the correct form: 'This is the house _____ I was born.'",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "which",
+        "B": "where",
+        "C": "that",
+        "D": "there"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Relative Clauses",
+      "explanation": "'Where' is used to refer to a place in a relative clause when the place is the object of the verb or preposition.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 46,
+    "fields": {
+      "text": "Which sentence is in the passive voice?",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "The committee will announce the results tomorrow.",
+        "B": "The results will be announced tomorrow.",
+        "C": "They will announce the results tomorrow.",
+        "D": "We will hear the results tomorrow."
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Passive Voice",
+      "explanation": "In the passive voice, the subject receives the action. The structure is: subject + be + past participle + (by + agent).",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 47,
+    "fields": {
+      "text": "Choose the correct form: 'I wish I _____ to the party last night.'",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "went",
+        "B": "had gone",
+        "C": "have gone",
+        "D": "would go"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Wishes and Regrets",
+      "explanation": "We use 'had + past participle' after 'wish' to express regret about something that happened or didn't happen in the past.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 48,
+    "fields": {
+      "text": "Which sentence contains a non-defining relative clause?",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "The man who lives next door is a doctor.",
+        "B": "My brother, who lives in London, is visiting us.",
+        "C": "The book that I'm reading is very interesting.",
+        "D": "The city where I was born is very beautiful."
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Relative Clauses",
+      "explanation": "A non-defining relative clause adds extra information and is separated by commas. It can be removed without changing the essential meaning of the sentence.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 49,
+    "fields": {
+      "text": "Choose the correct form: 'By the time you arrive, I _____ cooking dinner.'",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "will finish",
+        "B": "will have finished",
+        "C": "am finishing",
+        "D": "finish"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Future Perfect",
+      "explanation": "The future perfect (will have + past participle) is used to say that something will be completed before a specific time in the future.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 50,
+    "fields": {
+      "text": "Which sentence is in the subjunctive mood?",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "If I was you, I would apologize.",
+        "B": "If I were you, I would apologize.",
+        "C": "If I am you, I will apologize.",
+        "D": "I was you, so I apologized."
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Subjunctive Mood",
+      "explanation": "The subjunctive mood uses 'were' instead of 'was' for all subjects in hypothetical or contrary-to-fact situations, such as giving advice with 'If I were you'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 51,
+    "fields": {
+      "text": "Which of the following sentences contain(s) a phrasal verb? (Select all that apply)",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "I ran into my old friend at the mall.",
+        "B": "She looked after her younger brother.",
+        "C": "He quickly ran to the store.",
+        "D": "They put off the meeting until next week."
+      },
+      "answer_key": "A,B,D",
+      "curriculum_tag": "Vocabulary - Phrasal Verbs",
+      "explanation": "Options A, B, and D contain phrasal verbs: 'ran into' (met by chance), 'looked after' (took care of), and 'put off' (postponed). Option C has a verb and a preposition but doesn't form a phrasal verb.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 52,
+    "fields": {
+      "text": "Choose the correct form: 'I suggest that he _____ to the doctor immediately.'",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "go",
+        "B": "goes",
+        "C": "went",
+        "D": "will go"
+      },
+      "answer_key": "A",
+      "curriculum_tag": "Grammar - Subjunctive Mood",
+      "explanation": "After verbs like 'suggest', 'recommend', 'demand', etc., we use the base form of the verb in the that-clause.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 53,
+    "fields": {
+      "text": "Which of the following sentences is/are correct? (Select all that apply)",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "Neither John nor his friends is coming to the party.",
+        "B": "The committee are divided in their opinions.",
+        "C": "Each of the students has completed their assignment.",
+        "D": "The news are very interesting today."
+      },
+      "answer_key": "B,C",
+      "curriculum_tag": "Grammar - Subject-Verb Agreement",
+      "explanation": "Option B is correct because 'committee' can be treated as plural when referring to its members. Option C is correct with 'each' taking a singular verb. Option A is incorrect (should be 'are' to agree with 'friends'). Option D is incorrect ('news' is uncountable and takes a singular verb).",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 54,
+    "fields": {
+      "text": "Choose the correct sentence(s): (Select all that apply)",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "She speaks French fluently, doesn't she?",
+        "B": "Let's go for a walk, shall we?",
+        "C": "You won't be late, will you?",
+        "D": "I'm right, amn't I?"
+      },
+      "answer_key": "A,B,C",
+      "curriculum_tag": "Grammar - Tag Questions",
+      "explanation": "Options A, B, and C use correct tag questions. Option D is incorrect; it should be 'aren't I?' instead of 'amn't I?' which is not standard English.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 55,
+    "fields": {
+      "text": "Identify the sentence(s) with incorrect use of articles: (Select all that apply)",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "She is the best student in the class.",
+        "B": "I saw a elephant at the zoo.",
+        "C": "He plays the guitar very well.",
+        "D": "She is doctor at the local hospital."
+      },
+      "answer_key": "B,D",
+      "curriculum_tag": "Grammar - Articles",
+      "explanation": "Option B is incorrect because it should be 'an elephant'. Option D is incorrect because it should be 'a doctor'. Options A and C are correct.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 56,
+    "fields": {
+      "text": "Which of the following sentences use(s) the past perfect tense correctly? (Select all that apply)",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "After I had finished my homework, I went to bed.",
+        "B": "She had already left when I arrived.",
+        "C": "I had seen that movie last week.",
+        "D": "He told me he has been to Paris."
+      },
+      "answer_key": "A,B",
+      "curriculum_tag": "Grammar - Past Perfect",
+      "explanation": "Options A and B correctly use the past perfect to show that one action was completed before another in the past. Option C incorrectly uses past perfect with a specific time expression. Option D uses present perfect in reported speech, which should be past perfect ('had been').",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 57,
+    "fields": {
+      "text": "Choose the correct form(s) to complete the sentence: 'I wish I _____ how to swim when I was younger.' (Select all that apply)",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "had learned",
+        "B": "learned",
+        "C": "would have learned",
+        "D": "have learned"
+      },
+      "answer_key": "A",
+      "curriculum_tag": "Grammar - Wishes and Regrets",
+      "explanation": "The correct form is 'had learned' (past perfect) to express regret about something that didn't happen in the past. The other options are grammatically incorrect in this context.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 58,
+    "fields": {
+      "text": "Which of the following sentences contain(s) a non-defining relative clause? (Select all that apply)",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "My brother, who lives in Canada, is a doctor.",
+        "B": "The book which is on the table is mine.",
+        "C": "Mr. Smith, whose car was stolen, is my neighbor.",
+        "D": "The students who study hard will pass the exam."
+      },
+      "answer_key": "A,C",
+      "curriculum_tag": "Grammar - Relative Clauses",
+      "explanation": "Options A and C contain non-defining relative clauses (set off by commas) that provide extra information. Options B and D contain defining relative clauses that are essential to the meaning of the sentence.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 59,
+    "fields": {
+      "text": "Choose the correct form(s) to complete the sentence: 'By this time next year, I _____ my degree.' (Select all that apply)",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "will complete",
+        "B": "will have completed",
+        "C": "will be completing",
+        "D": "will have been completing"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Future Perfect",
+      "explanation": "The future perfect tense ('will have completed') is used to indicate that an action will be completed before a specific time in the future. The other options are either incorrect or less appropriate in this context.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 60,
+    "fields": {
+      "text": "Which of the following sentences is/are examples of the second conditional? (Select all that apply)",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "If it rains, we will stay at home.",
+        "B": "If I won the lottery, I would travel the world.",
+        "C": "If I had known, I would have told you.",
+        "D": "If I were you, I would apologize."
+      },
+      "answer_key": "B,D",
+      "curriculum_tag": "Grammar - Conditionals",
+      "explanation": "Options B and D are examples of the second conditional, which is used for hypothetical or unlikely situations in the present or future. Option A is first conditional (real possibility), and option C is third conditional (unreal past).",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 61,
+    "fields": {
+      "text": "Identify the sentence(s) with correct subject-verb agreement: (Select all that apply)",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "The team is playing well this season.",
+        "B": "The team are arguing among themselves.",
+        "C": "The news are very interesting today.",
+        "D": "The police are investigating the crime."
+      },
+      "answer_key": "A,B,D",
+      "curriculum_tag": "Grammar - Subject-Verb Agreement",
+      "explanation": "Options A, B, and D are correct. 'Team' can be singular (A) or plural (B) depending on whether you're referring to it as a unit or as individuals. 'Police' is always plural. Option C is incorrect because 'news' is uncountable and takes a singular verb.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 62,
+    "fields": {
+      "text": "Which of the following sentences use(s) reported speech correctly? (Select all that apply)",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "She said that she is going to the store.",
+        "B": "He told me that he had finished his work.",
+        "C": "They said they will come to the party.",
+        "D": "She said she had seen that movie the previous week."
+      },
+      "answer_key": "B,D",
+      "curriculum_tag": "Grammar - Reported Speech",
+      "explanation": "Options B and D correctly use backshifted tenses in reported speech. Option A is incorrect because 'is going' should be 'was going' in reported speech. Option C is incorrect because 'will' should be 'would' in reported speech.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 63,
+    "fields": {
+      "text": "Choose the correct form(s) of the verb: 'I would rather you _____ that.' (Select all that apply)",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "don't do",
+        "B": "didn't do",
+        "C": "won't do",
+        "D": "wouldn't do"
+      },
+      "answer_key": "B",
+      "curriculum_tag": "Grammar - Would Rather",
+      "explanation": "After 'would rather', we use the past simple to talk about preferences regarding other people's actions. The correct form is 'didn't do'.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 64,
+    "fields": {
+      "text": "Which of the following sentences contain(s) a gerund? (Select all that apply)",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "Swimming is good exercise.",
+        "B": "I enjoy reading books.",
+        "C": "She is afraid of flying.",
+        "D": "To travel is to live."
+      },
+      "answer_key": "A,B,C",
+      "curriculum_tag": "Grammar - Gerunds and Infinitives",
+      "explanation": "Options A, B, and C contain gerunds (verb+ing used as a noun). 'Swimming' is the subject, 'reading' is the object of 'enjoy', and 'flying' is the object of the preposition 'of'. Option D contains an infinitive ('to travel').",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 65,
+    "fields": {
+      "text": "Which of the following sentences is/are examples of the passive voice? (Select all that apply)",
+      "difficulty": "medium",
+      "format": "mcq_complex",
+      "options": {
+        "A": "The book was written by J.K. Rowling.",
+        "B": "The teacher gave us a lot of homework.",
+        "C": "The window was broken by the ball.",
+        "D": "They are building a new school."
+      },
+      "answer_key": "A,C",
+      "curriculum_tag": "Grammar - Passive Voice",
+      "explanation": "Options A and C are in the passive voice, where the subject receives the action. Options B and D are in the active voice, where the subject performs the action.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-09-26T10:00:00Z"
+    }
+  }
+]

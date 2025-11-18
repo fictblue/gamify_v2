@@ -69,7 +69,7 @@ class StudentDashboardView(View):
             'user': request.user,
             'level': profile.get_level_display(),
             'progress_percentage': min(profile.progress, 100),
-            'xp': profile.xp,
+            'xp': profile.total_xp,  # Use total_xp for consistency with navbar/sidebar
             'total_xp': profile.total_xp,
             'xp_for_next_level': xp_for_next_level,
             'xp_progress_percentage': xp_progress_percentage,

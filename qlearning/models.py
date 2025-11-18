@@ -87,6 +87,16 @@ class QLearningLog(models.Model):
         help_text='Next state hash (for Q-learning update)'
     )
     timestamp = models.DateTimeField(auto_now_add=True)
+    metadata = models.JSONField(
+        default=dict,
+        help_text='Additional metadata for the Q-learning update',
+        null=True,
+        blank=True
+    )
+    is_adaptation = models.BooleanField(
+        default=False,
+        help_text='Whether this log entry is for an adaptation event'
+    )
 
     def __str__(self):
         return f"{self.user.username} - {self.state_hash[:8]} - {self.action} -> {self.q_value_after:.3f}"

@@ -155,115 +155,126 @@ class QuizService:
             )
 
     @staticmethod
-    def pick_next_question(profile: StudentProfile, epsilon: float = None) -> Optional[Question]:
+    def pick_next_question(profile: StudentProfile, epsilon: float = None) -> Optional[Dict]:
         """
-        ENHANCED: Pick the next question using Q-Learning with intelligent repetition handling.
-
-        Prioritization:
-        1. Questions user hasn't seen (highest priority)
-        2. Questions user got wrong recently (medium priority)
-        3. Questions user got right but not recently (lower priority)
-        4. Questions user has mastered (lowest priority)
+        FIXED: Pick next question respecting difficulty constraints AND anti-repetition.
+        
+        Now integrated with QLearningEngine.ALLOWED_ACTIONS to respect level constraints.
 
         Args:
             profile: StudentProfile instance
-            epsilon: Exploration rate (uses dynamic calculation if None)
+            epsilon: Not used, kept for backward compatibility
 
         Returns:
-            Question instance or None if no questions available
+            Dict with question and metadata or None if no questions available
         """
-        # Get enhanced state
-        state = QuizService.state_tuple(profile)
-
-        # Use Q-Learning to choose difficulty (with dynamic epsilon if not provided)
-        chosen_difficulty = QLearningEngine.choose_action(
-            profile.user,
-            state,
-            epsilon,
-            current_difficulty=profile.last_difficulty
+        from qlearning.engine import QLearningEngine
+    
+        # ============================================
+        # FIX: Get allowed difficulties from engine
+        # ============================================
+        allowed_difficulties = QLearningEngine.ALLOWED_ACTIONS.get(
+            profile.level,
+            ['easy', 'medium', 'hard']  # Fallback
         )
+    
+        print(f"\n=== QuizService.pick_next_question ===")
+        print(f"User: {profile.user}, Level: {profile.level}")
+        print(f"Allowed difficulties: {allowed_difficulties}")
 
-        # Get all questions of the chosen difficulty
-        all_questions = list(Question.objects.filter(difficulty=chosen_difficulty))
+        # Get IDs of all questions the user has attempted
+        attempted_question_ids = set(AttemptLog.objects
+                                   .filter(user=profile.user)
+                                   .values_list('question_id', flat=True))
+    
+        print(f"Attempted questions: {len(attempted_question_ids)}")
 
-        if not all_questions:
-            # Fallback to other difficulties if chosen difficulty has no questions
-            fallback_difficulties = [d for d in QuizService.DIFFICULTY_ACTIONS if d != chosen_difficulty]
-            random.shuffle(fallback_difficulties)
-
-            for fallback_difficulty in fallback_difficulties:
-                all_questions = list(Question.objects.filter(difficulty=fallback_difficulty))
-                if all_questions:
-                    chosen_difficulty = fallback_difficulty
-                    break
-
-        if not all_questions:
-            return None
-
-        # Get user's attempt history for this difficulty
-        user_attempts = AttemptLog.objects.filter(
-            user=profile.user,
-            difficulty_attempted=chosen_difficulty
-        ).select_related('question')
-
-        # Create a scoring system for question selection
-        question_scores = {}
-
-        for question in all_questions:
-            # Get attempts for this specific question
-            question_attempts = user_attempts.filter(question=question)
-            attempt_count = question_attempts.count()
-
-            if attempt_count == 0:
-                # Never seen this question - highest priority
-                question_scores[question] = 100
-            else:
-                # Calculate score based on recent performance
-                recent_attempts = question_attempts.order_by('-created_at')[:3]  # Last 3 attempts
-
-                correct_count = sum(1 for attempt in recent_attempts if attempt.is_correct)
-                recent_accuracy = correct_count / len(recent_attempts) if recent_attempts else 0
-
-                # Base score on accuracy (lower accuracy = higher priority to practice)
-                base_score = (1 - recent_accuracy) * 50
-
-                # Boost score if it's been a while since last attempt
-                if recent_attempts:
-                    days_since_last = (timezone.now() - recent_attempts[0].created_at).days
-                    recency_bonus = min(days_since_last * 2, 30)  # Max 30 point bonus
-                else:
-                    recency_bonus = 20
-
-                # Penalty for too many attempts (diminishing returns)
-                repetition_penalty = min(attempt_count * 5, 20)
-
-                question_scores[question] = base_score + recency_bonus - repetition_penalty
-
-        # Sort questions by score (highest first)
-        sorted_questions = sorted(
-            question_scores.items(),
-            key=lambda x: x[1],
-            reverse=True
+        # ============================================
+        # FIX: Only get questions in allowed difficulties
+        # ============================================
+        all_allowed_questions = list(
+            Question.objects.filter(difficulty__in=allowed_difficulties)
         )
+    
+        if not all_allowed_questions:
+            print("ERROR: No questions available in allowed difficulties!")
+            return {
+                'question': None,
+                'is_first_attempt': False,
+                'message': f'No questions available for level {profile.level}. Please contact administrator.'
+            }
+    
+        print(f"Total questions in allowed difficulties: {len(all_allowed_questions)}")
 
-        # Add some randomness to avoid predictable patterns
-        top_questions = [q for q, score in sorted_questions[:3]]  # Top 3 questions
-        if top_questions:
-            return random.choice(top_questions)
+        # Find un-attempted questions within allowed difficulties
+        new_questions = [q for q in all_allowed_questions if q.id not in attempted_question_ids]
+    
+        print(f"Unattempted questions: {len(new_questions)}")
+
+        if new_questions:
+            # Use Q-Learning to select difficulty, then pick from that difficulty
+            state_tuple = QuizService.state_tuple(profile)
+        
+            selected_difficulty = QLearningEngine.choose_action(
+                user=profile.user,
+                state_tuple=state_tuple,
+                epsilon=epsilon,
+                current_difficulty=profile.last_difficulty
+            )
+        
+            print(f"Q-Learning selected difficulty: {selected_difficulty}")
+        
+            # Get unattempted questions in selected difficulty
+            candidate_questions = [q for q in new_questions if q.difficulty == selected_difficulty]
+        
+            # Fallback: if no questions in selected difficulty, try other allowed difficulties
+            if not candidate_questions:
+                print(f"No questions in {selected_difficulty}, trying others")
+            for difficulty in allowed_difficulties:
+                if difficulty != selected_difficulty:
+                    candidate_questions = [q for q in new_questions if q.difficulty == difficulty]
+                    if candidate_questions:
+                        print(f"Found {len(candidate_questions)} in {difficulty}")
+                        break
+        
+            # Final fallback: any unattempted question
+            if not candidate_questions:
+                candidate_questions = new_questions
+                print(f"Using any unattempted: {len(candidate_questions)}")
+        
+            # Select random from candidates
+            question = random.choice(candidate_questions)
+        
+            print(f"Selected: ID={question.id}, Difficulty={question.difficulty}")
+        
+            return {
+                'question': question,
+                'is_first_attempt': True,
+                'message': 'Try this new question!',
+                'selected_difficulty': question.difficulty,
+                'allowed_difficulties': allowed_difficulties
+            }
         else:
-            # Fallback to random selection
-            return random.choice(all_questions)
+            # All questions in allowed difficulties have been attempted
+            print("All questions completed!")
+            return {
+                'question': None,
+                'is_first_attempt': False,
+                'message': f'Congratulations! You have attempted all {len(all_allowed_questions)} questions available for level {profile.level}.',
+                'total_attempted': len(attempted_question_ids),
+                'allowed_difficulties': allowed_difficulties
+            }
 
     @staticmethod
     def calculate_attempt_xp(question: Question, user, is_correct: bool, time_spent: float) -> Dict:
         """
         Calculate XP reward considering question repetition and other factors.
-
+        
         Args:
             question: Question instance
             user: User instance
             is_correct: Whether the answer was correct
-            time_spent: Time spent on question
+            time_spent: Time spent in seconds
 
         Returns:
             Dict with XP breakdown and metadata
@@ -333,7 +344,8 @@ class QuizService:
         time_spent: float
     ) -> Dict:
         """
-        ENHANCED: Record attempt with improved reward calculation and Q-Learning integration.
+        Record attempt with anti-farming protection.
+        Only first attempts are awarded XP and count towards progress.
 
         Args:
             profile: StudentProfile instance
@@ -347,146 +359,163 @@ class QuizService:
         with transaction.atomic():
             # Determine if answer is correct
             is_correct = QuizService._validate_answer(question, chosen_answer)
-
-            # Calculate XP using new repetition-aware system
-            xp_calculation = QuizService.calculate_attempt_xp(
-                question, profile.user, is_correct, time_spent
-            )
-
-            # Store old values for Q-Learning
-            old_streak = profile.streak_correct
-
-            # Get current state BEFORE updating profile
-            current_state = QuizService.state_tuple(profile)
-
-            # Update profile with calculated XP
-            if is_correct:
-                profile.streak_correct += 1
-                profile.points += xp_calculation['final_xp']
-            else:
-                profile.streak_correct = 0
-                profile.points += xp_calculation['final_xp']  # Allow negative points
-
-            # Update progress based on performance
-            progress_increment = 1 if is_correct else 0
-            profile.progress = min(100, profile.progress + progress_increment)
-            profile.last_difficulty = question.difficulty
-            profile.save()
-
-            # Check for hidden streak rewards
-            hidden_reward_applied = False
-            if old_streak < QuizService.STREAK_REWARD_THRESHOLD <= profile.streak_correct:
-                profile.points += QuizService.HIDDEN_STREAK_REWARD
-                profile.save()
-                hidden_reward_applied = True
-
-            # Calculate Q-Learning reward (considers difficulty, streak, time)
-            q_reward = QuizService._calculate_q_reward(
-                is_correct, question.difficulty, profile.streak_correct, time_spent
-            )
-
-            # Get next state AFTER updating profile
-            next_state = QuizService.state_tuple(profile)
-
-            # Update Q-Learning with enhanced state
-            updated_entry = QLearningEngine.update_q(
+            
+            # Check if this is the first attempt
+            previous_attempts = AttemptLog.objects.filter(
                 user=profile.user,
-                state_tuple=current_state,
-                action=question.difficulty,
-                reward=q_reward,
-                next_state_tuple=next_state
+                question=question
             )
+            is_first_attempt = not previous_attempts.exists()
+            
+            # Calculate XP (0 for repeat attempts)
+            if is_first_attempt:
+                xp_info = QuizService.calculate_attempt_xp(
+                    question=question,
+                    user=profile.user,
+                    is_correct=is_correct,
+                    time_spent=time_spent
+                )
+                xp_earned = xp_info['final_xp']
+            else:
+                xp_info = {
+                    'base_xp': 0,
+                    'final_xp': 0,
+                    'is_first_attempt': False,
+                    'xp_category': 'repeat_attempt',
+                    'attempt_count': previous_attempts.count() + 1,
+                    'difficulty_multiplier': 1.0,
+                    'time_bonus': 0,
+                    'streak_bonus': 0
+                }
+                xp_earned = 0
 
-            # Create Q-Table snapshot for analysis
-            qtable_snapshot = QuizService._create_qtable_snapshot(profile.user, current_state)
+            # Apply hint policy if answer was wrong
+            hint = None
+            if not is_correct:
+                # Count previous wrong attempts for this question
+                previous_wrong = previous_attempts.filter(is_correct=False).count()
+                hint = QuizService._apply_hint_policy(question, is_correct, previous_wrong)
 
-            # Create AttemptLog
-            attempt_log = AttemptLog.objects.create(
+            # Create attempt log
+            attempt = AttemptLog.objects.create(
                 user=profile.user,
                 question=question,
                 chosen_answer=chosen_answer,
                 is_correct=is_correct,
                 difficulty_attempted=question.difficulty,
                 time_spent=time_spent,
-                hint_given=None,
-                reward_numeric=q_reward,
-                qtable_snapshot=qtable_snapshot
+                reward_numeric=xp_earned,
+                is_first_attempt=is_first_attempt,
+                hint_given=hint
             )
 
-            # Update global statistics
-            LevelTransitionPolicy.update_global_statistics(attempt_log)
+            # Only update XP and streak for first attempts
+            if is_first_attempt and xp_earned > 0:
+                # Update XP
+                profile.xp += xp_earned
+                
+                # Update streak
+                if is_correct:
+                    profile.streak_count += 1
+                    # Apply streak bonus if threshold reached
+                    if profile.streak_count % QuizService.STREAK_REWARD_THRESHOLD == 0:
+                        streak_bonus = QuizService.HIDDEN_STREAK_REWARD
+                        xp_info['streak_bonus'] = streak_bonus
+                        profile.xp += streak_bonus
+                else:
+                    profile.streak_count = 0
+                
+                profile.save()
 
-            # Apply hint policy if answer was wrong
-            hint = None
-            if not is_correct:
-                # Count previous wrong attempts for this question
-                previous_wrong = AttemptLog.objects.filter(
-                    user=profile.user,
-                    question=question,
-                    is_correct=False
-                ).count()
-
-                hint = LevelTransitionPolicy.get_hint_for_question(question, previous_wrong)
-
-                if hint:
-                    attempt_log.hint_given = hint
-                    attempt_log.save()
-
-            # Check if user can level up (XP-based)
-            can_level_up, target_level = LevelTransitionPolicy.can_level_up(profile)
-
-            # Check if user should level down (performance-based)
-            should_level_down, down_level = LevelTransitionPolicy.should_level_down(profile)
+            # Check for level up (only for first attempts with XP earned)
+            level_up = False
+            new_level = profile.level
+            if is_first_attempt and xp_earned > 0 and QuizService._check_level_up(profile):
+                level_up = True
+                new_level = profile.level
 
         return {
-            'attempt_log': attempt_log,
             'is_correct': is_correct,
+            'xp_earned': xp_earned,
+            'total_xp': profile.xp,
+            'streak': profile.streak_count,
+            'is_first_attempt': is_first_attempt,
+            'explanation': question.explanation,
+            'correct_answer': question.answer_key,
+            'attempt_count': xp_info['attempt_count'],
+            'level_up': level_up,
+            'new_level': new_level,
             'hint': hint,
-            'can_level_up': can_level_up,
-            'target_level': target_level,
-            'should_level_down': should_level_down,
-            'down_level': down_level,
-            'hidden_reward_applied': hidden_reward_applied,
-            'streak_reward': QuizService.HIDDEN_STREAK_REWARD if hidden_reward_applied else 0,
-            'q_reward': q_reward,
-            'xp_calculation': xp_calculation,
-            'new_streak': profile.streak_correct,
-            'new_points': profile.points,
-            'new_progress': profile.progress,
-            'current_state': current_state,
-            'next_state': next_state,
-            'q_value_change': updated_entry.q_value if updated_entry else 0
+            'xp_breakdown': {
+                'base_xp': xp_info.get('base_xp', 0),
+                'difficulty_multiplier': xp_info.get('difficulty_multiplier', 1.0),
+                'time_bonus': xp_info.get('time_bonus', 0),
+                'streak_bonus': xp_info.get('streak_bonus', 0),
+                'final_xp': xp_earned,
+                'is_repeat': not is_first_attempt
+            }
         }
 
     @staticmethod
     def _validate_answer(question: Question, chosen_answer: str) -> bool:
         """
-        Validate student answer based on question format.
-
-        Args:
-            question: Question instance
-            chosen_answer: Student's answer
-
-        Returns:
-            Boolean indicating if answer is correct
+        FIXED: Validate answer with proper type handling for mcq_complex.
         """
         try:
             if question.format == 'mcq_simple':
-                # For MCQ, expect JSON like "A" or "B"
+                # Simple MCQ
                 if chosen_answer.strip():
                     return chosen_answer.strip() == question.answer_key.strip()
+                
             elif question.format == 'mcq_complex':
-                # For complex MCQ, expect JSON array like ["A", "B"]
-                if chosen_answer.strip():
-                    chosen_answers = json.loads(chosen_answer)
-                    correct_answers = json.loads(question.answer_key)
-                    return set(chosen_answers) == set(correct_answers)
+                # Complex MCQ with multiple answers
+                if not chosen_answer or not chosen_answer.strip():
+                    return False
+            
+                # Parse chosen answer (JSON from frontend)
+                chosen_answers = json.loads(chosen_answer)
+            
+                # ============================================
+                # FIX: Handle answer_key type properly
+                # ============================================
+                answer_key = question.answer_key
+            
+                # Case 1: Python list (from JSONField)
+                if isinstance(answer_key, list):
+                    correct_answers = answer_key
+                
+                # Case 2: String (needs parsing)
+                elif isinstance(answer_key, str):
+                    answer_key_str = answer_key.strip()
+                
+                    if answer_key_str.startswith('[') and answer_key_str.endswith(']'):
+                        # JSON array string
+                        try:
+                            correct_answers = json.loads(answer_key_str)
+                        except json.JSONDecodeError:
+                            # Manual parse
+                            correct_answers = [ans.strip().strip('"\'') for ans in answer_key_str[1:-1].split(',')]
+                    elif ',' in answer_key_str:
+                        # Comma-separated
+                        correct_answers = [ans.strip() for ans in answer_key_str.split(',')]
+                    else:
+                        # Single value
+                        correct_answers = [answer_key_str]
+                else:
+                    return False
+            
+                # Compare sets
+                return set(chosen_answers) == set(correct_answers)
+            
             elif question.format == 'short_answer':
-                # For short answer, do case-insensitive comparison
+                # Short answer (case-insensitive)
                 if chosen_answer.strip() and question.answer_key.strip():
                     return chosen_answer.strip().lower() == question.answer_key.strip().lower()
-        except (json.JSONDecodeError, ValueError):
-            pass
+                
+        except (json.JSONDecodeError, ValueError, TypeError) as e:
+            print(f"Validation error: {e}")
+            return False
+    
         return False
 
     @staticmethod

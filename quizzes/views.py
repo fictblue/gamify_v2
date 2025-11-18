@@ -76,7 +76,12 @@ class AdminQuizCreateView(View):
             messages.error(request, 'Access denied. Quiz creation is for administrators only.')
             return redirect('accounts:login')
 
-        return render(request, 'quizzes/admin/quiz_form.html', {'is_edit': False})
+        context = {
+            'is_edit': False,
+            'DIFFICULTY_CHOICES': Question.DIFFICULTY_CHOICES,
+            'FORMAT_CHOICES': Question.FORMAT_CHOICES
+        }
+        return render(request, 'quizzes/admin/quiz_form.html', context)
 
     def post(self, request):
         if request.user.role != 'admin':
@@ -139,6 +144,8 @@ class AdminQuizEditView(View):
             'is_edit': True,
             'question': question,
             'options_str': options_str,
+            'DIFFICULTY_CHOICES': Question.DIFFICULTY_CHOICES,
+            'FORMAT_CHOICES': Question.FORMAT_CHOICES
         }
 
         return render(request, 'quizzes/admin/quiz_form.html', context)
@@ -268,123 +275,10 @@ class StudentQuizListView(View):
         return render(request, 'quizzes/student/quiz_list.html', context)
 
 
-def get_available_difficulties(user_level, user, is_initial_session=False):
-    """
-    Get available question difficulties based on refined adaptive logic.
-
-    Args:
-        user_level: Current user level
-        user: User instance for performance analysis
-        is_initial_session: If True, use primary difficulty selection for new sessions
-    """
-    if is_initial_session:
-        # PRIMARY DIFFICULTY SELECTION for new quiz sessions
-        primary_difficulties = {
-            'beginner': ['easy'],  # New users and beginners start with easy
-            'intermediate': ['medium'],  # Intermediate start with medium
-            'advanced': ['hard'],  # Advanced start with hard
-            'expert': ['hard']  # Expert only hard
-        }
-        return primary_difficulties.get(user_level, ['easy'])
-
-    # ADAPTIVE DIFFICULTY SELECTION for ongoing sessions
-    base_difficulties = {
-        'beginner': ['easy', 'medium'],      # Easy dominated, but can explore medium
-        'intermediate': ['easy', 'medium', 'hard'],  # Fully adaptive
-        'advanced': ['medium', 'hard'],     # Hard dominated, fallback to medium
-        'expert': ['hard']                  # Only hard
-    }
-
-    # Get user's performance metrics
-    recent_attempts = AttemptLog.objects.filter(user=user).order_by('-created_at')[:20]
-
-    if not recent_attempts.exists():
-        # New user - use base difficulties for their level
-        return base_difficulties.get(user_level, ['easy'])
-
-    # Calculate performance by difficulty
-    easy_attempts = [a for a in recent_attempts if a.question.difficulty == 'easy']
-    medium_attempts = [a for a in recent_attempts if a.question.difficulty == 'medium']
-    hard_attempts = [a for a in recent_attempts if a.question.difficulty == 'hard']
-
-    easy_accuracy = 0
-    medium_accuracy = 0
-    hard_accuracy = 0
-
-    if easy_attempts:
-        easy_accuracy = sum(1 for a in easy_attempts if a.is_correct) / len(easy_attempts)
-    if medium_attempts:
-        medium_accuracy = sum(1 for a in medium_attempts if a.is_correct) / len(medium_attempts)
-    if hard_attempts:
-        hard_accuracy = sum(1 for a in hard_attempts if a.is_correct) / len(hard_attempts)
-
-    # Adaptive difficulty selection based on performance thresholds
-    available_difficulties = list(base_difficulties.get(user_level, ['easy']))
-
-    # Enhanced fallback logic for struggling users at higher levels
-    if user_level == 'beginner':
-        # Beginner: Start with EASY ONLY, then gradually introduce medium
-        if len(recent_attempts) < 3:
-            # First 3 questions: ONLY easy for confidence building
-            available_difficulties = ['easy']
-        elif len(recent_attempts) < 8:
-            # Next 5 questions: Easy dominated, but can explore medium if performing well
-            if easy_accuracy >= 0.8 and len(easy_attempts) >= 3:
-                # Performing very well on easy - allow medium exploration
-                available_difficulties = ['easy', 'medium']
-            else:
-                # Still building confidence - stick to easy
-                available_difficulties = ['easy']
-        else:
-            # After 8+ questions: Normal beginner exploration
-            # If performing well on easy (70%+ accuracy), increase medium exploration
-            if easy_accuracy >= 0.7 and len(easy_attempts) >= 5:
-                # Keep both easy and medium, but Q-learning will handle the balance
-                pass  # Already included in base_difficulties
-            else:
-                # Not performing well enough yet - stick to easy
-                available_difficulties = ['easy']
-
-    elif user_level == 'intermediate':
-        # Intermediate: Fully adaptive - all difficulties available
-        # Performance-based adjustments handled by Q-learning
-        pass  # Already includes all difficulties
-
-    elif user_level == 'advanced':
-        # Advanced: Hard dominated, but fallback to medium if struggling
-        if hard_accuracy < 0.5 and len(hard_attempts) >= 3:
-            # Struggling on hard - ensure medium is available for fallback
-            if 'medium' not in available_difficulties:
-                available_difficulties.append('medium')
-
-        # Additional fallback: if struggling badly, also allow easy
-        if hard_accuracy < 0.3 and len(hard_attempts) >= 5:
-            if 'easy' not in available_difficulties:
-                available_difficulties.append('easy')
-
-    elif user_level == 'expert':
-        # Expert: Hard dominated, but fallback to medium if struggling badly
-        if hard_accuracy < 0.4 and len(hard_attempts) >= 5:
-            # Really struggling on hard - allow medium for fallback
-            if 'medium' not in available_difficulties:
-                available_difficulties.append('medium')
-
-        # Extreme fallback: if still struggling, allow easy
-        if hard_accuracy < 0.2 and len(hard_attempts) >= 8:
-            if 'easy' not in available_difficulties:
-                available_difficulties.append('easy')
-
-    # Remove duplicates and sort
-    available_difficulties = list(set(available_difficulties))
-    available_difficulties.sort()
-
-    return available_difficulties
-
-
 @csrf_exempt
 @login_required
 def get_next_question(request):
-    """Get the next question using Q-Learning algorithm"""
+    """Get the next question using Q-Learning with anti-repetition and difficulty constraints"""
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Method not allowed'}, status=405)
 
@@ -392,49 +286,115 @@ def get_next_question(request):
         return JsonResponse({'success': False, 'error': 'Access denied'}, status=403)
 
     try:
-        # Get user profile
         profile = request.user.student_profile
 
+        # ============================================
+        # FIX 1: Use engine.ALLOWED_ACTIONS for difficulty constraints
+        # ============================================
+        from qlearning.engine import QLearningEngine
+        
+        # Get allowed difficulties from engine (respects beginner/advanced constraints)
+        allowed_difficulties = QLearningEngine.ALLOWED_ACTIONS.get(
+            profile.level, 
+            ['easy', 'medium', 'hard']
+        )
+
+        # SAFE FALLBACK: If level not in ALLOWED_ACTIONS, default based on level
+        if allowed_difficulties is None:
+            if profile.level == 'beginner':
+                allowed_difficulties = ['easy', 'medium']
+            elif profile.level == 'intermediate':
+                allowed_difficulties = ['easy', 'medium', 'hard']
+            elif profile.level == 'advanced':
+                allowed_difficulties = ['medium', 'hard']
+            elif profile.level == 'expert':
+                allowed_difficulties = ['hard']
+            else:
+                # Unknown level - start with easy only for safety
+                allowed_difficulties = ['easy']
+                print(f"WARNING: Unknown user level '{profile.level}', defaulting to easy only")
+        
+        print(f"User level: {profile.level}, Allowed difficulties: {allowed_difficulties}")
+
+        # ============================================
+        # FIX 2: Get UNATTEMPTED questions filtered by allowed difficulties
+        # ============================================
+        
+        # Get IDs of questions user has already attempted
+        attempted_question_ids = set(
+            AttemptLog.objects
+            .filter(user=request.user)
+            .values_list('question_id', flat=True)
+        )
+        
+        print(f"User has attempted {len(attempted_question_ids)} questions")
+
+        # Get unattempted questions within allowed difficulties
+        unattempted_questions = Question.objects.filter(
+            difficulty__in=allowed_difficulties
+        ).exclude(id__in=attempted_question_ids)
+        
+        print(f"Found {unattempted_questions.count()} unattempted questions in allowed difficulties")
+
+        # If no unattempted questions, user has completed all available questions
+        if not unattempted_questions.exists():
+            return JsonResponse({
+                'success': False,
+                'error': 'no_more_questions',
+                'message': f'Congratulations! You have attempted all available questions for level {profile.level}.',
+                'completed': True,
+                'allowed_difficulties': allowed_difficulties,
+                'total_attempted': len(attempted_question_ids)
+            }, status=200)
+
+        # ============================================
+        # FIX 3: Use Q-Learning to select difficulty, then pick question from that difficulty
+        # ============================================
+        
         # Get current state for Q-Learning
         current_state = get_user_state(profile)
-
-        # Check if this is the first question in a new session
-        # If user has no recent attempts (last 5 minutes), treat as initial session
-        recent_attempts = AttemptLog.objects.filter(
+        
+        # Use Q-Learning engine to choose difficulty (with safety constraints)
+        from quizzes.services import QuizService
+        state_tuple = QuizService.state_tuple(profile)
+        
+        selected_difficulty = QLearningEngine.choose_action(
             user=request.user,
-            created_at__gte=timezone.now() - timedelta(minutes=5)
+            state_tuple=state_tuple,
+            epsilon=None,  # Use dynamic epsilon
+            current_difficulty=profile.last_difficulty
         )
+        
+        print(f"Q-Learning selected difficulty: {selected_difficulty}")
 
-        is_initial_session = not recent_attempts.exists()
+        # Get unattempted questions in selected difficulty
+        candidate_questions = unattempted_questions.filter(difficulty=selected_difficulty)
+        
+        # If no questions in selected difficulty, try other allowed difficulties
+        if not candidate_questions.exists():
+            print(f"No questions in {selected_difficulty}, trying other difficulties")
+            for difficulty in allowed_difficulties:
+                if difficulty != selected_difficulty:
+                    candidate_questions = unattempted_questions.filter(difficulty=difficulty)
+                    if candidate_questions.exists():
+                        selected_difficulty = difficulty
+                        print(f"Found questions in {difficulty}")
+                        break
+        
+        # Final check: if still no questions (shouldn't happen, but safety)
+        if not candidate_questions.exists():
+            return JsonResponse({
+                'success': False,
+                'error': 'no_suitable_questions',
+                'message': 'No suitable questions found. Please contact administrator.',
+            }, status=404)
 
-        # Get available difficulties based on session type
-        available_difficulties = get_available_difficulties(profile.level, request.user, is_initial_session)
+        # Select random question from candidates
+        selected_question = random.choice(candidate_questions)
+        
+        print(f"Selected question: ID={selected_question.id}, Difficulty={selected_question.difficulty}")
 
-        if not available_difficulties:
-            # Fallback if no difficulties available
-            available_difficulties = ['easy']
-
-        # Select action (question difficulty) using epsilon-greedy, but only from available difficulties
-        selected_difficulty = select_action_epsilon_greedy_adaptive(
-            profile.user, current_state, available_difficulties, is_initial_session
-        )
-
-        # Get questions for selected difficulty
-        questions = Question.objects.filter(difficulty=selected_difficulty)
-
-        if not questions.exists():
-            # Fallback to easy if no questions available
-            questions = Question.objects.filter(difficulty='easy')
-            if not questions.exists():
-                return JsonResponse({
-                    'success': False,
-                    'error': 'No questions available'
-                }, status=404)
-
-        # Select random question from chosen difficulty
-        selected_question = random.choice(questions)
-
-        # Get level transition info (for UI display)
+        # Get level transition info
         can_level_up, target_level = LevelTransitionPolicy.can_level_up(profile)
         level_progress = LevelTransitionPolicy.calculate_level_progress(profile)
         user_stats = LevelTransitionPolicy.get_user_statistics(request.user)
@@ -451,15 +411,19 @@ def get_next_question(request):
             },
             'user_level': profile.level,
             'selected_difficulty': selected_difficulty,
+            'allowed_difficulties': allowed_difficulties,
             'can_level_up': can_level_up,
             'target_level': target_level,
             'level_progress': level_progress,
             'user_stats': user_stats,
+            'is_first_attempt': True,
         }
 
         return JsonResponse(response_data)
 
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 
@@ -862,7 +826,8 @@ def update_q_table(user, current_state, action, reward, next_state, learning_rat
         reward=reward,
         q_value_before=old_q,
         q_value_after=new_q,
-        next_state_hash=next_state
+        next_state_hash=next_state,
+        metadata={}  # Add empty metadata
     )
 
     return new_q
@@ -945,31 +910,117 @@ class StudentQuizTakeView(View):
 
         return render(request, 'quizzes/student/quiz_result.html', context)
 
-    def validate_answer(self, question, chosen_answer):
-        """Validate student answer based on question format"""
+    def validate_answer(question, chosen_answer):
+        """
+        FIX 4: Fixed validation for mcq_complex with proper type handling
+        """
         try:
+            # Handle None case
+            if chosen_answer is None:
+                return False
+            
+            # Ensure chosen_answer is a string
+            chosen_answer = str(chosen_answer)
+        
             if question.format == 'mcq_simple':
-                # For MCQ, expect JSON like "A" or "B"
+                # Simple MCQ: direct comparison
                 if chosen_answer.strip():
-                    return chosen_answer.strip() == question.answer_key.strip()
+                    return bool(chosen_answer.strip() == question.answer_key.strip())
+                return False
+            
             elif question.format == 'mcq_complex':
-                # For complex MCQ, expect JSON array like ["A", "B"]
-                if chosen_answer.strip():
-                    chosen_answers = json.loads(chosen_answer)
-                    correct_answers = json.loads(question.answer_key)
-                    return set(chosen_answers) == set(correct_answers)
+                # Complex MCQ with multiple correct answers
+                try:
+                    # Check if answer is empty
+                    if not chosen_answer or not chosen_answer.strip():
+                        return False
+                
+                    print(f"\n=== VALIDATING MCQ COMPLEX ===")
+                    print(f"Question ID: {question.id}")
+                    print(f"Chosen answer (raw): {chosen_answer} (type: {type(chosen_answer).__name__})")
+                    print(f"Answer key (raw): {question.answer_key} (type: {type(question.answer_key).__name__})")
+                
+                # Parse chosen answer (should be JSON string from frontend)
+                    try:
+                        chosen_answers = json.loads(chosen_answer)
+                    except json.JSONDecodeError as e:
+                        print(f"ERROR: Failed to parse chosen_answer: {e}")
+                        return False
+                
+                    # ============================================
+                    # FIX: Handle answer_key being either Python list or JSON string
+                    # ============================================
+                    answer_key = question.answer_key
+                
+                    # Case 1: answer_key is already a Python list (from database JSONField)
+                    if isinstance(answer_key, list):
+                        correct_answers = answer_key
+                        print(f"Answer key is Python list: {correct_answers}")
+                
+                    # Case 2: answer_key is a string
+                    elif isinstance(answer_key, str):
+                        answer_key_str = answer_key.strip()
+                        
+                        # Case 2a: JSON array string like '["A", "B"]'
+                        if answer_key_str.startswith('[') and answer_key_str.endswith(']'):
+                            try:
+                                correct_answers = json.loads(answer_key_str)
+                                print(f"Parsed JSON array: {correct_answers}")
+                            except json.JSONDecodeError:
+                                # Fallback: manual parsing
+                                correct_answers = [ans.strip().strip('"\'') for ans in answer_key_str[1:-1].split(',')]
+                                print(f"Manual parse: {correct_answers}")
+                    
+                    # Case 2b: Comma-separated like 'A,B' or 'A, B'
+                        elif ',' in answer_key_str:
+                            correct_answers = [ans.strip() for ans in answer_key_str.split(',')]
+                            print(f"Comma-separated: {correct_answers}")
+                    
+                    # Case 2c: Single value
+                        else:
+                            correct_answers = [answer_key_str]
+                            print(f"Single value: {correct_answers}")
+                    else:
+                        print(f"ERROR: Unexpected answer_key type: {type(answer_key)}")
+                        return False
+                
+                    # Ensure both are lists
+                    if not isinstance(chosen_answers, list) or not isinstance(correct_answers, list):
+                        print(f"ERROR: Expected lists, got {type(chosen_answers)} and {type(correct_answers)}")
+                        return False
+                
+                    # Compare sets (order doesn't matter)
+                    result = set(chosen_answers) == set(correct_answers)
+                    print(f"Comparison: {set(chosen_answers)} == {set(correct_answers)} → {result}")
+                
+                    return result
+                
+                except Exception as e:
+                    print(f"ERROR in validate_answer (mcq_complex): {e}")
+                    import traceback
+                    traceback.print_exc()
+                    return False
+            
             elif question.format == 'short_answer':
-                # For short answer, do case-insensitive comparison
+                # Short answer: case-insensitive comparison
                 if chosen_answer.strip() and question.answer_key.strip():
-                    return chosen_answer.strip().lower() == question.answer_key.strip().lower()
-        except (json.JSONDecodeError, ValueError):
-            pass
+                    return bool(chosen_answer.strip().lower() == question.answer_key.strip().lower())
+                return False
+            
+        except (json.JSONDecodeError, ValueError) as e:
+            print(f"ERROR in validate_answer: {e}")
+            return False
+        
+        # Default: incorrect
+        return False
 
+
+# Replace submit_answer() function in views.py
 
 @csrf_exempt
 @login_required
 def submit_answer(request):
-    """Enhanced quiz submission with improved Q-Learning and time tracking"""
+    """Enhanced quiz submission with Adaptive Retry System"""
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Method not allowed'}, status=405)
 
@@ -987,36 +1038,84 @@ def submit_answer(request):
         # Get student's answer
         chosen_answer = request.POST.get('answer', '')
 
-        # Get wrong attempts count
+        # Get wrong attempts count (0-based from frontend, so attempt 1 = 0 wrong attempts initially)
         wrong_attempts = int(request.POST.get('wrong_attempts', 0))
+        current_attempt_number = wrong_attempts + 1  # 1-based attempt number
 
-        # Get time spent from client-side calculation
+        # Get time spent
         time_spent = float(request.POST.get('time_spent', 0))
 
-        # Validate answer based on question format
-        is_correct = validate_answer(question, chosen_answer)
+        # ============================================
+        # ADAPTIVE RETRY SYSTEM
+        # ============================================
+        from qlearning.policies import RetryPolicy
+        
+        # Get max retries for this question
+        max_retries = RetryPolicy.get_max_retries(question, request.user)
+        
+        print(f"\n=== ADAPTIVE RETRY SYSTEM ===")
+        print(f"Question: {question.id} ({question.difficulty})")
+        print(f"Current attempt: {current_attempt_number}/{max_retries + 1}")
+        print(f"Wrong attempts so far: {wrong_attempts}")
 
-        # Get user profile for Q-Learning
+        # Validate answer
+        print(f"\n=== VALIDATING ANSWER ===")
+        print(f"Chosen answer: {chosen_answer}")
+        print(f"Answer key: {question.answer_key}")
+        
+        try:
+            is_correct = validate_answer(question, chosen_answer)
+            print(f"Validation result: {is_correct}")
+        except Exception as e:
+            print(f"Error in validate_answer: {str(e)}")
+            is_correct = False
+
+        # Get user profile
         profile = request.user.student_profile
 
-        # Calculate XP using new repetition-aware system
+        # ============================================
+        # XP CALCULATION with Retry Penalty
+        # ============================================
+        
+        # Get base XP from QuizService (considers repetition)
         xp_calculation = QuizService.calculate_attempt_xp(
             question, request.user, is_correct, time_spent
         )
-        adaptive_reward = xp_calculation['final_xp']
+        base_xp = xp_calculation['final_xp']
+        
+        # Apply retry penalty if wrong
+        if not is_correct:
+            # Apply attempt-based penalty
+            adaptive_reward = RetryPolicy.calculate_attempt_xp(
+                base_xp=abs(base_xp),  # Use absolute value for penalty calculation
+                attempt_number=current_attempt_number,
+                is_correct=False
+            )
+        else:
+            # Apply attempt-based multiplier for correct answers
+            adaptive_reward = RetryPolicy.calculate_attempt_xp(
+                base_xp=base_xp,
+                attempt_number=current_attempt_number,
+                is_correct=True
+            )
+            
+            # Update XP calculation for frontend display
+            xp_calculation['attempt_penalty'] = 1.0 - RetryPolicy.get_xp_multiplier(current_attempt_number)
+            xp_calculation['final_xp'] = adaptive_reward
 
-        # Q-Learning: Get current state and next state
+        print(f"Base XP: {base_xp}, Adaptive XP: {adaptive_reward}, Attempt: {current_attempt_number}")
+
+        # Q-Learning state update
         current_state = get_user_state(profile)
 
-        # FIXED: Update XP directly without calling non-existent add_xp()
+        # Update profile XP
         profile.xp += adaptive_reward
-        profile.total_xp += adaptive_reward
+        profile.total_xp += max(0, adaptive_reward)  # Only positive XP for total
         
-        # Ensure XP doesn't go negative
         if profile.xp < 0:
             profile.xp = 0
 
-        # Check for automatic level up based on XP thresholds (INCREASED for more learning time)
+        # Check for level up
         leveled_up = False
         new_level = None
         old_level = profile.level
@@ -1033,61 +1132,9 @@ def submit_answer(request):
         
         if leveled_up:
             profile.level = new_level
-            profile.xp = 0  # Reset XP for new level
-            
-            # Log level transition for analytics
-            from qlearning.models import LevelTransitionLog
-            try:
-                LevelTransitionLog.objects.create(
-                    user=request.user,
-                    transition_type='level_up_auto',
-                    old_level=old_level,
-                    new_level=new_level,
-                    transition_condition={
-                        'xp_threshold': profile.get_xp_for_next_level(),
-                        'xp_earned': adaptive_reward,
-                        'total_xp': profile.total_xp
-                    },
-                    performance_metrics={
-                        'current_streak': profile.streak_correct,
-                        'total_attempts': 0,
-                        'questions_attempted': 0
-                    }
-                )
-            except Exception as e:
-                # Silently fail if level transition logging fails
-                pass
+            profile.xp = 0
 
-        # Log reward for analytics
-        from qlearning.models import RewardIncentivesLog
-        try:
-            # Determine reward type
-            reward_type = 'points'
-            if leveled_up:
-                reward_type = 'level_up_bonus'
-
-            RewardIncentivesLog.objects.create(
-                user=request.user,
-                reward_type=reward_type,
-                reward_value=adaptive_reward,
-                trigger_condition={
-                    'question_difficulty': question.difficulty,
-                    'is_correct': is_correct,
-                    'time_spent': time_spent,
-                    'leveled_up': leveled_up,
-                    'new_level': new_level if leveled_up else None
-                },
-                user_reaction={
-                    'will_continue_session': True,  # Assume they continue unless logout
-                    'engagement_score': 1.0 if adaptive_reward > 0 else 0.5
-                },
-                session_continuation=True  # Will be updated by session tracking
-            )
-        except Exception as e:
-            # Silently fail if reward logging fails
-            pass
-
-        # Update other profile stats
+        # Update streak
         if is_correct:
             profile.streak_correct += 1
         else:
@@ -1097,10 +1144,8 @@ def submit_answer(request):
         profile.last_difficulty = question.difficulty
         profile.save()
 
-        # Get next state after profile update
+        # Update Q-table
         next_state = get_user_state(profile)
-
-        # Update Q-table with the reward
         update_q_table(
             user=request.user,
             current_state=current_state,
@@ -1109,141 +1154,7 @@ def submit_answer(request):
             next_state=next_state
         )
 
-        # Log Q-Learning performance periodically (every 10 attempts)
-        from qlearning.models import QLearningPerformanceLog
-        try:
-            user_q_entries = QTableEntry.objects.filter(user=request.user)
-            total_entries = user_q_entries.count()
-
-            if total_entries > 0 and total_entries % 10 == 0:  # Every 10 Q-table entries
-                # Calculate performance metrics
-                avg_q_value = sum(entry.q_value for entry in user_q_entries) / total_entries
-
-                # Simple action distribution (count by difficulty)
-                action_counts = {'easy': 0, 'medium': 0, 'hard': 0}
-                for entry in user_q_entries:
-                    if entry.action in action_counts:
-                        action_counts[entry.action] += 1
-
-                total_actions = sum(action_counts.values())
-                action_distribution = {
-                    action: count / total_actions if total_actions > 0 else 0
-                    for action, count in action_counts.items()
-                }
-
-                # Estimate optimal action frequency (simplified)
-                optimal_frequency = max(action_distribution.values()) if action_distribution else 0
-
-                QLearningPerformanceLog.objects.create(
-                    user=request.user,
-                    state_hash=current_state,
-                    action_distribution=action_distribution,
-                    optimal_action_frequency=optimal_frequency,
-                    average_q_value=avg_q_value,
-                    q_table_size=total_entries,
-                    learning_progress=min(1.0, total_entries / 100),  # Progress towards maturity
-                    snapshot_interval=10,
-                    metadata={
-                        'total_attempts': total_entries,
-                        'user_level': profile.level,
-                        'recent_accuracy': recent_accuracy if 'recent_accuracy' in locals() else 0.5
-                    }
-                )
-        except Exception as e:
-            # Silently fail if Q-Learning performance logging fails
-            pass
-
-        # Log success rate for analytics (daily aggregation)
-        from qlearning.models import SuccessRateLog
-        try:
-            # Check if we need to create/update daily success rate log
-            today_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
-            today_end = today_start + timedelta(days=1)
-
-            # Get or create today's success rate log for this user and difficulty
-            success_log, created = SuccessRateLog.objects.get_or_create(
-                user=request.user,
-                difficulty=question.difficulty,
-                time_window_start=today_start,
-                time_window_end=today_end,
-                defaults={
-                    'total_attempts': 0,
-                    'correct_attempts': 0,
-                    'average_time_spent': 0.0,
-                    'accuracy_percentage': 0.0
-                }
-            )
-
-            # Update the log with this attempt
-            success_log.total_attempts += 1
-            if is_correct:
-                success_log.correct_attempts += 1
-
-            # Update average time (simple moving average)
-            if success_log.average_time_spent == 0:
-                success_log.average_time_spent = time_spent
-            else:
-                success_log.average_time_spent = (
-                    (success_log.average_time_spent * (success_log.total_attempts - 1)) + time_spent
-                ) / success_log.total_attempts
-
-            # Recalculate accuracy
-            success_log.accuracy_percentage = (
-                success_log.correct_attempts / success_log.total_attempts * 100
-            )
-
-            success_log.save()
-
-        except Exception as e:
-            # Silently fail if success rate logging fails
-            pass
-
-        # Log global system statistics periodically (daily)
-        from qlearning.models import GlobalSystemLog
-        try:
-            # Check if we need to update daily global stats
-            today = timezone.now().date()
-            today_start = timezone.datetime.combine(today, timezone.datetime.min.time())
-            today_end = today_start + timedelta(days=1)
-
-            # Check if today's global log exists
-            global_log_exists = GlobalSystemLog.objects.filter(
-                metric_type='engagement_daily',
-                time_window='daily',
-                timestamp__gte=today_start,
-                timestamp__lt=today_end
-            ).exists()
-
-            if not global_log_exists:
-                # Calculate global statistics for today
-                total_users = CustomUser.objects.filter(role='student').count()
-                today_attempts = AttemptLog.objects.filter(created_at__gte=today_start).count()
-
-                if today_attempts > 0:
-                    correct_attempts = AttemptLog.objects.filter(
-                        created_at__gte=today_start,
-                        is_correct=True
-                    ).count()
-                    global_accuracy = correct_attempts / today_attempts * 100
-
-                    GlobalSystemLog.objects.create(
-                        metric_type='engagement_daily',
-                        metric_data={
-                            'total_users': total_users,
-                            'total_attempts': today_attempts,
-                            'correct_attempts': correct_attempts,
-                            'global_accuracy': round(global_accuracy, 2),
-                            'active_users': CustomUser.objects.filter(
-                                student_profile__updated_at__gte=today_start
-                            ).count()
-                        },
-                        time_window='daily'
-                    )
-        except Exception as e:
-            # Silently fail if global logging fails
-            pass
-
-        # Create attempt log with proper time tracking
+        # Create attempt log
         attempt_log = AttemptLog.objects.create(
             user=request.user,
             question=question,
@@ -1255,72 +1166,58 @@ def submit_answer(request):
             qtable_snapshot=current_state,
         )
 
-        # Log response to adaptation (difficulty changes, hints, etc.)
-        from qlearning.models import ResponseToAdaptationLog
-        try:
-            # Check if this was an adaptation response
-            adaptation_type = None
-            adaptation_details = {}
-
-            # Check for difficulty adaptation
-            if question.difficulty != profile.last_difficulty:
-                adaptation_type = 'difficulty_transition'
-                adaptation_details = {
-                    'old_difficulty': profile.last_difficulty,
-                    'new_difficulty': question.difficulty,
-                    'reason': 'Q-Learning adaptation based on performance'
-                }
-
-            # Check for hint adaptation
-            if show_hint and wrong_attempts > 0:
-                adaptation_type = 'hint_adaptation'
-                adaptation_details = {
-                    'hint_level': wrong_attempts,
-                    'question_difficulty': question.difficulty,
-                    'hint_shown': show_hint
-                }
-
-            if adaptation_type:
-                ResponseToAdaptationLog.objects.create(
-                    user=request.user,
-                    adaptation_type=adaptation_type,
-                    old_state={
-                        'level': old_level if 'old_level' in locals() else profile.level,
-                        'last_difficulty': profile.last_difficulty,
-                        'streak': profile.streak_correct
-                    },
-                    new_state={
-                        'level': profile.level,
-                        'current_difficulty': question.difficulty,
-                        'streak': profile.streak_correct,
-                        'xp': profile.xp
-                    },
-                    adaptation_details=adaptation_details,
-                    first_attempt_after={
-                        'is_correct': is_correct,
-                        'time_spent': time_spent,
-                        'xp_earned': adaptive_reward
-                    },
-                    hint_usage_change=1 if show_hint else 0,
-                    session_duration_change=time_spent if is_correct else 0
-                )
-        except Exception as e:
-            # Silently fail if adaptation logging fails
-            pass
-
-        # Determine if hint should be shown (after 1st, 2nd, or 3rd wrong attempt)
+        # ============================================
+        # PROGRESSIVE HINT SYSTEM
+        # ============================================
+        
+        hint_data = None
         show_hint = False
-        if not is_correct and wrong_attempts >= 1:
+        should_advance = False
+        
+        if not is_correct:
+            # Get progressive hint
+            hint_data = RetryPolicy.get_progressive_hint(
+                question, 
+                current_attempt_number,
+                max_retries
+            )
             show_hint = True
+            
+            # Check if should auto-advance
+            should_advance = RetryPolicy.should_auto_advance(
+                wrong_attempts, 
+                max_retries
+            )
+            
+            print(f"Hint level: {hint_data['level']}, Should advance: {should_advance}")
 
-        # Get correct answer for UI feedback
+        # ============================================
+        # RESPONSE DATA
+        # ============================================
+        
+        # Get correct answer for display
         correct_answer = None
         correct_answers = None
+        
         if question.format == 'mcq_simple':
             correct_answer = question.answer_key
         elif question.format == 'mcq_complex':
-            correct_answers = json.loads(question.answer_key) if question.answer_key else []
+            answer_key = question.answer_key
+            if isinstance(answer_key, list):
+                correct_answers = answer_key
+            elif isinstance(answer_key, str):
+                answer_key_str = answer_key.strip()
+                if answer_key_str.startswith('['):
+                    try:
+                        correct_answers = json.loads(answer_key_str)
+                    except:
+                        correct_answers = [ans.strip() for ans in answer_key_str[1:-1].split(',')]
+                else:
+                    correct_answers = [ans.strip() for ans in answer_key_str.split(',')]
+        else:
+            correct_answer = question.answer_key
 
+        # Build response
         response_data = {
             'success': True,
             'is_correct': is_correct,
@@ -1330,11 +1227,26 @@ def submit_answer(request):
             'new_total_xp': profile.total_xp,
             'leveled_up': leveled_up,
             'new_level': new_level,
-            'show_hint': show_hint,
+            
+            # Retry system data
             'wrong_attempts': wrong_attempts,
+            'current_attempt': current_attempt_number,
+            'max_attempts': max_retries + 1,
+            'should_advance': should_advance,
+            
+            # Hint system data
+            'show_hint': show_hint,
+            'hint_data': hint_data,
+            
+            # Answer data
             'correct_answer': correct_answer,
             'correct_answers': correct_answers,
+            'explanation': question.explanation,
+            
+            # Messages
             'message': get_feedback_message(is_correct, adaptive_reward, leveled_up, new_level),
+            'retry_message': RetryPolicy.get_retry_message(current_attempt_number, max_retries) if not is_correct else None,
+            
             'next_url': reverse('quizzes:student_quiz_list')
         }
 
@@ -1342,8 +1254,10 @@ def submit_answer(request):
 
     except Exception as e:
         import logging
+        import traceback
         logger = logging.getLogger(__name__)
         logger.error(f"Error in submit_answer: {str(e)}", exc_info=True)
+        traceback.print_exc()
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 
@@ -1387,7 +1301,15 @@ def enhance_hint_with_context(base_hint: str, question, attempts: int) -> str:
         if question.format == 'mcq_simple':
             answer_text = f"The correct answer is {question.answer_key}."
         elif question.format == 'mcq_complex':
-            correct_answers = json.loads(question.answer_key) if question.answer_key else []
+            # Process answer_key for complex MCQ
+            answer_key = question.answer_key.strip() if question.answer_key else ''
+            if answer_key.startswith('[') and answer_key.endswith(']'):
+                try:
+                    correct_answers = json.loads(answer_key)
+                except json.JSONDecodeError:
+                    correct_answers = [ans.strip() for ans in answer_key[1:-1].split(',')]
+            else:
+                correct_answers = [ans.strip() for ans in answer_key.split(',')] if answer_key else []
             answer_text = f"The correct answers are: {', '.join(correct_answers)}."
         else:  # short_answer
             answer_text = f"The correct answer is: {question.answer_key}"
@@ -1411,22 +1333,81 @@ def track_hint_usage(user, question, hint_attempts: int):
 def validate_answer(question, chosen_answer):
     """Validate student answer based on question format"""
     try:
+        # Handle case where chosen_answer is None
+        if chosen_answer is None:
+            return False
+            
+        # Ensure chosen_answer is a string
+        chosen_answer = str(chosen_answer)
+        
         if question.format == 'mcq_simple':
             # For MCQ, expect JSON like "A" or "B"
             if chosen_answer.strip():
-                return chosen_answer.strip() == question.answer_key.strip()
+                return bool(chosen_answer.strip() == question.answer_key.strip())
+            return False
+            
         elif question.format == 'mcq_complex':
             # For complex MCQ, expect JSON array like ["A", "B"]
-            if chosen_answer.strip():
-                chosen_answers = json.loads(chosen_answer)
-                correct_answers = json.loads(question.answer_key)
+            try:
+                # Check if answer is empty or just whitespace
+                if not chosen_answer or not chosen_answer.strip():
+                    return False
+                
+                # Debug log
+                print(f"Validating complex MCQ answer. Chosen: '{chosen_answer}', Type: {type(chosen_answer)}")
+                
+                # Parse the JSON answer with better error handling
+                try:
+                    chosen_answers = json.loads(chosen_answer)
+                except json.JSONDecodeError:
+                    print(f"Failed to parse chosen_answer as JSON: {chosen_answer}")
+                    return False
+                
+                # Handle different answer_key formats
+                answer_key = question.answer_key.strip()
+                
+                # Case 1: Already a JSON array string like '["A", "B"]'
+                if answer_key.startswith('[') and answer_key.endswith(']'):
+                    try:
+                        correct_answers = json.loads(answer_key)
+                    except json.JSONDecodeError:
+                        print(f"Invalid JSON array in answer_key for question {question.id}")
+                        return False
+                # Case 2: Comma-separated values like 'A,B' or 'B,C'
+                elif ',' in answer_key:
+                    correct_answers = [ans.strip() for ans in answer_key.split(',')]
+                # Case 3: Single value
+                else:
+                    correct_answers = [answer_key.strip()]
+                    
+                print(f"Processed correct_answers: {correct_answers}")
+                
+                # Ensure both are lists
+                if not isinstance(chosen_answers, list) or not isinstance(correct_answers, list):
+                    print(f"Invalid answer format. Expected lists, got {type(chosen_answers)} and {type(correct_answers)}")
+                    return False
+                
+                # Debug log
+                print(f"Comparing answers - Chosen: {chosen_answers}, Correct: {correct_answers}")
+                
+                # Compare the sets of answers
                 return set(chosen_answers) == set(correct_answers)
+                
+            except Exception as e:
+                print(f"Unexpected error in validate_answer (mcq_complex): {str(e)}")
+                return False
+            
         elif question.format == 'short_answer':
             # For short answer, do case-insensitive comparison
             if chosen_answer.strip() and question.answer_key.strip():
-                return chosen_answer.strip().lower() == question.answer_key.strip().lower()
+                return bool(chosen_answer.strip().lower() == question.answer_key.strip().lower())
+            return False
+            
     except (json.JSONDecodeError, ValueError):
         pass
+        
+    # Default return False for any unhandled case
+    return False
 def get_feedback_message(is_correct, xp_change, leveled_up, new_level):
     """Generate appropriate feedback message"""
     if is_correct:
@@ -1505,3 +1486,71 @@ def take_quiz(request, question_id):
     except Exception as e:
         messages.error(request, f'Error loading quiz: {str(e)}')
         return redirect('quizzes:student_quiz_list')
+
+@login_required
+def debug_user_constraints(request):
+    """Debug endpoint to check user's difficulty constraints"""
+    if request.user.role != 'student':
+        return JsonResponse({'error': 'Students only'}, status=403)
+    
+    from qlearning.engine import QLearningEngine
+    profile = request.user.student_profile
+    
+    allowed = QLearningEngine.ALLOWED_ACTIONS.get(profile.level, ['unknown'])
+    
+    # Get attempted questions by difficulty
+    attempts_by_diff = {}
+    for diff in ['easy', 'medium', 'hard']:
+        count = AttemptLog.objects.filter(
+            user=request.user,
+            question__difficulty=diff
+        ).count()
+        attempts_by_diff[diff] = count
+    
+    return JsonResponse({
+        'user': request.user.username,
+        'level': profile.level,
+        'allowed_difficulties': allowed,
+        'attempts_by_difficulty': attempts_by_diff,
+        'total_attempts': sum(attempts_by_diff.values()),
+        'xp': profile.xp,
+        'total_xp': profile.total_xp,
+    })
+
+def get_available_difficulties(user_level, user, is_initial_session=False):
+    """
+    SIMPLIFIED: Get available difficulties based ONLY on QLearningEngine.ALLOWED_ACTIONS.
+    
+    This function is now just a wrapper around QLearningEngine.ALLOWED_ACTIONS
+    to maintain compatibility with StudentQuizListView.
+    
+    Args:
+        user_level: Current user level (beginner/intermediate/advanced/expert)
+        user: User instance (not used anymore, kept for compatibility)
+        is_initial_session: Not used anymore, kept for compatibility
+    
+    Returns:
+        List of allowed difficulty strings
+    """
+    from qlearning.engine import QLearningEngine
+    
+    # Simply return ALLOWED_ACTIONS from engine
+    allowed = QLearningEngine.ALLOWED_ACTIONS.get(user_level)
+    
+    # Safe fallback
+    if allowed is None:
+        print(f"WARNING: Unknown user level '{user_level}', defaulting based on level name")
+        if user_level == 'beginner':
+            allowed = ['easy', 'medium']
+        elif user_level == 'intermediate':
+            allowed = ['easy', 'medium', 'hard']
+        elif user_level == 'advanced':
+            allowed = ['medium', 'hard']
+        elif user_level == 'expert':
+            allowed = ['hard']
+        else:
+            # Unknown level - default to easy only for safety
+            allowed = ['easy']
+            print(f"ERROR: Completely unknown level '{user_level}', forcing easy only")
+    
+    return allowed

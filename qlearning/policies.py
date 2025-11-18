@@ -451,3 +451,251 @@ class LevelTransitionPolicy:
             'accuracy': (correct / total * 100) if total > 0 else 0,
             'daily_stats': daily_stats
         }
+        
+
+class RetryPolicy:
+    """
+    Adaptive retry policy for quiz questions based on difficulty and user performance.
+    
+    Features:
+    - Difficulty-based retry limits
+    - Performance-adjusted retry limits
+    - Progressive hint system
+    - XP penalty calculation per attempt
+    """
+    
+    # Base retry limits by difficulty
+    BASE_RETRY_LIMITS = {
+        'easy': 1,      # 1 retry (2 total attempts)
+        'medium': 2,    # 2 retries (3 total attempts)
+        'hard': 3       # 3 retries (4 total attempts)
+    }
+    
+    # XP multipliers per attempt (diminishing returns)
+    XP_MULTIPLIERS_BY_ATTEMPT = {
+        1: 1.0,    # First attempt: 100% XP
+        2: 0.7,    # Second attempt: 70% XP
+        3: 0.5,    # Third attempt: 50% XP
+        4: 0.3,    # Fourth attempt: 30% XP
+        5: 0.1     # Fifth+ attempt: 10% XP
+    }
+    
+    # Retry messages by attempt
+    RETRY_MESSAGES = {
+        1: "Almost there! Give it another shot! 💪",
+        2: "You're learning! One more try! 🎯",
+        3: "Don't give up! Here's a bigger hint: 💡",
+        4: "That's okay! Let's see the answer together 📚"
+    }
+    
+    @staticmethod
+    def get_max_retries(question, user) -> int:
+        """
+        Get maximum retry attempts for a question based on difficulty and user performance.
+        
+        Args:
+            question: Question instance
+            user: User instance
+            
+        Returns:
+            Maximum number of retries allowed
+        """
+        # Get base retry limit for difficulty
+        base_retries = RetryPolicy.BASE_RETRY_LIMITS.get(
+            question.difficulty, 
+            2  # Default to medium
+        )
+        
+        # Get user's overall accuracy
+        try:
+            stats = LevelTransitionPolicy.get_user_statistics(user)
+            overall_accuracy = stats.get('overall_accuracy', 100)
+            
+            # BONUS: Struggling users get +1 retry for support
+            if overall_accuracy < 50:  # Less than 50% accuracy
+                return base_retries + 1
+                
+        except Exception:
+            pass
+        
+        return base_retries
+    
+    @staticmethod
+    def get_xp_multiplier(attempt_number: int) -> float:
+        """
+        Get XP multiplier based on attempt number.
+        
+        Args:
+            attempt_number: Current attempt number (1-based)
+            
+        Returns:
+            XP multiplier (0.0 to 1.0)
+        """
+        return RetryPolicy.XP_MULTIPLIERS_BY_ATTEMPT.get(
+            attempt_number,
+            0.1  # Min 10% for attempts > 5
+        )
+    
+    @staticmethod
+    def get_retry_message(attempt_number: int, max_retries: int) -> str:
+        """
+        Get encouraging message based on attempt number.
+        
+        Args:
+            attempt_number: Current attempt number (1-based)
+            max_retries: Maximum retries allowed
+            
+        Returns:
+            Encouraging message string
+        """
+        if attempt_number <= max_retries:
+            return RetryPolicy.RETRY_MESSAGES.get(
+                attempt_number,
+                f"Try {attempt_number}/{max_retries + 1}: You can do this! 💪"
+            )
+        else:
+            return "Maximum attempts reached. Let's move on! 📚"
+    
+    @staticmethod
+    def get_progressive_hint(question, attempt_number: int, max_retries: int) -> dict:
+        """
+        Get progressive hint based on attempt number.
+        
+        Hint levels:
+        - Attempt 1: General hint
+        - Attempt 2: Specific hint
+        - Attempt 3+: Very specific hint
+        - Max attempts: Show answer
+        
+        Args:
+            question: Question instance
+            attempt_number: Current attempt number (1-based)
+            max_retries: Maximum retries allowed
+            
+        Returns:
+            Dict with hint info
+        """
+        difficulty = question.difficulty
+        
+        # Determine hint level based on attempt and max
+        if attempt_number >= max_retries + 1:
+            # Max attempts reached - show answer
+            hint_level = 'answer'
+            hint_text = RetryPolicy._get_answer_hint(question)
+        elif attempt_number == 1:
+            # First wrong - gentle hint
+            hint_level = 'gentle'
+            hint_text = RetryPolicy._get_gentle_hint(question)
+        elif attempt_number == 2:
+            # Second wrong - specific hint
+            hint_level = 'specific'
+            hint_text = RetryPolicy._get_specific_hint(question)
+        else:
+            # Third+ wrong - very specific hint
+            hint_level = 'detailed'
+            hint_text = RetryPolicy._get_detailed_hint(question)
+        
+        return {
+            'level': hint_level,
+            'text': hint_text,
+            'attempt': attempt_number,
+            'max_attempts': max_retries + 1,
+            'show_answer': hint_level == 'answer'
+        }
+    
+    @staticmethod
+    def _get_gentle_hint(question) -> str:
+        """Get gentle hint (first attempt)"""
+        if question.curriculum_tag:
+            return f"💡 Think about {question.curriculum_tag}. Read the question carefully."
+        return "💡 Read the question carefully and consider all options."
+    
+    @staticmethod
+    def _get_specific_hint(question) -> str:
+        """Get specific hint (second attempt)"""
+        if question.difficulty == 'easy':
+            return "🔍 Focus on the most straightforward answer. What's the basic concept here?"
+        elif question.difficulty == 'medium':
+            return "🔍 Think about the key principles involved. What rules apply?"
+        else:  # hard
+            return "🔍 Consider the relationship between concepts. What connects them?"
+    
+    @staticmethod
+    def _get_detailed_hint(question) -> str:
+        """Get detailed hint (third+ attempt)"""
+        if question.difficulty == 'easy':
+            return "🎯 Look for the option that matches the fundamental concept most directly."
+        elif question.difficulty == 'medium':
+            return "🎯 Eliminate options that contradict the main principle, then choose from what remains."
+        else:  # hard
+            return "🎯 Break down the question into parts. Solve each part, then combine your reasoning."
+    
+    @staticmethod
+    def _get_answer_hint(question) -> str:
+        """Get answer reveal hint (max attempts)"""
+        import json
+        
+        if question.format == 'mcq_simple':
+            answer = question.answer_key
+            return f"📚 The correct answer is: <strong>{answer}</strong><br><br>{question.explanation or 'Consider reviewing this topic.'}"
+        
+        elif question.format == 'mcq_complex':
+            # Parse answer_key
+            answer_key = question.answer_key
+            if isinstance(answer_key, list):
+                correct_answers = answer_key
+            elif isinstance(answer_key, str):
+                answer_key_str = answer_key.strip()
+                if answer_key_str.startswith('['):
+                    try:
+                        correct_answers = json.loads(answer_key_str)
+                    except:
+                        correct_answers = [ans.strip() for ans in answer_key_str[1:-1].split(',')]
+                else:
+                    correct_answers = [ans.strip() for ans in answer_key_str.split(',')]
+            else:
+                correct_answers = ['Unknown']
+            
+            answers_str = ', '.join(correct_answers)
+            return f"📚 The correct answers are: <strong>{answers_str}</strong><br><br>{question.explanation or 'Consider reviewing this topic.'}"
+        
+        else:  # short_answer
+            answer = question.answer_key
+            return f"📚 The correct answer is: <strong>{answer}</strong><br><br>{question.explanation or 'Consider reviewing this topic.'}"
+    
+    @staticmethod
+    def should_auto_advance(wrong_attempts: int, max_retries: int) -> bool:
+        """
+        Check if question should auto-advance to next.
+        
+        Args:
+            wrong_attempts: Number of wrong attempts so far
+            max_retries: Maximum retries allowed
+            
+        Returns:
+            Boolean indicating if should auto-advance
+        """
+        return wrong_attempts > max_retries
+    
+    @staticmethod
+    def calculate_attempt_xp(base_xp: int, attempt_number: int, is_correct: bool) -> int:
+        """
+        Calculate XP for an attempt with retry penalty.
+        
+        Args:
+            base_xp: Base XP for the question
+            attempt_number: Current attempt number (1-based)
+            is_correct: Whether answer was correct
+            
+        Returns:
+            Final XP amount
+        """
+        if not is_correct:
+            # Wrong answer - small penalty
+            return -2 if attempt_number == 1 else -1
+        
+        # Correct answer - apply multiplier
+        multiplier = RetryPolicy.get_xp_multiplier(attempt_number)
+        final_xp = int(base_xp * multiplier)
+        
+        return final_xp

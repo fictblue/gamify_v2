@@ -1,1279 +1,1050 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Student Dashboard - GamifyLearn{% endblock %}
 
 {% block content %}
-<div class="dashboard-container">
-    <!-- Hero Section with Level Info -->
-    <section class="hero-section">
-        <div class="container-fluid">
-            <div class="hero-content">
-                <div class="level-hero-card">
-                    <div class="level-display">
-                        <div class="level-badge">
-                            <i class="fas fa-crown"></i>
-                            <span class="level-number">{{ level|upper }}</span>
-                        </div>
-                        <div class="level-info">
-                            <p class="label">Current Level</p>
-                            <h2>{{ level|title }}</h2>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Quick Stats Row -->
-                <div class="hero-stats">
-                    <div class="stat-item">
-                        <span class="stat-value">{{ total_xp }}</span>
-                        <span class="stat-label">Total XP</span>
-                    </div>
-                    <div class="stat-divider"></div>
-                    <div class="stat-item">
-                        <span class="stat-value">{{ profile.streak_correct }}</span>
-                        <span class="stat-label">Streak</span>
-                    </div>
-                    <div class="stat-divider"></div>
-                    <div class="stat-item">
-                        <span class="stat-value">{{ success_rate }}%</span>
-                        <span class="stat-label">Accuracy</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Main Content -->
-    <section class="main-content">
-        <div class="container-fluid">
-            <!-- Progress Section -->
-            <div class="card-section progress-section">
-                <div class="card-title-bar">
-                    <h3><i class="fas fa-chart-line"></i> Level Progress</h3>
-                </div>
-                <div class="card-inner">
-                    <div class="progress-wrapper">
-                        <div class="progress-info">
-                            <div class="progress-text">
-                                <span class="current-xp">{{ xp }}</span>
-                                <span class="slash">/</span>
-                                <span class="next-xp">{{ xp_for_next_level }}</span>
-                                <span class="xp-label">XP</span>
-                            </div>
-                            <p class="progress-description">
-                                Progress to 
-                                {% if level == 'beginner' %}<span class="target-level">Intermediate</span>
-                                {% elif level == 'intermediate' %}<span class="target-level">Advanced</span>
-                                {% elif level == 'advanced' %}<span class="target-level">Expert</span>
-                                {% else %}<span class="target-level">Max Level</span>
-                                {% endif %}
-                            </p>
-                        </div>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar-bg">
-                                <div class="progress-bar-fill" style="width: {{ xp_progress_percentage|floatformat:0 }}%"></div>
-                            </div>
-                            <span class="progress-percentage">{{ xp_progress_percentage|floatformat:0 }}%</span>
-                        </div>
-                    </div>
-
-                    <div class="action-button-group">
-                        {% if can_level_up %}
-                            <button type="button" class="btn btn-level-up" id="levelUpBtn">
-                                <i class="fas fa-rocket"></i> Level Up Now
-                            </button>
-                        {% else %}
-                            <p class="progress-hint">Keep answering questions to level up!</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-card-icon blue">
-                        <i class="fas fa-question-circle"></i>
-                    </div>
-                    <div class="stat-card-content">
-                        <p class="stat-card-label">Quiz Attempts</p>
-                        <p class="stat-card-value">{{ total_attempts }}</p>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-card-icon green">
-                        <i class="fas fa-fire"></i>
-                    </div>
-                    <div class="stat-card-content">
-                        <p class="stat-card-label">Current Streak</p>
-                        <p class="stat-card-value">{{ profile.streak_correct }}</p>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-card-icon cyan">
-                        <i class="fas fa-database"></i>
-                    </div>
-                    <div class="stat-card-content">
-                        <p class="stat-card-label">Questions Available</p>
-                        <p class="stat-card-value">{{ total_available_questions }}</p>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-card-icon pink">
-                        <i class="fas fa-chart-bar"></i>
-                    </div>
-                    <div class="stat-card-content">
-                        <p class="stat-card-label">Success Rate</p>
-                        <p class="stat-card-value">{{ success_rate }}%</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Content Grid -->
-            <div class="content-grid">
-                <!-- Recent Activity -->
-                <div class="card-section">
-                    <div class="card-title-bar">
-                        <h3><i class="fas fa-history"></i> Recent Activity</h3>
-                    </div>
-                    <div class="card-inner">
-                        {% if recent_attempts %}
-                            <div class="activity-list">
-                                {% for attempt in recent_attempts %}
-                                    <div class="activity-item">
-                                        <div class="activity-content">
-                                            <p class="activity-question">{{ attempt.question.text|truncatechars:50 }}</p>
-                                            <div class="activity-meta">
-                                                <span class="difficulty-badge difficulty-{{ attempt.get_difficulty_attempted_display|lower }}">
-                                                    {{ attempt.get_difficulty_attempted_display }}
-                                                </span>
-                                                <span class="time-spent">{{ attempt.time_spent }}s</span>
-                                            </div>
-                                        </div>
-                                        <div class="activity-result {% if attempt.is_correct %}correct{% else %}incorrect{% endif %}">
-                                            <i class="fas fa-{% if attempt.is_correct %}check{% else %}times{% endif %}"></i>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="empty-state">
-                                <i class="fas fa-inbox"></i>
-                                <p>No quiz attempts yet</p>
-                                <span>Start answering questions to see your activity here</span>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Achievements -->
-                <div class="card-section">
-                    <div class="card-title-bar">
-                        <h3><i class="fas fa-trophy"></i> Achievements</h3>
-                    </div>
-                    <div class="card-inner">
-                        <div class="achievements-grid">
-                            <div class="achievement-item">
-                                <div class="achievement-icon first-step">
-                                    <i class="fas fa-star"></i>
-                                </div>
-                                <p class="achievement-name">First Steps</p>
-                                <p class="achievement-desc">Complete 1 quiz</p>
-                            </div>
-                            <div class="achievement-item">
-                                <div class="achievement-icon on-fire">
-                                    <i class="fas fa-fire"></i>
-                                </div>
-                                <p class="achievement-name">On Fire</p>
-                                <p class="achievement-desc">5 correct streak</p>
-                            </div>
-                            <div class="achievement-item">
-                                <div class="achievement-icon sharpshooter">
-                                    <i class="fas fa-bullseye"></i>
-                                </div>
-                                <p class="achievement-name">Sharpshooter</p>
-                                <p class="achievement-desc">90% accuracy</p>
-                            </div>
-                            <div class="achievement-item">
-                                <div class="achievement-icon expert">
-                                    <i class="fas fa-crown"></i>
-                                </div>
-                                <p class="achievement-name">Expert</p>
-                                <p class="achievement-desc">Reach Expert level</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Difficulty Breakdown & Notifications -->
-            <div class="content-grid">
-                <!-- Difficulty Mix -->
-                <div class="card-section">
-                    <div class="card-title-bar">
-                        <h3><i class="fas fa-layer-group"></i> Question Difficulty</h3>
-                    </div>
-                    <div class="card-inner">
-                        <div class="difficulty-breakdown">
-                            <div class="difficulty-item">
-                                <span class="difficulty-label">Easy</span>
-                                <span class="difficulty-count">{{ questions_by_difficulty.easy|default:0 }}</span>
-                                <div class="difficulty-bar">
-                                    <div class="difficulty-bar-fill easy"></div>
-                                </div>
-                            </div>
-                            <div class="difficulty-item">
-                                <span class="difficulty-label">Medium</span>
-                                <span class="difficulty-count">{{ questions_by_difficulty.medium|default:0 }}</span>
-                                <div class="difficulty-bar">
-                                    <div class="difficulty-bar-fill medium"></div>
-                                </div>
-                            </div>
-                            <div class="difficulty-item">
-                                <span class="difficulty-label">Hard</span>
-                                <span class="difficulty-count">{{ questions_by_difficulty.hard|default:0 }}</span>
-                                <div class="difficulty-bar">
-                                    <div class="difficulty-bar-fill hard"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Notifications -->
-                <div class="card-section">
-                    <div class="card-title-bar">
-                        <h3><i class="fas fa-bell"></i> Updates</h3>
-                    </div>
-                    <div class="card-inner">
-                        <div class="notifications-list">
-                            <div class="notification info">
-                                <div class="notification-icon">
-                                    <i class="fas fa-info-circle"></i>
-                                </div>
-                                <div class="notification-content">
-                                    <p class="notification-title">Welcome to GamifyLearn</p>
-                                    <p class="notification-text">Complete quizzes to earn XP</p>
-                                </div>
-                            </div>
-                            {% if can_level_up %}
-                                <div class="notification success">
-                                    <div class="notification-icon">
-                                        <i class="fas fa-star"></i>
-                                    </div>
-                                    <div class="notification-content">
-                                        <p class="notification-title">Ready to Level Up!</p>
-                                        <p class="notification-text">You have enough XP to advance</p>
-                                    </div>
-                                </div>
-                            {% endif %}
-                            {% if success_rate > 80 %}
-                                <div class="notification achievement">
-                                    <div class="notification-icon">
-                                        <i class="fas fa-trophy"></i>
-                                    </div>
-                                    <div class="notification-content">
-                                        <p class="notification-title">Great Performance!</p>
-                                        <p class="notification-text">Maintaining excellent accuracy</p>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="card-section">
-                <div class="card-title-bar">
-                    <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
-                </div>
-                <div class="card-inner">
-                    <div class="action-grid">
-                        <a href="{% url 'quizzes:student_quiz_list' %}" class="action-button primary">
-                            <i class="fas fa-play"></i>
-                            <span>Take Quiz</span>
-                        </a>
-                        <a href="{% url 'accounts:profile' %}" class="action-button secondary">
-                            <i class="fas fa-user"></i>
-                            <span>View Profile</span>
-                        </a>
-                        <a href="{% url 'dashboards:student_dashboard' %}" class="action-button secondary">
-                            <i class="fas fa-chart-line"></i>
-                            <span>View Progress</span>
-                        </a>
-                        <button type="button" class="action-button secondary" id="checkLevelBtn">
-                            <i class="fas fa-sync-alt"></i>
-                            <span>Refresh</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-</div>
-{% endblock %}
-
-{% block extra_head %}
 <style>
-    /* ========== DESIGN SYSTEM ========== */
-    :root {
-        /* Primary Colors */
-        --neon-cyan: #00f0ff;
-        --neon-magenta: #ff00ff;
-        --neon-pink: #ff006e;
-        --neon-purple: #b537f2;
-        
-        /* Supporting Colors */
-        --accent-green: #00ff88;
-        --accent-blue: #0088ff;
-        --accent-orange: #ff8800;
-        
-        /* Neutral - Dark Theme */
-        --bg-primary: #0a0e27;
-        --bg-secondary: #12172d;
-        --bg-tertiary: #1a2147;
-        --bg-light: #232e52;
-        
-        /* Text Colors */
-        --text-primary: #ffffff;
-        --text-secondary: #d4d9e8;
-        --text-tertiary: #8b93b3;
-        
-        /* Status Colors */
-        --success: #00ff88;
-        --error: #ff3366;
-        --warning: #ffaa00;
-        --info: #0088ff;
-        
-        /* Spacing */
-        --spacing-xs: 0.5rem;
-        --spacing-sm: 1rem;
-        --spacing-md: 1.5rem;
-        --spacing-lg: 2rem;
-        --spacing-xl: 3rem;
+    /* ============================================
+       STUDENT DASHBOARD - MODERN BENTO GRID
+       Konsisten dengan Admin Dashboard design system
+       ============================================ */
+    
+    /* Override main content padding untuk dashboard */
+    .main-content {
+        padding: 24px;
+        max-width: 100%;
     }
-
-    * {
-        box-sizing: border-box;
+    
+    /* ============================================
+       HERO SECTION - Compact & Playful
+       ============================================ */
+    
+    .student-hero {
+        background: linear-gradient(135deg, 
+            rgba(88, 86, 214, 0.1) 0%, 
+            rgba(139, 69, 255, 0.05) 100%);
+        border: 2px solid var(--border-light);
+        border-radius: 24px;
+        padding: 32px;
+        margin-bottom: 32px;
+        position: relative;
+        overflow: hidden;
+        animation: fadeIn 0.4s ease;
     }
-
-    body {
-        
-        color: var(--text-primary);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    
+    .student-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(88, 86, 214, 0.1) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
     }
-
-    /* ========== LAYOUT ========== */
-    .dashboard-container {
-        min-height: 100vh;
-        
-    }
-
-    .container-fluid {
-        width: 100%;
-        padding-left: 2rem;
-        padding-right: 2rem;
-        margin-left: auto;
-        margin-right: auto;
-        max-width: 1400px;
-    }
-
-    /* ========== HERO SECTION ========== */
-    .hero-section {
-        
-        border-bottom: 2px solid rgba(0, 240, 255, 0.15);
-        padding: var(--spacing-lg) 0;
-        margin-bottom: var(--spacing-xl);
-    }
-
+    
     .hero-content {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: var(--spacing-lg);
+        gap: 32px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .hero-left {
+        flex: 1;
+    }
+    
+    .welcome-text {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 16px;
+        line-height: 1.2;
+    }
+    
+    .hero-title .level-badge-inline {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 12px;
+        font-size: 1.25rem;
+        color: white;
+        margin-left: 12px;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        margin-bottom: 24px;
+    }
+    
+    .hero-quick-stats {
+        display: flex;
+        gap: 24px;
         flex-wrap: wrap;
     }
-
-    .level-hero-card {
-        flex: 1;
-        min-width: 250px;
+    
+    .hero-stat {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
     }
-
-    .level-display {
+    
+    .hero-stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--primary);
+        line-height: 1;
+    }
+    
+    .hero-stat-label {
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .hero-right {
+        display: flex;
+        gap: 12px;
+    }
+    
+    .hero-action-btn {
+        padding: 14px 28px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.95rem;
         display: flex;
         align-items: center;
-        gap: var(--spacing-md);
+        gap: 8px;
+        transition: all var(--transition-fast);
+        border: none;
+        cursor: pointer;
     }
-
-    .level-badge {
-        width: 100px;
-        height: 100px;
-        background: linear-gradient(135deg, var(--neon-magenta), var(--neon-purple));
+    
+    .hero-action-btn.primary {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .hero-action-btn.primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .hero-action-btn.secondary {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        border: 2px solid var(--border-light);
+    }
+    
+    .hero-action-btn.secondary:hover {
+        border-color: var(--primary);
+        background: var(--bg-tertiary);
+    }
+    
+    /* ============================================
+       BENTO GRID SYSTEM
+       ============================================ */
+    
+    .bento-grid {
+        display: grid;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+    
+    /* Stats Grid - 4 columns */
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    /* Main Content Grid */
+    .main-bento {
+        grid-template-columns: repeat(12, 1fr);
+        grid-auto-rows: minmax(200px, auto);
+    }
+    
+    /* Bento Items */
+    .bento-item {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-light);
+        border-radius: 20px;
+        padding: 24px;
+        transition: all var(--transition-base);
+        box-shadow: var(--shadow-sm);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .bento-item:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary);
+    }
+    
+    .bento-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        opacity: 0;
+        transition: opacity var(--transition-base);
+    }
+    
+    .bento-item:hover::before {
+        opacity: 1;
+    }
+    
+    /* Grid Spans */
+    .span-3 { grid-column: span 3; }
+    .span-4 { grid-column: span 4; }
+    .span-6 { grid-column: span 6; }
+    .span-8 { grid-column: span 8; }
+    .span-12 { grid-column: span 12; }
+    .row-2 { grid-row: span 2; }
+    
+    /* ============================================
+       STAT CARDS - Playful & Colorful
+       ============================================ */
+    
+    .stat-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        height: 100%;
+    }
+    
+    .stat-icon {
+        width: 64px;
+        height: 64px;
         border-radius: 16px;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 0 30px rgba(255, 0, 255, 0.3);
-        border: 2px solid rgba(0, 240, 255, 0.2);
+        font-size: 2rem;
+        flex-shrink: 0;
+        position: relative;
     }
-
-    .level-badge i {
-        font-size: 2.5rem;
-        color: var(--neon-cyan);
-        margin-bottom: 0.5rem;
+    
+    .stat-icon::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 18px;
+        background: inherit;
+        opacity: 0.2;
+        z-index: -1;
     }
-
-    .level-number {
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: var(--text-primary);
-        letter-spacing: 2px;
+    
+    .stat-icon.blue {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
     }
-
-    .level-info p {
-        color: var(--text-tertiary);
+    
+    .stat-icon.green {
+        background: linear-gradient(135deg, #58cc02 0%, #00d084 100%);
+        color: white;
+    }
+    
+    .stat-icon.orange {
+        background: linear-gradient(135deg, #ff9500 0%, #ff6b6b 100%);
+        color: white;
+    }
+    
+    .stat-icon.purple {
+        background: linear-gradient(135deg, #ce9ffc 0%, #7367f0 100%);
+        color: white;
+    }
+    
+    .stat-content {
+        flex: 1;
+    }
+    
+    .stat-label {
         font-size: 0.875rem;
-        margin: 0;
-        text-transform: uppercase;
-        letter-spacing: 1px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 4px;
     }
-
-    .level-info h2 {
-        margin: 0.25rem 0 0 0;
-        font-size: 2.5rem;
-        background: linear-gradient(135deg, var(--neon-cyan), var(--accent-blue));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        font-weight: 800;
-    }
-
-    .hero-stats {
-        display: flex;
-        justify-content: center;
-        gap: var(--spacing-xl);
-        flex-wrap: wrap;
-    }
-
-    .stat-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: var(--spacing-xs);
-    }
-
+    
     .stat-value {
         font-size: 2rem;
-        font-weight: 700;
-        color: var(--neon-cyan);
-        text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+        font-weight: 800;
+        color: var(--text-primary);
+        line-height: 1;
     }
-
-    .stat-label {
-        font-size: 0.75rem;
-        color: var(--text-tertiary);
-        text-transform: uppercase;
-        letter-spacing: 1px;
+    
+    /* ============================================
+       PROGRESS CARD - Large & Prominent
+       ============================================ */
+    
+    .progress-card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
     }
-
-    .stat-divider {
-        width: 1px;
-        height: 60px;
-        background: rgba(0, 240, 255, 0.2);
+    
+    .progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 24px;
     }
-
-    /* ========== MAIN CONTENT ========== */
-    .main-content {
-        padding: 0 0 var(--spacing-xl) 0;
-    }
-
-    /* ========== CARD SECTIONS ========== */
-    .card-section {
-        background: var(--bg-secondary);
-        border: 1px solid rgba(0, 240, 255, 0.15);
-        border-radius: 16px;
-        overflow: hidden;
-        margin-bottom: var(--spacing-lg);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        transition: all 0.3s ease;
-    }
-
-    .card-section:hover {
-        border-color: rgba(0, 240, 255, 0.3);
-        box-shadow: 0 8px 30px rgba(0, 240, 255, 0.1);
-    }
-
-    .card-title-bar {
-        background: linear-gradient(135deg, rgba(0, 25, 50, 0.9), rgba(20, 50, 100, 0.9));
-        padding: var(--spacing-md) var(--spacing-lg);
-        border-bottom: 2px solid rgba(0, 240, 255, 0.15);
-    }
-
-    .card-title-bar h3 {
-        margin: 0;
+    
+    .progress-title {
         font-size: 1.25rem;
         font-weight: 700;
         color: var(--text-primary);
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        gap: 8px;
     }
-
-    .card-title-bar i {
-        color: var(--neon-cyan);
-        text-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+    
+    .progress-title i {
+        color: var(--primary);
     }
-
-    .card-inner {
-        padding: var(--spacing-lg);
-    }
-
-    /* ========== PROGRESS SECTION ========== */
-    .progress-section {
-        grid-column: 1 / -1;
-    }
-
-    .progress-wrapper {
-        display: flex;
-        gap: var(--spacing-lg);
-        align-items: flex-start;
-        margin-bottom: var(--spacing-lg);
-    }
-
-    .progress-info {
-        flex: 0 0 200px;
-    }
-
-    .progress-text {
-        display: flex;
-        align-items: baseline;
-        gap: 0.5rem;
-        margin-bottom: var(--spacing-sm);
-    }
-
-    .current-xp, .next-xp {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--neon-cyan);
-    }
-
-    .slash {
-        color: var(--text-tertiary);
-    }
-
-    .xp-label {
-        color: var(--text-tertiary);
+    
+    .progress-info-badge {
+        padding: 8px 16px;
+        background: var(--primary-bg);
+        color: var(--primary);
+        border-radius: 12px;
         font-size: 0.875rem;
-    }
-
-    .progress-description {
-        color: var(--text-tertiary);
-        font-size: 0.9rem;
-        margin: 0;
-    }
-
-    .target-level {
-        color: var(--neon-magenta);
         font-weight: 600;
     }
-
-    .progress-bar-container {
+    
+    .progress-visual {
         flex: 1;
         display: flex;
-        align-items: center;
-        gap: var(--spacing-sm);
+        flex-direction: column;
+        justify-content: center;
+        gap: 24px;
     }
-
-    .progress-bar-bg {
-        flex: 1;
-        height: 32px;
-        background: rgba(0, 0, 0, 0.4);
-        border: 1px solid rgba(0, 240, 255, 0.2);
-        border-radius: 8px;
-        overflow: hidden;
+    
+    .xp-display {
+        text-align: center;
+    }
+    
+    .xp-numbers {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    
+    .xp-current {
+        font-size: 3rem;
+        font-weight: 800;
+        color: var(--primary);
+        line-height: 1;
+    }
+    
+    .xp-separator {
+        font-size: 1.5rem;
+        color: var(--text-tertiary);
+    }
+    
+    .xp-target {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-secondary);
+        line-height: 1;
+    }
+    
+    .xp-label {
+        font-size: 0.875rem;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .progress-bar-wrapper {
         position: relative;
     }
-
+    
+    .progress-bar-bg {
+        height: 24px;
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 2px solid var(--border-light);
+    }
+    
     .progress-bar-fill {
         height: 100%;
-        background: linear-gradient(90deg, var(--neon-cyan), var(--accent-blue));
-        border-radius: 8px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        border-radius: 10px;
         transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+        position: relative;
+        overflow: hidden;
     }
-
+    
+    .progress-bar-fill::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.3) 50%, 
+            transparent 100%);
+        animation: shimmer 2s infinite;
+    }
+    
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+    
     .progress-percentage {
-        min-width: 60px;
-        text-align: right;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         font-weight: 700;
-        color: var(--neon-cyan);
-        font-size: 0.9rem;
-    }
-
-    .action-button-group {
-        grid-column: 1 / -1;
-        display: flex;
-        gap: var(--spacing-sm);
-        justify-content: flex-start;
-        flex-wrap: wrap;
-    }
-
-    .btn-level-up {
-        background: linear-gradient(135deg, var(--neon-magenta), var(--neon-purple));
-        border: 2px solid rgba(0, 240, 255, 0.3);
+        font-size: 0.875rem;
         color: var(--text-primary);
-        padding: 0.75rem 2rem;
-        border-radius: 10px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    }
+    
+    .progress-target {
+        text-align: center;
+        margin-top: 16px;
         font-size: 0.95rem;
-        box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+        color: var(--text-secondary);
     }
-
-    .btn-level-up:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0 40px rgba(255, 0, 255, 0.5);
-        border-color: rgba(0, 240, 255, 0.5);
+    
+    .progress-target .target-level {
+        color: var(--primary);
+        font-weight: 700;
     }
-
-    .progress-hint {
-        color: var(--text-tertiary);
-        font-size: 0.9rem;
-        margin: 0;
-        font-style: italic;
+    
+    .level-up-section {
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-light);
     }
-
-    /* ========== STATS GRID ========== */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: var(--spacing-lg);
-        margin-bottom: var(--spacing-xl);
-    }
-
-    .stat-card {
-        background: var(--bg-secondary);
-        border: 1px solid rgba(0, 240, 255, 0.15);
+    
+    .level-up-btn {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        border: none;
         border-radius: 12px;
-        padding: var(--spacing-md);
-        display: flex;
-        gap: var(--spacing-md);
-        align-items: center;
-        transition: all 0.3s ease;
-    }
-
-    .stat-card:hover {
-        border-color: rgba(0, 240, 255, 0.3);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0, 240, 255, 0.1);
-    }
-
-    .stat-card-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 10px;
+        font-weight: 700;
+        font-size: 1rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
+        gap: 8px;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .level-up-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .level-up-btn:active {
+        transform: translateY(0);
+    }
+    
+    .level-up-hint {
+        text-align: center;
+        color: var(--text-tertiary);
+        font-size: 0.875rem;
+        font-style: italic;
+    }
+    
+    /* ============================================
+       ACTIVITY FEED - Modern Timeline
+       ============================================ */
+    
+    .activity-feed {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 500px;
+        overflow-y: auto;
+        padding-right: 8px;
+    }
+    
+    .activity-feed::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .activity-feed::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+        border-radius: 3px;
+    }
+    
+    .activity-feed::-webkit-scrollbar-thumb {
+        background: var(--border-medium);
+        border-radius: 3px;
+    }
+    
+    .activity-item {
+        display: flex;
+        gap: 12px;
+        padding: 16px;
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        border: 1px solid var(--border-light);
+        transition: all var(--transition-fast);
+    }
+    
+    .activity-item:hover {
+        background: var(--bg-tertiary);
+        border-color: var(--primary);
+        transform: translateX(4px);
+    }
+    
+    .activity-result-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
         flex-shrink: 0;
     }
-
-    .stat-card-icon.blue {
-        background: rgba(0, 136, 255, 0.2);
-        color: var(--accent-blue);
+    
+    .activity-result-icon.correct {
+        background: rgba(88, 204, 2, 0.15);
+        color: var(--success);
     }
-
-    .stat-card-icon.green {
-        background: rgba(0, 255, 136, 0.2);
-        color: var(--accent-green);
+    
+    .activity-result-icon.incorrect {
+        background: rgba(255, 75, 75, 0.15);
+        color: var(--error);
     }
-
-    .stat-card-icon.cyan {
-        background: rgba(0, 240, 255, 0.2);
-        color: var(--neon-cyan);
-    }
-
-    .stat-card-icon.pink {
-        background: rgba(255, 0, 110, 0.2);
-        color: var(--neon-pink);
-    }
-
-    .stat-card-content {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .stat-card-label {
-        color: var(--text-tertiary);
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin: 0;
-    }
-
-    .stat-card-value {
-        color: var(--text-primary);
-        font-size: 1.75rem;
-        font-weight: 700;
-        margin: 0;
-    }
-
-    /* ========== CONTENT GRID ========== */
-    .content-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-        gap: var(--spacing-lg);
-        margin-bottom: var(--spacing-lg);
-    }
-
-    @media (max-width: 900px) {
-        .content-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    /* ========== ACTIVITY LIST ========== */
-    .activity-list {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-sm);
-    }
-
-    .activity-item {
-        background: rgba(0, 0, 0, 0.2);
-        border: 1px solid rgba(0, 240, 255, 0.1);
-        border-radius: 10px;
-        padding: var(--spacing-md);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        transition: all 0.3s ease;
-    }
-
-    .activity-item:hover {
-        border-color: rgba(0, 240, 255, 0.3);
-        background: rgba(0, 240, 255, 0.05);
-    }
-
+    
     .activity-content {
         flex: 1;
+        min-width: 0;
     }
-
+    
     .activity-question {
+        font-weight: 600;
         color: var(--text-primary);
-        margin: 0 0 0.5rem 0;
+        margin-bottom: 8px;
         font-size: 0.95rem;
         line-height: 1.4;
     }
-
+    
     .activity-meta {
         display: flex;
-        gap: var(--spacing-sm);
+        gap: 12px;
         align-items: center;
+        flex-wrap: wrap;
     }
-
+    
     .difficulty-badge {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 6px;
+        padding: 4px 12px;
+        border-radius: 8px;
         font-size: 0.75rem;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-
+    
     .difficulty-badge.difficulty-easy {
-        background: rgba(0, 255, 136, 0.15);
-        color: var(--accent-green);
-        border: 1px solid rgba(0, 255, 136, 0.3);
+        background: rgba(88, 204, 2, 0.15);
+        color: var(--success);
     }
-
+    
     .difficulty-badge.difficulty-medium {
-        background: rgba(255, 170, 0, 0.15);
+        background: rgba(255, 153, 0, 0.15);
         color: var(--warning);
-        border: 1px solid rgba(255, 170, 0, 0.3);
     }
-
+    
     .difficulty-badge.difficulty-hard {
-        background: rgba(255, 51, 102, 0.15);
+        background: rgba(255, 75, 75, 0.15);
         color: var(--error);
-        border: 1px solid rgba(255, 51, 102, 0.3);
     }
-
-    .time-spent {
+    
+    .activity-time {
+        font-size: 0.75rem;
         color: var(--text-tertiary);
-        font-size: 0.8rem;
-    }
-
-    .activity-result {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
         display: flex;
         align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        flex-shrink: 0;
+        gap: 4px;
     }
-
-    .activity-result.correct {
-        background: rgba(0, 255, 136, 0.2);
-        color: var(--success);
-        box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
-    }
-
-    .activity-result.incorrect {
-        background: rgba(255, 51, 102, 0.2);
-        color: var(--error);
-        box-shadow: 0 0 15px rgba(255, 51, 102, 0.2);
-    }
-
-    /* ========== EMPTY STATE ========== */
-    .empty-state {
-        text-align: center;
-        padding: var(--spacing-lg);
-        color: var(--text-tertiary);
-    }
-
-    .empty-state i {
-        font-size: 3rem;
-        color: rgba(0, 240, 255, 0.2);
-        margin-bottom: var(--spacing-md);
-    }
-
-    .empty-state p {
-        color: var(--text-primary);
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-
-    .empty-state span {
-        display: block;
-        font-size: 0.9rem;
-    }
-
-    /* ========== ACHIEVEMENTS GRID ========== */
+    
+    /* ============================================
+       ACHIEVEMENTS GRID - Gamified
+       ============================================ */
+    
     .achievements-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        gap: var(--spacing-md);
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
     }
-
-    .achievement-item {
-        background: rgba(0, 0, 0, 0.3);
-        border: 2px solid rgba(0, 240, 255, 0.1);
-        border-radius: 12px;
-        padding: var(--spacing-md);
+    
+    .achievement-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        background: var(--bg-secondary);
+        border: 2px solid var(--border-light);
+        border-radius: 16px;
+        transition: all var(--transition-fast);
         text-align: center;
-        transition: all 0.3s ease;
     }
-
-    .achievement-item:hover {
-        border-color: rgba(0, 240, 255, 0.3);
+    
+    .achievement-card:hover {
+        border-color: var(--primary);
         transform: translateY(-4px);
-        box-shadow: 0 8px 25px rgba(0, 240, 255, 0.15);
+        box-shadow: var(--shadow-md);
     }
-
+    
     .achievement-icon {
-        width: 50px;
-        height: 50px;
-        margin: 0 auto var(--spacing-sm);
-        border-radius: 10px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
+        font-size: 1.75rem;
+        margin-bottom: 12px;
+        position: relative;
     }
-
+    
+    .achievement-icon::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        background: inherit;
+        opacity: 0.2;
+        z-index: -1;
+    }
+    
     .achievement-icon.first-step {
-        background: rgba(0, 136, 255, 0.2);
-        color: var(--accent-blue);
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
     }
-
+    
     .achievement-icon.on-fire {
-        background: rgba(255, 170, 0, 0.2);
-        color: var(--warning);
+        background: linear-gradient(135deg, #ff9500, #ff6b6b);
+        color: white;
     }
-
+    
     .achievement-icon.sharpshooter {
-        background: rgba(0, 240, 255, 0.2);
-        color: var(--neon-cyan);
+        background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+        color: white;
     }
-
+    
     .achievement-icon.expert {
-        background: rgba(255, 0, 255, 0.2);
-        color: var(--neon-magenta);
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+        color: white;
     }
-
+    
     .achievement-name {
-        color: var(--text-primary);
         font-weight: 700;
-        font-size: 0.9rem;
-        margin-bottom: 0.25rem;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+        font-size: 0.95rem;
     }
-
+    
     .achievement-desc {
-        color: var(--text-tertiary);
         font-size: 0.8rem;
-        margin: 0;
+        color: var(--text-secondary);
     }
-
-    /* ========== DIFFICULTY BREAKDOWN ========== */
-    .difficulty-breakdown {
+    
+    /* ============================================
+       DIFFICULTY BREAKDOWN
+       ============================================ */
+    
+    .difficulty-list {
         display: flex;
         flex-direction: column;
-        gap: var(--spacing-md);
+        gap: 20px;
     }
-
+    
     .difficulty-item {
-        display: grid;
-        grid-template-columns: 60px 40px 1fr;
+        display: flex;
         align-items: center;
-        gap: var(--spacing-md);
+        gap: 16px;
     }
-
+    
+    .difficulty-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+    
+    .difficulty-icon.easy {
+        background: rgba(88, 204, 2, 0.15);
+        color: var(--success);
+    }
+    
+    .difficulty-icon.medium {
+        background: rgba(255, 153, 0, 0.15);
+        color: var(--warning);
+    }
+    
+    .difficulty-icon.hard {
+        background: rgba(255, 75, 75, 0.15);
+        color: var(--error);
+    }
+    
+    .difficulty-info {
+        flex: 1;
+    }
+    
+    .difficulty-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    
     .difficulty-label {
-        color: var(--text-secondary);
         font-weight: 600;
-        font-size: 0.9rem;
-    }
-
-    .difficulty-count {
         color: var(--text-primary);
+        font-size: 0.95rem;
+    }
+    
+    .difficulty-count {
         font-weight: 700;
+        color: var(--text-secondary);
         font-size: 1.1rem;
-        text-align: right;
     }
-
+    
     .difficulty-bar {
-        height: 24px;
-        background: rgba(0, 0, 0, 0.4);
-        border-radius: 6px;
+        height: 8px;
+        background: var(--bg-tertiary);
+        border-radius: 4px;
         overflow: hidden;
-        border: 1px solid rgba(0, 240, 255, 0.1);
     }
-
+    
     .difficulty-bar-fill {
         height: 100%;
-        border-radius: 6px;
+        border-radius: 4px;
         transition: width 0.6s ease;
     }
-
+    
     .difficulty-bar-fill.easy {
-        background: linear-gradient(90deg, var(--accent-green), #00ff88);
-        width: 65%;
+        background: linear-gradient(90deg, var(--success), #00d084);
+        width: 100%;
     }
-
+    
     .difficulty-bar-fill.medium {
-        background: linear-gradient(90deg, var(--warning), #ffaa00);
-        width: 45%;
+        background: linear-gradient(90deg, var(--warning), #ff6b6b);
+        width: 75%;
     }
-
+    
     .difficulty-bar-fill.hard {
-        background: linear-gradient(90deg, var(--error), #ff3366);
-        width: 35%;
+        background: linear-gradient(90deg, var(--error), #c0392b);
+        width: 50%;
     }
-
-    /* ========== NOTIFICATIONS ========== */
+    
+    /* ============================================
+       NOTIFICATIONS - Info Cards
+       ============================================ */
+    
     .notifications-list {
         display: flex;
         flex-direction: column;
-        gap: var(--spacing-md);
+        gap: 12px;
     }
-
+    
     .notification {
-        background: rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(0, 240, 255, 0.15);
-        border-left: 4px solid var(--neon-cyan);
-        border-radius: 10px;
-        padding: var(--spacing-md);
         display: flex;
-        gap: var(--spacing-md);
-        transition: all 0.3s ease;
+        gap: 12px;
+        padding: 16px;
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        border-left: 4px solid var(--primary);
+        transition: all var(--transition-fast);
     }
-
+    
     .notification:hover {
-        border-color: rgba(0, 240, 255, 0.3);
-        background: rgba(0, 240, 255, 0.05);
+        background: var(--bg-tertiary);
+        transform: translateX(4px);
     }
-
+    
     .notification.success {
         border-left-color: var(--success);
     }
-
-    .notification.success:hover {
-        background: rgba(0, 255, 136, 0.05);
-    }
-
+    
     .notification.achievement {
-        border-left-color: var(--neon-magenta);
+        border-left-color: var(--secondary);
     }
-
-    .notification.achievement:hover {
-        background: rgba(255, 0, 255, 0.05);
-    }
-
+    
     .notification-icon {
         width: 40px;
         height: 40px;
-        border-radius: 8px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        font-size: 1.2rem;
+        font-size: 1.125rem;
     }
-
+    
     .notification.info .notification-icon {
-        background: rgba(0, 136, 255, 0.2);
-        color: var(--accent-blue);
+        background: var(--primary-bg);
+        color: var(--primary);
     }
-
+    
     .notification.success .notification-icon {
-        background: rgba(0, 255, 136, 0.2);
+        background: rgba(88, 204, 2, 0.15);
         color: var(--success);
     }
-
+    
     .notification.achievement .notification-icon {
-        background: rgba(255, 0, 255, 0.2);
-        color: var(--neon-magenta);
+        background: var(--secondary-bg);
+        color: var(--secondary);
     }
-
+    
     .notification-content {
         flex: 1;
     }
-
+    
     .notification-title {
-        color: var(--text-primary);
         font-weight: 700;
-        font-size: 0.95rem;
-        margin: 0 0 0.25rem 0;
-    }
-
-    .notification-text {
-        color: var(--text-tertiary);
-        font-size: 0.85rem;
-        margin: 0;
-    }
-
-    /* ========== ACTION GRID ========== */
-    .action-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: var(--spacing-md);
-    }
-
-    .action-button {
-        background: var(--bg-tertiary);
-        border: 2px solid rgba(0, 240, 255, 0.2);
-        border-radius: 10px;
-        padding: var(--spacing-md);
         color: var(--text-primary);
-        text-decoration: none;
+        margin-bottom: 4px;
+        font-size: 0.95rem;
+    }
+    
+    .notification-text {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+    
+    /* ============================================
+       QUICK ACTIONS GRID
+       ============================================ */
+    
+    .quick-actions-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .action-card {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.75rem;
-        font-weight: 700;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        font-size: 0.9rem;
+        justify-content: center;
+        gap: 12px;
+        padding: 24px 16px;
+        background: var(--bg-secondary);
+        border: 2px solid var(--border-light);
+        border-radius: 16px;
+        text-decoration: none;
+        color: var(--text-primary);
+        font-weight: 600;
+        transition: all var(--transition-fast);
         text-align: center;
     }
-
-    .action-button i {
-        font-size: 1.75rem;
-    }
-
-    .action-button.primary {
-        background: linear-gradient(135deg, var(--neon-cyan), var(--accent-blue));
-        border-color: rgba(0, 240, 255, 0.5);
-        color: var(--bg-primary);
-        box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
-    }
-
-    .action-button.primary:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 35px rgba(0, 240, 255, 0.4);
-        border-color: rgba(0, 240, 255, 0.7);
-    }
-
-    .action-button.secondary {
-        background: rgba(0, 240, 255, 0.05);
-        border-color: rgba(0, 240, 255, 0.2);
+    
+    .action-card:hover {
+        border-color: var(--primary);
+        background: var(--bg-tertiary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
         color: var(--text-primary);
     }
-
-    .action-button.secondary:hover {
-        background: rgba(0, 240, 255, 0.1);
-        border-color: rgba(0, 240, 255, 0.4);
-        transform: translateY(-2px);
+    
+    .action-card.primary {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-color: transparent;
+        color: white;
+        box-shadow: var(--shadow-md);
     }
-
-    .action-button:active {
-        transform: translateY(-1px);
+    
+    .action-card.primary:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        color: white;
     }
-
-    /* ========== RESPONSIVE DESIGN ========== */
+    
+    .action-card i {
+        font-size: 2rem;
+    }
+    
+    /* ============================================
+       SECTION HEADERS
+       ============================================ */
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+    
+    .section-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .section-title i {
+        color: var(--primary);
+    }
+    
+    /* ============================================
+       EMPTY STATE
+       ============================================ */
+    
+    .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+        color: var(--text-secondary);
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        color: var(--text-tertiary);
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+    
+    .empty-state-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+    }
+    
+    .empty-state-text {
+        font-size: 0.875rem;
+    }
+    
+    /* ============================================
+       RESPONSIVE DESIGN
+       ============================================ */
+    
     @media (max-width: 1200px) {
-        .container-fluid {
-            padding-left: 1.5rem;
-            padding-right: 1.5rem;
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
         }
-
+        
+        .span-3, .span-4, .span-6, .span-8 {
+            grid-column: span 12;
+        }
+        
         .hero-content {
             flex-direction: column;
             align-items: flex-start;
         }
-
-        .hero-stats {
-            width: 100%;
-        }
-
-        .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
     }
-
+    
     @media (max-width: 768px) {
-        .container-fluid {
-            padding-left: 1rem;
-            padding-right: 1rem;
+        .main-content {
+            padding: 16px;
         }
-
-        .hero-section {
-            padding: var(--spacing-md) 0;
-            margin-bottom: var(--spacing-lg);
+        
+        .student-hero {
+            padding: 24px;
         }
-
-        .level-badge {
-            width: 80px;
-            height: 80px;
+        
+        .hero-title {
+            font-size: 1.75rem;
         }
-
-        .level-badge i {
-            font-size: 2rem;
+        
+        .hero-title .level-badge-inline {
+            font-size: 1rem;
+            padding: 6px 12px;
         }
-
-        .level-info h2 {
-            font-size: 2rem;
-        }
-
-        .hero-stats {
-            gap: var(--spacing-lg);
-        }
-
-        .stat-divider {
-            display: none;
-        }
-
-        .progress-wrapper {
-            flex-direction: column;
-            gap: var(--spacing-md);
-        }
-
-        .progress-info {
-            flex: 1;
-            min-width: 100%;
-        }
-
-        .progress-bar-container {
-            width: 100%;
-        }
-
+        
         .stats-grid {
             grid-template-columns: 1fr;
         }
-
-        .stat-card {
-            padding: var(--spacing-md);
+        
+        .hero-quick-stats {
+            width: 100%;
+            justify-content: space-around;
         }
-
-        .card-title-bar h3 {
-            font-size: 1.1rem;
+        
+        .hero-right {
+            width: 100%;
+            flex-direction: column;
         }
-
-        .card-inner {
-            padding: var(--spacing-md);
-        }
-
-        .content-grid {
+        
+        .achievements-grid {
             grid-template-columns: 1fr;
         }
-
-        .achievements-grid {
-            grid-template-columns: repeat(2, 1fr);
+        
+        .quick-actions-grid {
+            grid-template-columns: 1fr;
         }
-
-        .activity-item {
-            flex-direction: column;
-            align-items: flex-start;
+        
+        .xp-current {
+            font-size: 2rem;
         }
-
-        .activity-result {
-            align-self: flex-end;
-            margin-top: var(--spacing-sm);
-        }
-
-        .action-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @media (max-width: 480px) {
-        :root {
-            --spacing-lg: 1.5rem;
-            --spacing-md: 1rem;
-        }
-
-        .hero-section {
-            padding: var(--spacing-sm) 0;
-            margin-bottom: var(--spacing-md);
-        }
-
-        .level-badge {
-            width: 70px;
-            height: 70px;
-        }
-
-        .level-info h2 {
+        
+        .xp-target {
             font-size: 1.5rem;
         }
-
+    }
+    
+    @media (max-width: 480px) {
+        .student-hero {
+            padding: 20px;
+        }
+        
+        .hero-title {
+            font-size: 1.5rem;
+        }
+        
         .stat-value {
             font-size: 1.5rem;
         }
-
-        .card-title-bar h3 {
-            font-size: 1rem;
-        }
-
-        .achievements-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .action-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .difficulty-item {
-            grid-template-columns: 50px 35px 1fr;
-            gap: var(--spacing-sm);
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            font-size: 1.5rem;
         }
     }
-
-    /* ========== ANIMATIONS ========== */
-    @keyframes slideInUp {
+    
+    /* ============================================
+       ANIMATIONS
+       ============================================ */
+    
+    @keyframes fadeIn {
         from {
             opacity: 0;
             transform: translateY(20px);
@@ -1283,29 +1054,20 @@
             transform: translateY(0);
         }
     }
-
-    .card-section {
-        animation: slideInUp 0.6s ease-out;
+    
+    .bento-item {
+        animation: fadeIn 0.6s ease-out;
     }
-
-    .stat-card {
-        animation: slideInUp 0.6s ease-out;
-    }
-
+    
     @keyframes pulse {
-        0%, 100% {
-            opacity: 1;
-        }
-        50% {
-            opacity: 0.5;
-        }
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.8; }
     }
-
-    .progress-bar-fill {
-        animation: pulse 3s ease-in-out infinite;
-    }
-
-    /* ========== ACCESSIBILITY ========== */
+    
+    /* ============================================
+       ACCESSIBILITY
+       ============================================ */
+    
     @media (prefers-reduced-motion: reduce) {
         * {
             animation-duration: 0.01ms !important;
@@ -1313,23 +1075,386 @@
             transition-duration: 0.01ms !important;
         }
     }
-
-    /* High contrast mode support */
-    @media (prefers-contrast: more) {
-        :root {
-            --text-secondary: #e8edf5;
-            --neon-cyan: #00ffff;
-        }
-
-        .card-section {
-            border-width: 2px;
-        }
-
-        .stat-card {
-            border-width: 2px;
-        }
-    }
 </style>
+
+<!-- Hero Section -->
+<div class="student-hero">
+    <div class="hero-content">
+        <div class="hero-left">
+            <p class="welcome-text">Welcome back, Student!</p>
+            <h1 class="hero-title">
+                Your Learning Journey
+                <span class="level-badge-inline">
+                    <i class="fas fa-crown"></i>
+                    {{ level|upper }}
+                </span>
+            </h1>
+            <p class="hero-subtitle">Keep up the momentum and reach your goals!</p>
+            
+            <div class="hero-quick-stats">
+                <div class="hero-stat">
+                    <span class="hero-stat-value">{{ xp }}</span>
+                    <span class="hero-stat-label">Total XP</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="hero-stat-value">{{ profile.streak_correct }}</span>
+                    <span class="hero-stat-label">Streak</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="hero-stat-value">{{ success_rate }}%</span>
+                    <span class="hero-stat-label">Accuracy</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="hero-right">
+            <a href="{% url 'quizzes:student_quiz_list' %}" class="hero-action-btn primary">
+                <i class="fas fa-play"></i>
+                Take Quiz
+            </a>
+            <button type="button" class="hero-action-btn secondary" id="checkLevelBtn">
+                <i class="fas fa-sync-alt"></i>
+                Refresh
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Grid -->
+<div class="bento-grid stats-grid">
+    <!-- Quiz Attempts -->
+    <div class="bento-item">
+        <div class="stat-card">
+            <div class="stat-icon blue">
+                <i class="fas fa-question-circle"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-label">Quiz Attempts</div>
+                <div class="stat-value">{{ total_attempts }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Current Streak -->
+    <div class="bento-item">
+        <div class="stat-card">
+            <div class="stat-icon orange">
+                <i class="fas fa-fire"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-label">Current Streak</div>
+                <div class="stat-value">{{ profile.streak_correct }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Questions Available -->
+    <div class="bento-item">
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <i class="fas fa-database"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-label">Available Questions</div>
+                <div class="stat-value">{{ total_available_questions }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success Rate -->
+    <div class="bento-item">
+        <div class="stat-card">
+            <div class="stat-icon purple">
+                <i class="fas fa-chart-bar"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-label">Success Rate</div>
+                <div class="stat-value">{{ success_rate }}%</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Bento Grid -->
+<div class="bento-grid main-bento">
+    <!-- Level Progress (Large - 8 columns, 2 rows) -->
+    <div class="bento-item span-8 row-2">
+        <div class="progress-card">
+            <div class="progress-header">
+                <h3 class="progress-title">
+                    <i class="fas fa-chart-line"></i>
+                    Level Progress
+                </h3>
+                <span class="progress-info-badge">{{ level|title }}</span>
+            </div>
+            
+            <div class="progress-visual">
+                <div class="xp-display">
+                    <div class="xp-numbers">
+                        <span class="xp-current">{{ xp }}</span>
+                        <span class="xp-separator">/</span>
+                        <span class="xp-target">{{ xp_for_next_level }}</span>
+                    </div>
+                    <div class="xp-label">Experience Points</div>
+                </div>
+                
+                <div class="progress-bar-wrapper">
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: {{ xp_progress_percentage|floatformat:0 }}%"></div>
+                    </div>
+                    <span class="progress-percentage">{{ xp_progress_percentage|floatformat:0 }}%</span>
+                </div>
+                
+                <p class="progress-target">
+                    Progress to 
+                    {% if level == 'beginner' %}
+                        <span class="target-level">Intermediate Level</span>
+                    {% elif level == 'intermediate' %}
+                        <span class="target-level">Advanced Level</span>
+                    {% elif level == 'advanced' %}
+                        <span class="target-level">Expert Level</span>
+                    {% else %}
+                        <span class="target-level">Max Level Reached!</span>
+                    {% endif %}
+                </p>
+            </div>
+            
+            <div class="level-up-section">
+                {% if can_level_up %}
+                    <button type="button" class="level-up-btn" id="levelUpBtn">
+                        <i class="fas fa-rocket"></i>
+                        Level Up Now!
+                    </button>
+                {% else %}
+                    <p class="level-up-hint">
+                        <i class="fas fa-lightbulb"></i>
+                        Keep answering questions to level up!
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activity (Medium - 4 columns, 2 rows) -->
+    <div class="bento-item span-4 row-2">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-history"></i>
+                Recent Activity
+            </h3>
+        </div>
+        
+        <div class="activity-feed">
+            {% if recent_attempts %}
+                {% for attempt in recent_attempts %}
+                <div class="activity-item">
+                    <div class="activity-result-icon {% if attempt.is_correct %}correct{% else %}incorrect{% endif %}">
+                        <i class="fas fa-{% if attempt.is_correct %}check{% else %}times{% endif %}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-question">{{ attempt.question.text|truncatechars:50 }}</div>
+                        <div class="activity-meta">
+                            <span class="difficulty-badge difficulty-{{ attempt.get_difficulty_attempted_display|lower }}">
+                                {{ attempt.get_difficulty_attempted_display }}
+                            </span>
+                            <span class="activity-time">
+                                <i class="far fa-clock"></i>
+                                {{ attempt.time_spent }}s
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <div class="empty-state-title">No Activity Yet</div>
+                    <div class="empty-state-text">Start answering questions to see your activity here</div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Achievements (Medium - 6 columns) -->
+    <div class="bento-item span-6">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-trophy"></i>
+                Achievements
+            </h3>
+        </div>
+        
+        <div class="achievements-grid">
+            <div class="achievement-card">
+                <div class="achievement-icon first-step">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="achievement-name">First Steps</div>
+                <div class="achievement-desc">Complete 1 quiz</div>
+            </div>
+            
+            <div class="achievement-card">
+                <div class="achievement-icon on-fire">
+                    <i class="fas fa-fire"></i>
+                </div>
+                <div class="achievement-name">On Fire</div>
+                <div class="achievement-desc">5 correct streak</div>
+            </div>
+            
+            <div class="achievement-card">
+                <div class="achievement-icon sharpshooter">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <div class="achievement-name">Sharpshooter</div>
+                <div class="achievement-desc">90% accuracy</div>
+            </div>
+            
+            <div class="achievement-card">
+                <div class="achievement-icon expert">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="achievement-name">Expert</div>
+                <div class="achievement-desc">Reach Expert level</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Question Difficulty (Medium - 6 columns) -->
+    <div class="bento-item span-6">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-layer-group"></i>
+                Question Difficulty
+            </h3>
+        </div>
+        
+        <div class="difficulty-list">
+            <div class="difficulty-item">
+                <div class="difficulty-icon easy">
+                    <i class="fas fa-smile"></i>
+                </div>
+                <div class="difficulty-info">
+                    <div class="difficulty-header">
+                        <span class="difficulty-label">Easy</span>
+                        <span class="difficulty-count">{{ questions_by_difficulty.easy|default:0 }}</span>
+                    </div>
+                    <div class="difficulty-bar">
+                        <div class="difficulty-bar-fill easy"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="difficulty-item">
+                <div class="difficulty-icon medium">
+                    <i class="fas fa-meh"></i>
+                </div>
+                <div class="difficulty-info">
+                    <div class="difficulty-header">
+                        <span class="difficulty-label">Medium</span>
+                        <span class="difficulty-count">{{ questions_by_difficulty.medium|default:0 }}</span>
+                    </div>
+                    <div class="difficulty-bar">
+                        <div class="difficulty-bar-fill medium"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="difficulty-item">
+                <div class="difficulty-icon hard">
+                    <i class="fas fa-frown"></i>
+                </div>
+                <div class="difficulty-info">
+                    <div class="difficulty-header">
+                        <span class="difficulty-label">Hard</span>
+                        <span class="difficulty-count">{{ questions_by_difficulty.hard|default:0 }}</span>
+                    </div>
+                    <div class="difficulty-bar">
+                        <div class="difficulty-bar-fill hard"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Updates & Notifications (Large - 8 columns) -->
+    <div class="bento-item span-8">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-bell"></i>
+                Updates & Notifications
+            </h3>
+        </div>
+        
+        <div class="notifications-list">
+            <div class="notification info">
+                <div class="notification-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">Welcome to GamifyLearn</div>
+                    <div class="notification-text">Complete quizzes to earn XP and unlock new levels</div>
+                </div>
+            </div>
+            
+            {% if can_level_up %}
+            <div class="notification success">
+                <div class="notification-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">Ready to Level Up!</div>
+                    <div class="notification-text">You have enough XP to advance to the next level</div>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if success_rate > 80 %}
+            <div class="notification achievement">
+                <div class="notification-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">Great Performance!</div>
+                    <div class="notification-text">You're maintaining excellent accuracy - keep it up!</div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Quick Actions (Small - 4 columns) -->
+    <div class="bento-item span-4">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-bolt"></i>
+                Quick Actions
+            </h3>
+        </div>
+        
+        <div class="quick-actions-grid">
+            <a href="{% url 'quizzes:student_quiz_list' %}" class="action-card primary">
+                <i class="fas fa-play"></i>
+                <span>Take Quiz</span>
+            </a>
+            
+            <a href="{% url 'accounts:profile' %}" class="action-card">
+                <i class="fas fa-user"></i>
+                <span>View Profile</span>
+            </a>
+            
+            <a href="{% url 'dashboards:student_dashboard' %}" class="action-card">
+                <i class="fas fa-chart-line"></i>
+                <span>View Progress</span>
+            </a>
+            
+            <button type="button" class="action-card" id="refreshDashboard">
+                <i class="fas fa-sync-alt"></i>
+                <span>Refresh</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -1337,12 +1462,27 @@
     document.addEventListener('DOMContentLoaded', function() {
         const levelUpBtn = document.getElementById('levelUpBtn');
         const checkLevelBtn = document.getElementById('checkLevelBtn');
+        const refreshDashboard = document.getElementById('refreshDashboard');
 
+        // Initial level check
         checkLevelStatus();
 
+        // Event listeners
         if (checkLevelBtn) {
             checkLevelBtn.addEventListener('click', function() {
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
                 checkLevelStatus();
+                setTimeout(() => {
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+                }, 1000);
+            });
+        }
+
+        if (refreshDashboard) {
+            refreshDashboard.addEventListener('click', function() {
+                location.reload();
             });
         }
 
@@ -1376,7 +1516,7 @@
         }
 
         function levelUp() {
-            if (!confirm('Ready to level up? This will reset your XP but unlock harder questions!')) {
+            if (!confirm('🚀 Ready to level up?\n\nThis will reset your XP but unlock harder questions and new challenges!')) {
                 return;
             }
 
@@ -1390,7 +1530,7 @@
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+                    'X-CSRFToken': getCookie('csrftoken')
                 }
             })
             .then(response => response.json())
@@ -1402,7 +1542,7 @@
                     showNotification('Error: ' + data.error, 'error');
                     if (levelUpBtn) {
                         levelUpBtn.disabled = false;
-                        levelUpBtn.innerHTML = '<i class="fas fa-rocket"></i> Level Up Now';
+                        levelUpBtn.innerHTML = '<i class="fas fa-rocket"></i> Level Up Now!';
                     }
                 }
             })
@@ -1411,22 +1551,111 @@
                 showNotification('Network error occurred', 'error');
                 if (levelUpBtn) {
                     levelUpBtn.disabled = false;
-                    levelUpBtn.innerHTML = '<i class="fas fa-rocket"></i> Level Up Now';
+                    levelUpBtn.innerHTML = '<i class="fas fa-rocket"></i> Level Up Now!';
                 }
             });
         }
 
         function updateProgressDisplay(stats) {
             const progressBarFill = document.querySelector('.progress-bar-fill');
+            const progressPercentage = document.querySelector('.progress-percentage');
+            const xpCurrent = document.querySelector('.xp-current');
+            const xpTarget = document.querySelector('.xp-target');
+
             if (progressBarFill && stats.xp !== undefined && stats.xp_for_next_level !== undefined) {
                 const percentage = Math.min((stats.xp / stats.xp_for_next_level) * 100, 100);
                 progressBarFill.style.width = percentage + '%';
+                
+                if (progressPercentage) {
+                    progressPercentage.textContent = Math.round(percentage) + '%';
+                }
+            }
+
+            if (xpCurrent && stats.xp !== undefined) {
+                xpCurrent.textContent = stats.xp;
+            }
+
+            if (xpTarget && stats.xp_for_next_level !== undefined) {
+                xpTarget.textContent = stats.xp_for_next_level;
             }
         }
 
         function showNotification(message, type = 'info') {
-            console.log(`[${type.toUpperCase()}] ${message}`);
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 24px;
+                right: 24px;
+                padding: 16px 24px;
+                background: ${type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--error)' : 'var(--primary)'};
+                color: white;
+                border-radius: 12px;
+                box-shadow: var(--shadow-lg);
+                z-index: 10000;
+                animation: slideInRight 0.3s ease;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            `;
+            
+            const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
+            notification.innerHTML = `
+                <i class="fas fa-${icon}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
         }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
     });
 </script>
 {% endblock %}

@@ -441,6 +441,7 @@ class QLearningEngine:
                 q_value_before=q_value_before,
                 q_value_after=q_value_after,
                 next_state_hash=next_state_hash,
+                metadata={}  # Add empty metadata
             )
 
         return current_entry
