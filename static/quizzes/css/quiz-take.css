@@ -1,0 +1,892 @@
+/* ============================================
+   QUIZ TAKE - MODERN DESIGN
+   Konsisten dengan Dashboard Design System
+   ============================================ */
+
+/* ============================================
+   LAYOUT
+   ============================================ */
+
+.quiz-container {
+    min-height: calc(100vh - 120px);
+    padding: 24px 0;
+}
+
+/* ============================================
+   XP FEEDBACK TOAST
+   ============================================ */
+
+.xp-toast {
+    position: fixed;
+    top: 100px;
+    right: 30px;
+    background: var(--bg-primary);
+    border: 2px solid var(--border-light);
+    border-radius: 16px;
+    padding: 16px 20px;
+    min-width: 300px;
+    box-shadow: var(--shadow-lg);
+    transform: translateX(400px);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 9999;
+    backdrop-filter: blur(20px);
+}
+
+.xp-toast.show {
+    transform: translateX(0);
+}
+
+.xp-toast.success {
+    border-color: var(--success);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.9), 0 0 40px rgba(88, 204, 2, 0.3);
+}
+
+.xp-toast.warning {
+    border-color: var(--warning);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.9), 0 0 40px rgba(255, 153, 0, 0.3);
+}
+
+.xp-toast-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.xp-toast-icon {
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.xp-toast-message {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.xp-toast-subtext {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* ============================================
+   QUIZ CARD - BENTO STYLE
+   ============================================ */
+
+.quiz-card {
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
+    overflow: hidden;
+}
+
+.quiz-card-header {
+    padding: 24px;
+    background: var(--bg-secondary);
+    border-bottom: 2px solid var(--border-light);
+    flex-shrink: 0;
+}
+
+.quiz-card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.quiz-card-title i {
+    color: var(--primary);
+}
+
+.timer-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--bg-tertiary);
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    transition: all var(--transition-fast);
+}
+
+.timer-badge i {
+    color: var(--warning);
+}
+
+.timer-badge:hover {
+    border-color: var(--warning);
+    box-shadow: 0 0 20px rgba(255, 153, 0, 0.2);
+}
+
+/* ============================================
+   CARD BODY - SCROLLABLE
+   ============================================ */
+
+.quiz-card-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 24px;
+    scroll-behavior: smooth;
+}
+
+.quiz-card-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.quiz-card-body::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 4px;
+}
+
+.quiz-card-body::-webkit-scrollbar-thumb {
+    background: var(--border-medium);
+    border-radius: 4px;
+}
+
+.quiz-card-body::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+/* ============================================
+   QUESTION CONTENT
+   ============================================ */
+
+.question-content {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.question-text-wrapper {
+    margin-bottom: 24px;
+}
+
+.question-text {
+    font-size: 1.25rem;
+    line-height: 1.8;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    font-weight: 500;
+}
+
+.question-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* ============================================
+   BADGES
+   ============================================ */
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border: 2px solid;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all var(--transition-fast);
+}
+
+.badge-tag {
+    background: var(--primary-bg);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.badge-difficulty {
+    background: var(--bg-tertiary);
+}
+
+.badge-difficulty.difficulty-easy {
+    border-color: var(--success);
+    color: var(--success);
+}
+
+.badge-difficulty.difficulty-medium {
+    border-color: var(--warning);
+    color: var(--warning);
+}
+
+.badge-difficulty.difficulty-hard {
+    border-color: var(--error);
+    color: var(--error);
+}
+
+/* ============================================
+   OPTIONS SECTION
+   ============================================ */
+
+.options-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.options-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.options-title i {
+    color: var(--primary);
+}
+
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* ============================================
+   OPTION CARDS - RADIO (MCQ Simple)
+   ============================================ */
+
+.option-card {
+    position: relative;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    transition: all var(--transition-fast);
+    overflow: hidden;
+}
+
+.option-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--primary);
+    transform: scaleY(0);
+    transition: transform var(--transition-fast);
+}
+
+.option-card:hover {
+    border-color: var(--primary);
+    background: var(--bg-tertiary);
+    transform: translateX(4px);
+    box-shadow: var(--shadow-sm);
+}
+
+.option-card:hover::before {
+    transform: scaleY(1);
+}
+
+.option-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    cursor: pointer;
+    margin: 0;
+    position: relative;
+    width: 100%;
+}
+
+/* Radio Button Style (MCQ Simple) */
+.option-input[type="radio"] + .option-label {
+    justify-content: space-between;
+}
+
+.option-input[type="radio"] + .option-label .option-key {
+    font-weight: 700;
+    color: var(--primary);
+    margin-right: 12px;
+    font-size: 1.1rem;
+}
+
+.option-input[type="radio"] + .option-label .option-text {
+    flex: 1;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.option-checkmark {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--border-medium);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+    color: transparent;
+    flex-shrink: 0;
+}
+
+.option-input[type="radio"]:checked + .option-label .option-checkmark {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: 0 0 20px rgba(88, 86, 214, 0.4);
+}
+
+.option-input[type="radio"]:checked ~ .option-card,
+.option-input[type="radio"]:checked + .option-label {
+    border-color: var(--primary);
+    background: var(--primary-bg);
+}
+
+/* Checkbox Style (MCQ Complex) */
+.option-input[type="checkbox"] + .option-label {
+    gap: 12px;
+}
+
+.option-checkbox {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: 2px solid var(--border-medium);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+    color: transparent;
+    flex-shrink: 0;
+}
+
+.option-input[type="checkbox"]:checked + .option-label .option-checkbox {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: 0 0 20px rgba(88, 86, 214, 0.4);
+}
+
+.option-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.option-content .option-key {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 1.1rem;
+}
+
+.option-content .option-text {
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Selected State */
+.option-input:checked ~ .option-card {
+    border-color: var(--primary);
+    background: var(--primary-bg);
+}
+
+.option-card.selected {
+    border-color: var(--primary);
+    background: var(--primary-bg);
+}
+
+/* Correct/Incorrect States */
+.option-card.correct {
+    border-color: var(--success);
+    background: rgba(88, 204, 2, 0.1);
+    animation: correctPulse 0.6s ease;
+}
+
+.option-card.incorrect {
+    border-color: var(--error);
+    background: rgba(255, 75, 75, 0.1);
+    animation: shake 0.5s ease;
+}
+
+@keyframes correctPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+/* ============================================
+   SHORT ANSWER INPUT
+   ============================================ */
+
+.answer-input {
+    width: 100%;
+    padding: 16px 20px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all var(--transition-fast);
+}
+
+.answer-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: var(--bg-tertiary);
+    box-shadow: 0 0 20px rgba(88, 86, 214, 0.2);
+}
+
+.answer-input::placeholder {
+    color: var(--text-tertiary);
+}
+
+/* ============================================
+   HINT BOX
+   ============================================ */
+
+.hint-box {
+    display: none;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-light);
+    border-left: 4px solid var(--warning);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 24px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hint-box.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.hint-box-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.hint-box-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: var(--warning);
+    font-size: 1rem;
+}
+
+.hint-box-title i {
+    font-size: 1.25rem;
+}
+
+.hint-scroll-btn {
+    padding: 6px 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    color: var(--primary);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.hint-scroll-btn:hover {
+    background: var(--primary-bg);
+    border-color: var(--primary);
+}
+
+.hint-box-content {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* ============================================
+   CARD FOOTER
+   ============================================ */
+
+.quiz-card-footer {
+    padding: 20px 24px;
+    background: var(--bg-secondary);
+    border-top: 2px solid var(--border-light);
+    flex-shrink: 0;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all var(--transition-fast);
+    border: 2px solid;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-color: transparent;
+    color: white;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-secondary {
+    background: var(--bg-tertiary);
+    border-color: var(--border-light);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    border-color: var(--primary);
+    background: var(--primary-bg);
+    color: var(--primary);
+}
+
+.btn-block {
+    width: 100%;
+    justify-content: center;
+}
+
+/* ============================================
+   STAT CARDS
+   ============================================ */
+
+.stat-card {
+    margin-bottom: 24px;
+}
+
+.stat-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.stat-card-header i {
+    color: var(--primary);
+    font-size: 1.125rem;
+}
+
+.stat-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ============================================
+   STATS GRID
+   ============================================ */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.stat-item,
+.stat-item-full {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.stat-value.primary {
+    color: var(--primary);
+}
+
+.stat-value.success {
+    color: var(--success);
+}
+
+.stat-value.error {
+    color: var(--error);
+}
+
+.stat-value.accent {
+    color: var(--secondary);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-sublabel {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    margin-top: 4px;
+}
+
+.stat-divider {
+    height: 1px;
+    background: var(--border-light);
+}
+
+/* ============================================
+   LEVEL BADGES
+   ============================================ */
+
+.level-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.level-badge {
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 2px solid;
+    text-align: center;
+    transition: all var(--transition-fast);
+}
+
+.level-badge small {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.level-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.level-badge.user-level {
+    background: var(--primary-bg);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.level-badge.question-level {
+    background: var(--secondary-bg);
+    border-color: var(--secondary);
+    color: var(--secondary);
+}
+
+.level-up-alert {
+    padding: 12px;
+    background: rgba(88, 204, 2, 0.1);
+    border: 2px solid var(--success);
+    border-radius: 12px;
+    color: var(--success);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+
+/* ============================================
+   QUICK ACTIONS
+   ============================================ */
+
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* ============================================
+   LOADING SPINNER
+   ============================================ */
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(88, 86, 214, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--primary);
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 991.98px) {
+    .action-buttons {
+        justify-content: stretch;
+    }
+    
+    .btn {
+        flex: 1;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .quiz-container {
+        padding: 16px 0;
+    }
+    
+    .quiz-card-header,
+    .quiz-card-body,
+    .quiz-card-footer {
+        padding: 16px;
+    }
+    
+    .quiz-card-title {
+        font-size: 1.25rem;
+    }
+    
+    .question-text {
+        font-size: 1.1rem;
+    }
+    
+    .timer-badge {
+        padding: 8px 12px;
+        font-size: 0.875rem;
+    }
+    
+    .xp-toast {
+        right: 15px;
+        left: 15px;
+        min-width: auto;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .quiz-card-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 12px !important;
+    }
+    
+    .timer-badge {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .question-text {
+        font-size: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 1.75rem;
+    }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+.option-label:focus-within {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.btn:focus {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}

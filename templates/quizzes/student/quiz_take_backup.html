@@ -4,26 +4,712 @@
 {% block title %}Quiz Session - Question {{ question.id }} | GamifyLearn{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'quizzes/css/quiz-take.css' %}">
+<style>
+/* Quiz Neon-Matte Theme */
+.quiz-container {
+    min-height: calc(100vh - 120px);
+    padding: 2rem 0;
+    position: relative;
+}
+
+/* Animated Background Grid */
+.quiz-bg-grid {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 0;
+    animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+/* Question Card - Glassmorphism */
+.question-card-neon {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 24px;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.9),
+        0 0 40px rgba(0, 255, 255, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 80vh; /* Prevent card from being too tall */
+    display: flex;
+    flex-direction: column;
+}
+
+.question-card-neon .card-body {
+    flex: 1;
+    overflow-y: auto; /* Make question content scrollable */
+    overflow-x: hidden;
+    padding: 2rem;
+    max-height: calc(80vh - 120px); /* Account for header and buttons */
+    scroll-behavior: smooth;
+}
+
+.question-card-neon .card-footer {
+    background: rgba(0, 0, 0, 0.7);
+    border-top: 2px solid rgba(0, 255, 255, 0.3);
+    padding: 1.5rem 2rem;
+    flex-shrink: 0; /* Don't shrink footer */
+}
+
+/* Enhanced hint box positioning within scrollable card */
+.question-card-neon .hint-box-neon {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.question-card-neon.has-hint .question-content {
+    margin-bottom: 1rem;
+}
+
+.question-card-neon::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        circle at center,
+        rgba(0, 255, 255, 0.1) 0%,
+        transparent 50%
+    );
+    animation: pulseGlow 4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+.question-card-neon:hover {
+    border-color: rgba(0, 255, 255, 0.6);
+    box-shadow: 
+        0 12px 48px rgba(0, 0, 0, 0.95),
+        0 0 60px rgba(0, 255, 255, 0.3),
+        0 0 100px rgba(255, 0, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Card Header with Neon Glow */
+.card-header-neon {
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.15) 0%, rgba(255, 0, 255, 0.15) 100%);
+    border: none;
+    border-bottom: 2px solid rgba(0, 255, 255, 0.4);
+    padding: 1.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-header-neon::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.question-title {
+    color: #00ffff;
+    font-weight: 700;
+    font-size: 1.5rem;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+    margin: 0;
+}
+
+/* Timer with Neon Effect */
+.timer-neon {
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid rgba(255, 255, 0, 0.5);
+    border-radius: 12px;
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    color: #ffff00;
+    text-shadow: 0 0 15px rgba(255, 255, 0, 0.8);
+    box-shadow: 0 0 20px rgba(255, 255, 0, 0.3), inset 0 0 10px rgba(255, 255, 0, 0.1);
+    animation: timerPulse 2s ease-in-out infinite;
+}
+
+@keyframes timerPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(255, 255, 0, 0.3); }
+    50% { box-shadow: 0 0 30px rgba(255, 255, 0, 0.5); }
+}
+
+/* Question Text */
+.question-text-neon {
+    color: #ffffff;
+    font-size: 1.25rem;
+    line-height: 1.8;
+    margin-bottom: 2rem;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Badges with Neon Glow */
+.badge-neon {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border: 2px solid;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.badge-neon.difficulty-easy {
+    background: rgba(0, 255, 0, 0.1);
+    border-color: #00ff00;
+    color: #00ff00;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+}
+
+.badge-neon.difficulty-medium {
+    background: rgba(255, 255, 0, 0.1);
+    border-color: #ffff00;
+    color: #ffff00;
+    box-shadow: 0 0 15px rgba(255, 255, 0, 0.3);
+}
+
+.badge-neon.difficulty-hard {
+    background: rgba(255, 0, 0, 0.1);
+    border-color: #ff0000;
+    color: #ff0000;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+}
+
+.badge-neon.tag {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: #00ffff;
+    color: #00ffff;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+}
+
+/* Option Buttons - Futuristic Design */
+.option-neon {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.option-neon::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.option-neon:hover {
+    border-color: rgba(0, 255, 255, 0.8);
+    background: rgba(0, 255, 255, 0.1);
+    transform: translateX(8px);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+}
+
+.option-neon:hover::before {
+    left: 100%;
+}
+
+.option-neon.selected {
+    border-color: #00ffff;
+    background: rgba(0, 255, 255, 0.15);
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
+}
+
+.option-neon.selected .checkbox-neon {
+    border-color: #00ffff;
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+}
+
+.option-neon.correct {
+    border-color: #00ff00;
+    background: rgba(0, 255, 0, 0.15);
+    box-shadow: 0 0 40px rgba(0, 255, 0, 0.5);
+    animation: correctPulse 0.6s ease;
+}
+
+.option-neon.incorrect {
+    border-color: #ff0000;
+    background: rgba(255, 0, 0, 0.15);
+    box-shadow: 0 0 40px rgba(255, 0, 0, 0.5);
+    animation: shake 0.5s ease;
+}
+
+@keyframes correctPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.option-label {
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+.option-key {
+    color: #00ffff;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+/* Checkbox styling - Enhanced clickability */
+.checkbox-neon {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(255, 255, 0, 0.4);
+    border-radius: 8px;
+    padding: 0.5rem;
+    margin-right: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: inline-block;
+    min-width: 24px;
+    min-height: 24px;
+    position: relative;
+    user-select: none; /* Prevent text selection */
+}
+
+.checkbox-neon:hover {
+    border-color: rgba(255, 255, 0, 0.8);
+    background: rgba(255, 255, 0, 0.1);
+    box-shadow: 0 0 15px rgba(255, 255, 0, 0.3);
+    transform: scale(1.1);
+}
+
+.checkbox-neon.checked {
+    border-color: #00ffff;
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+    transform: scale(1.1);
+}
+
+.checkbox-neon.checked .checkmark {
+    background: rgba(0, 255, 255, 0.3);
+    border-color: #00ffff;
+    opacity: 1;
+}
+
+.checkbox-neon.checked .checkmark::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #00ffff;
+    font-weight: bold;
+    font-size: 12px;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.8);
+}
+
+/* Hint Box Animation - Enhanced Layout */
+.hint-box-neon {
+    background: rgba(255, 255, 0, 0.08);
+    border: 2px solid rgba(255, 255, 0, 0.5);
+    border-left: 6px solid #ffff00;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 0 30px rgba(255, 255, 0, 0.2);
+    min-height: 120px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: slideInUp 0.4s ease;
+    position: relative;
+    z-index: 10;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+.hint-box-neon.showing {
+    opacity: 1;
+    transform: translateY(0);
+    margin-bottom: 2rem; /* Extra space when hint is visible */
+}
+
+.question-card-neon.has-hint {
+    padding-bottom: 1rem; /* Extra padding when hint is present */
+    margin-bottom: 2rem; /* Extra margin for proper spacing */
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hint-icon {
+    color: #ffff00;
+    font-size: 1.5rem;
+    text-shadow: 0 0 15px rgba(255, 255, 0, 0.8);
+}
+
+/* Buttons - Neon Style */
+.btn-neon {
+    background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
+    border: 2px solid rgba(0, 255, 255, 0.6);
+    border-radius: 12px;
+    padding: 1rem 2.5rem;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #000000;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 255, 255, 0.4), 0 0 30px rgba(255, 0, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-neon::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-neon:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-neon:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 35px rgba(0, 255, 255, 0.6), 0 0 50px rgba(255, 0, 255, 0.4);
+}
+
+.btn-neon:active {
+    transform: translateY(-1px);
+}
+
+.btn-outline-neon {
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid rgba(0, 255, 255, 0.5);
+    color: #00ffff;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.btn-outline-neon:hover {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: #00ffff;
+    color: #00ffff;
+}
+
+/* Sidebar Stats - Futuristic Cards */
+.stats-card-neon {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(15px);
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 255, 255, 0.15);
+    transition: all 0.3s ease;
+}
+
+.stats-card-neon:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0, 255, 255, 0.6);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.95), 0 0 50px rgba(0, 255, 255, 0.3);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    text-shadow: 0 0 20px currentColor;
+}
+
+.stat-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Progress Circle */
+.progress-circle-neon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #000000;
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.5), 0 0 60px rgba(255, 0, 255, 0.3);
+    animation: rotatePulse 3s ease-in-out infinite;
+}
+
+@keyframes rotatePulse {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(5deg) scale(1.05); }
+}
+
+/* XP Feedback Toast */
+.xp-feedback-neon {
+    position: fixed;
+    top: 100px;
+    right: 30px;
+    background: rgba(0, 0, 0, 0.95);
+    border: 2px solid;
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    min-width: 300px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.9);
+    transform: translateX(400px);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 9999;
+    backdrop-filter: blur(20px);
+}
+
+.xp-feedback-neon.show {
+    transform: translateX(0);
+}
+
+.xp-feedback-neon.success {
+    border-color: #00ff00;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 255, 0, 0.3);
+}
+
+.xp-feedback-neon.warning {
+    border-color: #ffff00;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.9), 0 0 40px rgba(255, 255, 0, 0.3);
+}
+
+/* Loading Spinner */
+.loading-neon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #00ffff;
+    animation: spin 0.8s linear infinite;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+/* Responsive Design - Enhanced */
+@media (max-width: 768px) {
+    .question-card-neon {
+        border-radius: 16px;
+        margin: 0 0.5rem;
+    }
+
+    .card-header-neon {
+        padding: 1rem 1.5rem;
+    }
+
+    .question-title {
+        font-size: 1.25rem;
+    }
+
+    .option-neon {
+        padding: 1rem 1.25rem;
+    }
+
+    .stats-card-neon {
+        margin-bottom: 1rem;
+    }
+
+    .xp-feedback-neon {
+        right: 15px;
+        left: 15px;
+        min-width: auto;
+    }
+
+    /* Mobile checkbox improvements */
+    .checkbox-neon {
+        min-width: 32px;
+        min-height: 32px;
+        padding: 0.75rem;
+        margin-right: 0.75rem;
+    }
+
+    .checkbox-neon .checkmark {
+        width: 20px;
+        height: 20px;
+    }
+
+    .checkbox-neon.checked .checkmark::after {
+        font-size: 14px;
+    }
+
+    /* Mobile hint box improvements */
+    .hint-box-neon {
+        margin: 1rem 0;
+        padding: 1rem;
+        border-radius: 12px;
+    }
+
+    .question-card-neon.has-hint .card-body {
+        max-height: calc(70vh - 180px); /* Better mobile spacing */
+    }
+
+    .question-card-neon .card-footer {
+        padding: 1rem 1.5rem; /* Smaller padding on mobile */
+    }
+
+    .question-card-neon.has-hint .question-content {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Accessibility */
+.option-neon:focus-within {
+    outline: 3px solid #00ffff;
+    outline-offset: 4px;
+}
+
+.btn-neon:focus {
+    outline: 3px solid #00ffff;
+    outline-offset: 4px;
+}
+
+/* Additional style for level badges */
+.level-badge-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.level-badge {
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    border: 2px solid;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.level-badge.user-level {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: #00ffff;
+    color: #00ffff;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.level-badge.question-level {
+    background: rgba(255, 0, 255, 0.1);
+    border-color: #ff00ff;
+    color: #ff00ff;
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+}
+
+.level-badge small {
+    display: block;
+    font-size: 0.75rem;
+    opacity: 0.8;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.level-badge .value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+/* Session Info Badge */
+.session-info-badge {
+    background: rgba(0, 255, 0, 0.1);
+    border: 2px solid rgba(0, 255, 0, 0.5);
+    border-radius: 12px;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.session-info-badge .session-duration {
+    color: #00ff00;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.session-info-badge small {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.75rem;
+    display: block;
+    margin-top: 0.25rem;
+}
+</style>
 {% endblock %}
 
 {% block content %}
-<!-- XP Feedback Toast -->
-<div class="xp-toast" id="xpFeedback">
-    <div class="xp-toast-content">
-        <i class="fas fa-coins xp-toast-icon"></i>
-        <div class="xp-toast-text">
-            <div class="xp-toast-message" id="xpMessage">+10 XP!</div>
-            <small class="xp-toast-subtext" id="xpSubtext">Great job!</small>
-        </div>
-    </div>
-</div>
+<!-- Background Grid Animation -->
+<div class="quiz-bg-grid"></div>
 
 <div class="quiz-container">
-    <div class="container-fluid" style="max-width: 1400px;">
-        <div class="row g-4">
+    <div class="container">
+        <div class="row">
             <!-- Main Quiz Content -->
-            <div class="col-lg-8">
+            <div class="col-lg-8 mb-4">
+                <!-- XP Feedback Toast -->
+                <div class="xp-feedback-neon" id="xpFeedback">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="fas fa-coins" style="font-size: 1.5rem; color: #00ffff;"></i>
+                        <div>
+                            <div style="font-weight: 700; color: #00ffff;" id="xpMessage">+10 XP!</div>
+                            <small style="color: rgba(255,255,255,0.7);" id="xpSubtext">Great job!</small>
+                        </div>
+                    </div>
+                </div>
+
                 <form id="quizForm" method="post">
                     {% csrf_token %}
                     <input type="hidden" name="start_time" value="{{ start_time }}">
@@ -31,129 +717,122 @@
                     <input type="hidden" name="question_id" value="{{ question.id }}">
 
                     <!-- Question Card -->
-                    <div class="bento-item quiz-card" id="questionCard">
-                        <!-- Card Header -->
-                        <div class="quiz-card-header">
+                    <div class="question-card-neon">
+                        <div class="card-header-neon">
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                                <h4 class="quiz-card-title">
-                                    <i class="fas fa-brain"></i>
+                                <h4 class="question-title">
+                                    <i class="fas fa-brain me-2"></i>
                                     Question #{{ question.id }}
                                 </h4>
-                                <div class="timer-badge" id="timer">
-                                    <i class="far fa-clock"></i>
-                                    <span id="timeDisplay">00:00</span>
+                                <div class="timer-neon" id="timer">
+                                    <i class="fas fa-clock me-2"></i>
+                                    <span id="timeDisplay">05:00</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Card Body -->
-                        <div class="quiz-card-body">
+                        <div class="card-body" style="padding: 2rem;">
                             <div class="question-content">
-                                <!-- Question Text -->
-                                <div class="question-text-wrapper">
-                                    <p class="question-text">{{ question.text }}</p>
-                                    <div class="question-badges">
-                                        <span class="badge badge-tag">
-                                            <i class="fas fa-tag"></i>
+                                <div class="mb-4">
+                                    <p class="question-text-neon">{{ question.text }}</p>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span class="badge-neon tag">
+                                            <i class="fas fa-tag me-1"></i>
                                             {{ question.curriculum_tag }}
                                         </span>
-                                        <span class="badge badge-difficulty difficulty-{{ question.difficulty }}">
-                                            <i class="fas fa-chart-line"></i>
+                                        <span class="badge-neon difficulty-{{ question.difficulty }}">
+                                            <i class="fas fa-chart-line me-1"></i>
                                             {{ question.get_difficulty_display }}
                                         </span>
                                     </div>
                                 </div>
 
-                                <!-- Options Section -->
+                                <!-- Options (sama seperti sebelumnya) -->
                                 {% if question.format == 'mcq_simple' %}
-                                    <div class="options-section">
-                                        <h6 class="options-title">
-                                            <i class="fas fa-list-ul"></i>
-                                            Choose one answer:
+                                    <div class="mb-4">
+                                        <h6 style="color: #00ffff; margin-bottom: 1.5rem;">
+                                            <i class="fas fa-list-ul me-2"></i>Choose one answer:
                                         </h6>
-                                        <div class="options-container" id="optionsContainer">
+                                        <div id="optionsContainer">
                                             {% for key, value in question.options.items %}
-                                                <div class="option-card" data-option="{{ key }}">
-                                                    <input class="option-input" type="radio"
-                                                           name="answer" value="{{ key }}" id="option{{ key }}">
-                                                    <label class="option-label" for="option{{ key }}">
-                                                        <span class="option-key">{{ key }}.</span>
-                                                        <span class="option-text">{{ value }}</span>
-                                                        <span class="option-checkmark">
-                                                            <i class="fas fa-check"></i>
-                                                        </span>
-                                                    </label>
+                                                <div class="option-neon" data-option="{{ key }}">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio"
+                                                               name="answer" value="{{ key }}" id="option{{ key }}"
+                                                               style="display: none;">
+                                                        <label class="option-label w-100" for="option{{ key }}" style="cursor: pointer;">
+                                                            <span class="option-key">{{ key }}.</span> {{ value }}
+                                                        </label>
+                                                    </div>
                                                 </div>
                                             {% endfor %}
                                         </div>
                                     </div>
                                 {% elif question.format == 'mcq_complex' %}
-                                    <div class="options-section">
-                                        <h6 class="options-title">
-                                            <i class="fas fa-check-double"></i>
-                                            Choose all correct answers:
+                                    <div class="mb-4">
+                                        <h6 style="color: #00ffff; margin-bottom: 1.5rem;">
+                                            <i class="fas fa-check-double me-2"></i>Choose all correct answers:
                                         </h6>
-                                        <div class="options-container" id="optionsContainer">
+                                        <div id="optionsContainer">
                                             {% for key, value in question.options.items %}
-                                                <div class="option-card" data-option="{{ key }}">
-                                                    <input class="option-input" type="checkbox"
-                                                           name="answer" value="{{ key }}" id="option{{ key }}">
-                                                    <label class="option-label" for="option{{ key }}">
-                                                        <span class="option-checkbox">
-                                                            <i class="fas fa-check"></i>
-                                                        </span>
-                                                        <div class="option-content">
-                                                            <span class="option-key">{{ key }}.</span>
-                                                            <span class="option-text">{{ value }}</span>
+                                                <div class="option-neon" data-option="{{ key }}">
+                                                    <div class="d-flex align-items-center">
+                                                        <!-- Custom visible checkbox -->
+                                                        <div class="checkbox-neon me-3" data-checkbox="{{ key }}">
+                                                            <div class="checkmark"></div>
                                                         </div>
-                                                    </label>
+                                                        <!-- Hidden actual checkbox for form submission -->
+                                                        <input class="form-check-input" type="checkbox"
+                                                               name="answer" value="{{ key }}" id="option{{ key }}"
+                                                               style="display: none;">
+                                                        <label class="option-label flex-grow-1" for="option{{ key }}" style="cursor: pointer; margin-bottom: 0;">
+                                                            <span class="option-key">{{ key }}.</span> {{ value }}
+                                                        </label>
+                                                    </div>
                                                 </div>
                                             {% endfor %}
                                         </div>
                                     </div>
                                 {% elif question.format == 'short_answer' %}
-                                    <div class="options-section">
-                                        <h6 class="options-title">
-                                            <i class="fas fa-keyboard"></i>
-                                            Type your answer:
+                                    <div class="mb-4">
+                                        <h6 style="color: #00ffff; margin-bottom: 1.5rem;">
+                                            <i class="fas fa-keyboard me-2"></i>Type your answer:
                                         </h6>
-                                        <input type="text" class="answer-input" name="answer"
-                                               id="shortAnswer" placeholder="Enter your answer here..." 
-                                               autocomplete="off">
+                                        <input type="text" class="form-control answer-input-neon" name="answer"
+                                               id="shortAnswer" placeholder="Enter your answer here..." autocomplete="off">
                                     </div>
                                 {% endif %}
+                            </div>
 
-                                <!-- Hint Box -->
-                                <div id="hintBox" class="hint-box">
-                                    <div class="hint-box-header">
-                                        <div class="hint-box-title">
-                                            <i class="fas fa-lightbulb"></i>
-                                            <span>Hint</span>
+                            <!-- Hint Box - Enhanced Layout -->
+                            <div id="hintBox" class="hint-box-neon" style="display: none; opacity: 0; transform: translateY(20px);">
+                                <div class="d-flex align-items-start gap-3">
+                                    <i class="fas fa-lightbulb hint-icon"></i>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 style="color: #ffff00; margin: 0;">💡 Hint</h6>
+                                            <button type="button" class="btn btn-sm" onclick="scrollToQuestion()"
+                                                    style="background: rgba(0, 255, 255, 0.1); border: 1px solid rgba(0, 255, 255, 0.5); color: #00ffff; padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 6px;">
+                                                <i class="fas fa-eye"></i> View Question
+                                            </button>
                                         </div>
-                                        <button type="button" class="hint-scroll-btn" onclick="scrollToQuestion()">
-                                            <i class="fas fa-arrow-up"></i>
-                                            Back to Question
-                                        </button>
+                                        <div id="hintContent" style="color: rgba(255, 255, 255, 0.9); line-height: 1.6;"></div>
                                     </div>
-                                    <div class="hint-box-content" id="hintContent"></div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Card Footer -->
-                        <div class="quiz-card-footer">
-                            <div class="action-buttons">
-                                <button type="submit" class="btn btn-primary btn-submit" id="submitBtn">
-                                    <i class="fas fa-paper-plane"></i>
-                                    Submit Answer
+                        <div class="card-footer" style="border-top: 2px solid rgba(0, 255, 255, 0.3); padding: 1.5rem 2rem;">
+                            <!-- Action Buttons -->
+                            <div class="d-flex flex-wrap gap-3 justify-content-center mt-4">
+                                <button type="submit" class="btn btn-neon" id="submitBtn">
+                                    <i class="fas fa-paper-plane me-2"></i>Submit Answer
                                 </button>
-                                <button type="button" class="btn btn-secondary" id="hintBtn" onclick="requestHint()">
-                                    <i class="fas fa-lightbulb"></i>
-                                    Get Hint
+                                <button type="button" class="btn btn-outline-neon" id="hintBtn" onclick="requestHint()">
+                                    <i class="fas fa-lightbulb me-2"></i>Get Hint
                                 </button>
-                                <button type="button" class="btn btn-secondary" onclick="endQuiz()">
-                                    <i class="fas fa-door-open"></i>
-                                    End Quiz
+                                <button type="button" class="btn btn-outline-neon" onclick="endQuiz()">
+                                    <i class="fas fa-door-open me-2"></i>End Quiz
                                 </button>
                             </div>
                         </div>
@@ -163,91 +842,80 @@
 
             <!-- Sidebar Stats -->
             <div class="col-lg-4">
-                <!-- Session Duration -->
-                <div class="bento-item stat-card">
-                    <div class="stat-card-header">
-                        <i class="fas fa-hourglass-half"></i>
-                        <span>Session Time</span>
+                <!-- Session Info -->
+                <div class="session-info-badge">
+                    <div class="session-duration" id="sessionDuration">
+                        <i class="fas fa-hourglass-half me-2"></i>
+                        <span id="sessionTime">0m 0s</span>
                     </div>
-                    <div class="stat-card-body">
-                        <div class="stat-value primary" id="sessionTime">0m 0s</div>
-                    </div>
+                    <small>Total Session Time</small>
                 </div>
 
-                <!-- Level Info -->
-                <div class="bento-item stat-card">
-                    <div class="stat-card-header">
-                        <i class="fas fa-trophy"></i>
-                        <span>Level Info</span>
-                    </div>
-                    <div class="stat-card-body">
-                        <div class="level-badges">
-                            <div class="level-badge user-level">
-                                <small>Your Level</small>
-                                <div class="level-value">{{ profile.level|upper }}</div>
-                            </div>
-                            <div class="level-badge question-level">
-                                <small>Question Level</small>
-                                <div class="level-value">{{ question.difficulty|upper }}</div>
-                            </div>
+                <!-- Level Cards -->
+                <div class="stats-card-neon">
+                    <h6 style="color: #00ffff; margin-bottom: 1rem; text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);">
+                        <i class="fas fa-trophy me-2"></i>Level Info
+                    </h6>
+                    <div class="level-badge-container">
+                        <!-- User Level -->
+                        <div class="level-badge user-level">
+                            <small>Your Level</small>
+                            <div class="value">{{ profile.level|upper }}</div>
                         </div>
-                        {% if can_level_up %}
-                            <div class="level-up-alert">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>Ready to level up!</span>
-                            </div>
-                        {% endif %}
+                        <!-- Question Level -->
+                        <div class="level-badge question-level">
+                            <small>Question Level</small>
+                            <div class="value">{{ question.difficulty|upper }}</div>
+                        </div>
                     </div>
+                    {% if can_level_up %}
+                        <div class="mt-3 p-3" style="background: rgba(0, 255, 0, 0.1); border: 2px solid #00ff00; border-radius: 12px;">
+                            <i class="fas fa-arrow-up" style="color: #00ff00;"></i>
+                            <span style="color: #00ff00; font-weight: 600;">Ready to level up!</span>
+                        </div>
+                    {% endif %}
                 </div>
 
-                <!-- Session Stats -->
-                <div class="bento-item stat-card">
-                    <div class="stat-card-header">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Session Stats</span>
-                    </div>
-                    <div class="stat-card-body">
-                        <div class="stats-grid">
-                            <div class="stat-item">
-                                <div class="stat-value success" id="correctCount">0</div>
-                                <div class="stat-label">Correct</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value error" id="wrongCount">0</div>
-                                <div class="stat-label">Wrong</div>
-                            </div>
+                <!-- Session Stats Card -->
+                <div class="stats-card-neon">
+                    <h6 style="color: #00ffff; margin-bottom: 1.5rem; text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);">
+                        <i class="fas fa-chart-bar me-2"></i>Session Stats
+                    </h6>
+                    <div class="row text-center mb-3">
+                        <div class="col-6">
+                            <div class="stat-number" style="color: #00ff00;" id="correctCount">0</div>
+                            <div class="stat-label">Correct</div>
                         </div>
-                        <div class="stat-divider"></div>
-                        <div class="stat-item-full">
-                            <div class="stat-value primary" id="totalQuestions">0</div>
+                        <div class="col-6">
+                            <div class="stat-number" style="color: #ff0000;" id="wrongCount">0</div>
+                            <div class="stat-label">Wrong</div>
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-12">
+                            <div class="stat-number" style="color: #00ffff; font-size: 2rem;" id="totalQuestions">0</div>
                             <div class="stat-label">Total Questions</div>
                         </div>
-                        <div class="stat-divider"></div>
-                        <div class="stat-item-full">
-                            <div class="stat-value accent" id="accuracy">0%</div>
-                            <div class="stat-label">Success Rate</div>
-                            <div id="firstTryBadge" class="stat-sublabel"></div>
-                        </div>
+                    </div>
+                    <hr style="border-color: rgba(0, 255, 255, 0.3); margin: 1.5rem 0;">
+                    <div class="text-center">
+                        <div class="stat-number" style="color: #00ffff; font-size: 2rem;" id="accuracy">0%</div>
+                        <div class="stat-label">Accuracy</div>
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
-                <div class="bento-item stat-card">
-                    <div class="stat-card-header">
-                        <i class="fas fa-bolt"></i>
-                        <span>Quick Actions</span>
-                    </div>
-                    <div class="stat-card-body">
-                        <div class="quick-actions">
-                            <button class="btn btn-secondary btn-block" onclick="skipQuestion()">
-                                <i class="fas fa-forward"></i>
-                                Skip Question
-                            </button>
-                            <button class="btn btn-secondary btn-block" onclick="endQuiz()">
-                                <i class="fas fa-home"></i>
-                                End Session
-                            </button>
-                        </div>
+                <!-- Quick Actions Card -->
+                <div class="stats-card-neon">
+                    <h6 style="color: #00ffff; margin-bottom: 1rem;">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h6>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-neon" onclick="skipQuestion()">
+                            <i class="fas fa-forward me-2"></i>Skip Question
+                        </button>
+                        <button class="btn btn-outline-neon" onclick="endQuiz()">
+                            <i class="fas fa-home me-2"></i>End Session
+                        </button>
                     </div>
                 </div>
             </div>
@@ -907,98 +1575,61 @@ function endQuiz() {
     }
     
     function showAutoHint(hintText) {
-        try {
-            console.log('showAutoHint called with text:', hintText.substring(0, 50) + '...');
-            
-            const hintBox = document.getElementById('hintBox');
-            const hintContent = document.getElementById('hintContent');
-            const questionCard = document.querySelector('.quiz-card');
-            
-            // Debug log elements
-            console.log('hintBox:', hintBox);
-            console.log('hintContent:', hintContent);
-            console.log('questionCard:', questionCard);
+        const hintBox = document.getElementById('hintBox');
+        const hintContent = document.getElementById('hintContent');
+        const questionCard = document.querySelector('.question-card-neon');
+        const questionContent = document.querySelector('.question-content');
 
-            // Only proceed if required elements exist
-            if (!hintBox) {
-                console.error('hintBox element not found');
-                return;
-            }
-            if (!hintContent) {
-                console.error('hintContent element not found');
-                return;
-            }
+        hintContent.innerHTML = `<p class="mb-0">${hintText}</p>`;
 
-            // Set hint content
-            hintContent.innerHTML = `<p class="mb-0">${hintText}</p>`;
+        // Add proper spacing before showing hint
+        questionCard.classList.add('has-hint');
 
-            // Add proper spacing before showing hint if question card exists
-            if (questionCard) {
-                console.log('Adding has-hint class to question card');
-                questionCard.classList.add('has-hint');
-            } else {
-                console.warn('questionCard not found, skipping has-hint class');
+        // Show hint with improved animation
+        hintBox.style.display = 'block';
+        setTimeout(() => {
+            hintBox.classList.add('showing');
+            hintBox.style.opacity = '1';
+            hintBox.style.transform = 'translateY(0)';
+        }, 50);
+
+        // Ensure question content is visible by scrolling to top of question if needed
+        setTimeout(() => {
+            const cardBody = questionCard.querySelector('.card-body');
+            if (cardBody.scrollTop > 0) {
+                // If user has scrolled down, smoothly scroll back to show question
+                cardBody.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
             }
 
-            // Show hint with improved animation
-            hintBox.style.display = 'block';
+            // Then scroll hint into view
             setTimeout(() => {
-                hintBox.classList.add('showing');
-                hintBox.style.opacity = '1';
-                hintBox.style.transform = 'translateY(0)';
-            }, 50);
-
-            // Ensure question content is visible by scrolling to top of question if needed
-            setTimeout(() => {
-                if (questionCard) {
-                    const cardBody = questionCard.querySelector('.card-body');
-                    if (cardBody && cardBody.scrollTop > 0) {
-                        // If user has scrolled down, smoothly scroll back to show question
-                        cardBody.scrollTo({
-                            top: 0,
-                            behavior: 'smooth'
-                        });
-                    }
-                }
-
-                // Then scroll hint into view if hintBox exists
-                if (hintBox) {
-                    setTimeout(() => {
-                        hintBox.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'nearest',
-                            inline: 'nearest'
-                        });
-                    }, 300);
-                }
-            }, 100);
-        } catch (error) {
-            console.error('Error showing hint:', error);
-        }
+                hintBox.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest',
+                    inline: 'nearest'
+                });
+            }, 300);
+        }, 100);
     }
 
     function hideHint() {
         const hintBox = document.getElementById('hintBox');
-        const questionCard = document.querySelector('.quiz-card');
+        const questionCard = document.querySelector('.question-card-neon');
 
-        // Only proceed if elements exist
-        if (hintBox) {
-            // Hide hint with animation
-            hintBox.classList.remove('showing');
-            hintBox.style.opacity = '0';
-            hintBox.style.transform = 'translateY(20px)';
+        // Remove extra spacing
+        questionCard.classList.remove('has-hint');
 
-            setTimeout(() => {
-                if (hintBox) {
-                    hintBox.style.display = 'none';
-                }
-            }, 400);
-        }
-        
-        // Remove extra spacing if question card exists
-        if (questionCard) {
-            questionCard.classList.remove('has-hint');
-        }
+        // Hide hint with animation
+        hintBox.classList.remove('showing');
+        hintBox.style.opacity = '0';
+        hintBox.style.transform = 'translateY(20px)';
+
+        setTimeout(() => {
+            hintBox.style.display = 'none';
+        }, 400);
     }
 
     function scrollToQuestion() {
