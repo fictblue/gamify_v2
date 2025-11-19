@@ -1027,10 +1027,19 @@ if (typeof QLearningDashboard === 'undefined') {
             this.charts.adaptationResponse.destroy();
         }
 
-        // Prepare data for the chart
-        const labels = ['Adaptation Type 1', 'Adaptation Type 2', 'Adaptation Type 3'];
-        const successData = [75, 85, 65]; // Example success rates
-        const totalData = [100, 100, 100]; // Example total attempts
+        // Use real data from API
+        const labels = adaptationData.labels || [];
+        const beforeData = adaptationData.before_adaptation || [];
+        const afterData = adaptationData.after_adaptation || [];
+        const effectivenessRates = adaptationData.effectiveness_rates || [];
+
+        // If no data, show a message
+        if (labels.length === 0) {
+            labels.push('No Data Available');
+            beforeData.push(0);
+            afterData.push(0);
+            effectivenessRates.push(0);
+        }
 
         this.charts.adaptationResponse = new Chart(ctx, {
             type: 'bar',
@@ -1038,19 +1047,137 @@ if (typeof QLearningDashboard === 'undefined') {
                 labels: labels,
                 datasets: [
                     {
-                        label: 'Successful Adaptations',
-                        data: successData,
+                        label: 'Sebelum Adaptasi',
+                        data: beforeData,
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Setelah Adaptasi',
+                        data: afterData,
                         backgroundColor: 'rgba(75, 192, 192, 0.6)',
                         borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 1
                     },
                     {
-                        label: 'Total Adaptations',
-                        data: totalData,
-                        backgroundColor: 'rgba(201, 203, 207, 0.6)',
-                        borderColor: 'rgba(201, 203, 207, 1)',
-                        borderWidth: 1,
-                        type: 'bar'
+                        label: 'Efektivitas (%)',
+                        data: effectivenessRates,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 2,
+                        type: 'line',
+                        yAxisID: 'y1',
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Performa (Q-Value)'
+                        },
+                        max: 1.0,
+                        position: 'left'
+                    },
+                    y1: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Efektivitas (%)'
+                        },
+                        max: 100,
+                        position: 'right',
+                        grid: {
+                            drawOnChartArea: false,
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Respon Adaptasi Sistem Q-Learning'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    if (context.dataset.label.includes('%')) {
+                                        label += context.parsed.y.toFixed(1) + '%';
+                                    } else {
+                                        label += context.parsed.y.toFixed(3);
+                                    }
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    updateQLearningPerformanceChart(qLearningData) {
+        const ctx = document.getElementById('qLearningPerformanceChart');
+        if (!ctx) return;
+
+        const labels = qLearningData.labels || [];
+        const qValues = qLearningData.q_values || [];
+        const bestQValues = qLearningData.best_q_values || [];
+        const explorationRates = qLearningData.exploration_rates || [];
+        const learningRates = qLearningData.learning_rates || [];
+
+        if (labels.length === 0) {
+            labels.push('No Data Available');
+            qValues.push(0);
+            bestQValues.push(0);
+            explorationRates.push(0);
+            learningRates.push(0);
+        }
+
+        if (this.charts.qLearningPerformance) {
+            this.charts.qLearningPerformance.destroy();
+        }
+
+        this.charts.qLearningPerformance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Q-Value Rata-rata',
+                        data: qValues,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Q-Value Terbaik',
+                        data: bestQValues,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Tingkat Eksplorasi',
+                        data: explorationRates,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        tension: 0.1,
+                        yAxisID: 'y1'
                     }
                 ]
             },
@@ -1062,36 +1189,91 @@ if (typeof QLearningDashboard === 'undefined') {
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Number of Adaptations'
+                            text: 'Q-Value'
                         },
-                        max: 100
+                        max: 1.0
                     },
-                    x: {
+                    y1: {
+                        beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Adaptation Type'
+                            text: 'Tingkat Eksplorasi'
+                        },
+                        max: 1.0,
+                        position: 'right',
+                        grid: {
+                            drawOnChartArea: false
                         }
                     }
                 },
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Adaptation Response Effectiveness',
-                        font: {
-                            size: 16
-                        }
+                        text: 'Kinerja Q-Learning'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                }
+            }
+        });
+    }
+
+    updateUserStateChart(userStateData) {
+        const ctx = document.getElementById('userStateChart');
+        if (!ctx) return;
+
+        const stateDistribution = userStateData.state_distribution || [];
+        const totalUsers = userStateData.total_users || 0;
+
+        if (stateDistribution.length === 0) {
+            stateDistribution.push({ state: 'No Data', count: 0, percentage: 100 });
+        }
+
+        if (this.charts.userState) {
+            this.charts.userState.destroy();
+        }
+
+        this.charts.userState = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: stateDistribution.map(s => s.state),
+                datasets: [{
+                    data: stateDistribution.map(s => s.count),
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(153, 102, 255, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: `Analisis State Pengguna (Total: ${totalUsers})`
                     },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                const label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null) {
-                                    label += context.parsed.y + '%';
-                                }
-                                return label;
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `${label}: ${value} (${percentage}%)`;
                             }
                         }
                     }
@@ -1106,39 +1288,39 @@ if (typeof QLearningDashboard === 'undefined') {
                 console.warn('No data received from server');
                 return;
             }
-            
+
             console.log('Updating dashboard with data:', data);
-            
+
             // 2.1.4.1 Keterlibatan Pengguna
             if (data.user_engagement) {
                 console.log('Updating user engagement chart');
                 this.updateEngagementChart(data.user_engagement);
             }
-            
+
             // 2.1.4.2 Tingkat Keberhasilan
             if (data.success_rates) {
                 console.log('Updating success rate chart');
                 this.updateSuccessRateChart(data.success_rates);
             }
-            
+
             // 2.1.4.3 Respon Adaptasi
             if (data.adaptation) {
                 console.log('Updating adaptation response chart');
                 this.updateAdaptationResponseChart(data.adaptation);
             }
-            
+
             // 2.1.4.4 Kinerja Q-Learning
             if (data.q_learning) {
                 console.log('Updating Q-Learning performance chart');
                 this.updateQLearningPerformanceChart(data.q_learning);
             }
-            
+
             // 3.1.1.a Analisis State
             if (data.user_states) {
                 console.log('Updating user state analysis');
                 this.updateUserStateChart(data.user_states);
             }
-            
+
             // 3.1.1.b Analisis Action
             if (data.action_distribution) {
                 console.log('Updating action distribution chart');

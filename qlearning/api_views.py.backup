@@ -136,83 +136,41 @@ class QLearningMetricsAPI(View):
     def get_q_learning_metrics(self, start_date, end_date):
         """Get Q-Learning specific metrics"""
         try:
-            from qlearning.models import QLearningDecisionLog
-            from django.db.models.functions import TruncHour
-            
-            # Get Q-Learning performance data over time
-            performance_data = list(QLearningDecisionLog.objects.filter(
-                timestamp__range=(start_date, end_date)
-            ).annotate(
-                hour=TruncHour('timestamp')
-            ).values('hour').annotate(
-                avg_q_value=Avg('q_value_chosen'),
-                avg_best_q=Avg('best_q_value'),
-                avg_epsilon=Avg('epsilon_value'),
-                total_decisions=Count('id'),
-                optimal_decisions=Count('id', filter=Q(is_optimal=True))
-            ).order_by('hour'))
-            
-            # Prepare labels and data for chart
-            labels = [pd['hour'].strftime('%Y-%m-%d %H:00') for pd in performance_data]
-            q_values = [float(pd['avg_q_value']) if pd['avg_q_value'] else 0.0 for pd in performance_data]
-            best_q_values = [float(pd['avg_best_q']) if pd['avg_best_q'] else 0.0 for pd in performance_data]
-            exploration_rates = [float(pd['avg_epsilon']) if pd['avg_epsilon'] else 0.0 for pd in performance_data]
-            
-            # Get decision type distribution
-            decision_distribution = list(QLearningDecisionLog.objects.filter(
-                timestamp__range=(start_date, end_date)
-            ).values('decision_type').annotate(
+            # Get Q-Table state distribution
+            state_distribution = list(QLearningState.objects.values('state_type').annotate(
                 count=Count('id')
             ).order_by('-count'))
             
-            # Get action distribution
-            action_distribution = list(QLearningDecisionLog.objects.filter(
-                timestamp__range=(start_date, end_date)
-            ).values('action_chosen').annotate(
-                count=Count('id'),
-                avg_q_value=Avg('q_value_chosen')
-            ).order_by('-count'))
+            # Get learning progress over time with state_type mapped to numeric values
+            learning_progress = list(UserLearningState.objects.filter(
+                last_visited__range=(start_date, end_date)
+            ).annotate(
+                date=TruncDate('last_visited'),
+                # Map state_type to numeric values for averaging
+                state_numeric=Case(
+                    When(state__state_type='initial', then=Value(1)),
+                    When(state__state_type='struggling', then=Value(2)),
+                    When(state__state_type='learning', then=Value(3)),
+                    When(state__state_type='mastered', then=Value(4)),
+                    default=Value(0),
+                    output_field=IntegerField()
+                )
+            ).values('date').annotate(
+                avg_state=Avg('state_numeric'),
+                count=Count('id')
+            ).order_by('date'))
             
-            # Calculate optimization rate
-            total_decisions = sum(dd['count'] for dd in decision_distribution)
-            optimal_decisions = next((dd['count'] for dd in decision_distribution if dd['decision_type'] == 'exploitation'), 0)
-            optimization_rate = (optimal_decisions / total_decisions * 100) if total_decisions > 0 else 0
-
             return {
-                'labels': labels,
-                'q_values': q_values,
-                'best_q_values': best_q_values,
-                'learning_rates': [1.0 - er for er in exploration_rates],  # Convert epsilon to learning rate
-                'exploration_rates': exploration_rates,
-                'decision_distribution': decision_distribution,
-                'action_distribution': action_distribution,
-                'optimization_rate': optimization_rate,
-                'total_decisions': total_decisions,
-                'performance_summary': {
-                    'avg_q_value': sum(q_values) / len(q_values) if q_values else 0,
-                    'max_q_value': max(q_values) if q_values else 0,
-                    'avg_exploration_rate': sum(exploration_rates) / len(exploration_rates) if exploration_rates else 0
-                }
+                'state_distribution': state_distribution or [],
+                'learning_progress': learning_progress or []
             }
-
+            
         except Exception as e:
             logger.error(f"Error in get_q_learning_metrics: {str(e)}")
             logger.error(traceback.format_exc())
             return {
-                'labels': [],
-                'q_values': [],
-                'best_q_values': [],
-                'learning_rates': [],
-                'exploration_rates': [],
-                'decision_distribution': [],
-                'action_distribution': [],
-                'optimization_rate': 0,
-                'total_decisions': 0,
-                'performance_summary': {
-                    'avg_q_value': 0,
-                    'max_q_value': 0,
-                    'avg_exploration_rate': 0
-                }
+                'state_distribution': [],
+                'learning_progress': []
             }
     
     def get_user_engagement_metrics(self, start_date, end_date):
@@ -287,94 +245,38 @@ class QLearningMetricsAPI(View):
     def get_adaptation_metrics(self, start_date, end_date):
         """Get adaptation effectiveness metrics"""
         try:
-            from qlearning.models import QLearningDecisionLog
-            from django.db.models.functions import TruncHour
-            from collections import defaultdict
+            # Get state transitions
+            transitions = list(UserLearningState.objects.filter(
+                last_visited__range=(start_date, end_date)
+            ).order_by('user', 'last_visited'))
             
-            # Get adaptation response data from decision logs
-            # Group by hour and calculate effectiveness metrics
-            adaptation_data = list(QLearningDecisionLog.objects.filter(
-                timestamp__range=(start_date, end_date)
-            ).annotate(
-                hour=TruncHour('timestamp')
-            ).values('hour').annotate(
-                total_decisions=Count('id'),
-                optimal_decisions=Count('id', filter=Q(is_optimal=True)),
-                exploration_decisions=Count('id', filter=Q(decision_type='exploration')),
-                exploitation_decisions=Count('id', filter=Q(decision_type='exploitation')),
-                avg_q_value=Avg('q_value_chosen'),
-                avg_epsilon=Avg('epsilon_value')
-            ).order_by('hour'))
+            # Calculate state transition matrix
+            transition_matrix = defaultdict(lambda: defaultdict(int))
+            for i in range(len(transitions) - 1):
+                if transitions[i].user_id == transitions[i+1].user_id:
+                    from_state = getattr(transitions[i].state, 'state_type', 'unknown')
+                    to_state = getattr(transitions[i+1].state, 'state_type', 'unknown')
+                    if from_state and to_state:  # Hanya proses jika kedua state valid
+                        transition_matrix[from_state][to_state] += 1
             
-            # Prepare data for adaptation response chart
-            labels = [ad['hour'].strftime('%Y-%m-%d %H:00') for ad in adaptation_data]
-            before_adaptation = []  # Simulated performance before adaptation
-            after_adaptation = []   # Actual performance after adaptation
-            
-            for ad in adaptation_data:
-                # Simulate before adaptation (lower performance)
-                before_perf = max(0.3, (float(ad['avg_q_value']) if ad['avg_q_value'] else 0.5) * 0.7)
-                before_adaptation.append(before_perf)
-                
-                # Actual after adaptation performance
-                after_perf = float(ad['avg_q_value']) if ad['avg_q_value'] else 0.5
-                after_adaptation.append(after_perf)
-            
-            # Calculate effectiveness percentages
-            effectiveness_rates = []
-            for i, (before, after) in enumerate(zip(before_adaptation, after_adaptation)):
-                if before > 0:
-                    improvement = ((after - before) / before) * 100
-                    effectiveness_rates.append(max(0, improvement))  # Ensure non-negative
-                else:
-                    effectiveness_rates.append(0)
-            
-            # Get action distribution for adaptation analysis
-            action_changes = list(QLearningDecisionLog.objects.filter(
-                timestamp__range=(start_date, end_date)
-            ).values('action_chosen', 'decision_type').annotate(
-                count=Count('id'),
-                avg_q_value=Avg('q_value_chosen')
-            ).order_by('action_chosen', 'decision_type'))
-            
-            # Organize action changes by difficulty
-            action_by_difficulty = defaultdict(lambda: {'exploration': 0, 'exploitation': 0})
-            for ac in action_changes:
-                difficulty = ac['action_chosen']
-                decision_type = ac['decision_type']
-                action_by_difficulty[difficulty][decision_type] = ac['count']
+            # Convert to serializable format
+            transition_data = [
+                {'from': k1, 'to': k2, 'count': v2} 
+                for k1, v1 in transition_matrix.items()
+                for k2, v2 in v1.items()
+            ]
             
             return {
-                'labels': labels,
-                'before_adaptation': before_adaptation,
-                'after_adaptation': after_adaptation,
-                'effectiveness_rates': effectiveness_rates,
-                'action_changes': dict(action_by_difficulty),
-                'total_adaptations': len(adaptation_data),
-                'avg_effectiveness': sum(effectiveness_rates) / len(effectiveness_rates) if effectiveness_rates else 0,
-                'adaptation_summary': {
-                    'total_decisions': sum(ad['total_decisions'] for ad in adaptation_data),
-                    'optimal_rate': sum(ad['optimal_decisions'] for ad in adaptation_data) / sum(ad['total_decisions'] for ad in adaptation_data) * 100 if adaptation_data else 0,
-                    'exploration_rate': sum(ad['exploration_decisions'] for ad in adaptation_data) / sum(ad['total_decisions'] for ad in adaptation_data) * 100 if adaptation_data else 0
-                }
+                'transitions': transition_data or [],
+                'total_transitions': len(transition_data)
             }
-
+            
         except Exception as e:
             logger.error(f"Error in get_adaptation_metrics: {str(e)}")
             logger.error(traceback.format_exc())
             return {
-                'labels': [],
-                'before_adaptation': [],
-                'after_adaptation': [],
-                'effectiveness_rates': [],
-                'action_changes': {},
-                'total_adaptations': 0,
-                'avg_effectiveness': 0,
-                'adaptation_summary': {
-                    'total_decisions': 0,
-                    'optimal_rate': 0,
-                    'exploration_rate': 0
-                }
+                'transitions': [],
+                'total_transitions': 0
             }
     
     def get_system_health_metrics(self):
@@ -423,112 +325,38 @@ class QLearningMetricsAPI(View):
         from collections import defaultdict
         
         try:
-            from qlearning.models import QLearningDecisionLog
-            from django.db.models.functions import TruncDay
-            from accounts.models import CustomUser
-            
-            # Get user distribution based on their Q-learning decision patterns
-            # We'll infer user states from their decision patterns and Q-values
-            user_states = list(QLearningDecisionLog.objects.filter(
-                timestamp__range=(start_date, end_date)
-            ).values('user').annotate(
-                last_decision=Max('timestamp'),
-                avg_q_value=Avg('q_value_chosen'),
-                total_decisions=Count('id'),
-                optimal_decisions=Count('id', filter=Q(is_optimal=True)),
-                unique_actions=Count('action_chosen', distinct=True)
-            ).order_by('-avg_q_value'))
-            
-            # Classify users into states based on their performance
-            state_distribution = {'beginner': 0, 'learning': 0, 'advanced': 0, 'mastered': 0}
-            user_details = []
-            
-            for us in user_states:
-                avg_q = float(us['avg_q_value']) if us['avg_q_value'] else 0.0
-                optimal_rate = (us['optimal_decisions'] / us['total_decisions'] * 100) if us['total_decisions'] > 0 else 0
-                
-                # Classify based on Q-value and optimal decision rate
-                if avg_q < 0.3 or optimal_rate < 30:
-                    state = 'beginner'
-                elif avg_q < 0.6 or optimal_rate < 60:
-                    state = 'learning'
-                elif avg_q < 0.8 or optimal_rate < 85:
-                    state = 'advanced'
-                else:
-                    state = 'mastered'
-                
-                state_distribution[state] += 1
-                user_details.append({
-                    'user_id': us['user'],
-                    'state': state,
-                    'avg_q_value': avg_q,
-                    'optimal_rate': optimal_rate,
-                    'total_decisions': us['total_decisions']
-                })
-            
-            # Prepare data for pie chart
-            state_data = [
-                {'state': state.capitalize(), 'count': count, 'percentage': (count / len(user_states) * 100) if user_states else 0}
-                for state, count in state_distribution.items()
-            ]
-            
-            # Get transitions between states over time
-            daily_states = list(QLearningDecisionLog.objects.filter(
-                timestamp__range=(start_date, end_date)
+            # Get current state distribution
+            states = UserLearningState.objects.filter(
+                is_current=True,
+                last_visited__range=(start_date, end_date)
+            ).values(
+                'state__state_type'
             ).annotate(
-                date=TruncDay('timestamp')
-            ).values('date', 'user').annotate(
-                avg_q=Avg('q_value_chosen'),
-                optimal_rate=Count('id', filter=Q(is_optimal=True)) / Count('id') * 100.0
-            ).order_by('date', 'user'))
-            
-            # Track state transitions per user over time
-            user_state_history = defaultdict(list)
-            for ds in daily_states:
-                user_id = ds['user']
-                avg_q = float(ds['avg_q']) if ds['avg_q'] else 0.0
-                optimal_rate = float(ds['optimal_rate']) if ds['optimal_rate'] else 0.0
-                
-                if avg_q < 0.3 or optimal_rate < 30:
-                    state = 'beginner'
-                elif avg_q < 0.6 or optimal_rate < 60:
-                    state = 'learning'
-                elif avg_q < 0.8 or optimal_rate < 85:
-                    state = 'advanced'
-                else:
-                    state = 'mastered'
-                
-                user_state_history[user_id].append((ds['date'], state))
-            
-            # Calculate transition matrix
-            transition_matrix = defaultdict(lambda: defaultdict(int))
-            for user_id, state_history in user_state_history.items():
-                for i in range(len(state_history) - 1):
-                    from_state = state_history[i][1]
-                    to_state = state_history[i + 1][1]
-                    if from_state != to_state:
-                        transition_matrix[from_state][to_state] += 1
-            
-            # Convert to list format
-            transition_data = [
-                {'from': from_state, 'to': to_state, 'count': count}
-                for from_state, transitions in transition_matrix.items()
-                for to_state, count in transitions.items()
-            ]
-            
-            return {
-                'state_distribution': state_data,
-                'transition_matrix': transition_data,
-                'total_users': len(user_states),
-                'user_details': user_details[:10],  # Top 10 users for detailed view
-                'state_summary': {
-                    'beginner': state_distribution['beginner'],
-                    'learning': state_distribution['learning'],
-                    'advanced': state_distribution['advanced'],
-                    'mastered': state_distribution['mastered']
-                }
-            }
+                count=Count('id')
+            ).order_by('-count')
 
+            # Get state transitions
+            transitions = UserLearningState.objects.filter(
+                last_visited__range=(start_date, end_date)
+            ).select_related('state').order_by('user', 'last_visited')
+
+            transition_matrix = defaultdict(lambda: defaultdict(int))
+            for i in range(len(transitions) - 1):
+                if (transitions[i].user_id == transitions[i+1].user_id and 
+                    transitions[i].state_id != transitions[i+1].state_id):
+                    from_state = transitions[i].state.state_type if transitions[i].state else 'unknown'
+                    to_state = transitions[i+1].state.state_type if transitions[i+1].state else 'unknown'
+                    transition_matrix[from_state][to_state] += 1
+
+            return {
+                'state_distribution': list(states),
+                'transition_matrix': [
+                    {'from': k1, 'to': k2, 'count': v2} 
+                    for k1, v1 in transition_matrix.items()
+                    for k2, v2 in v1.items()
+                ]
+            }
+            
         except Exception as e:
             logger.error(f"Error in get_user_state_analysis: {str(e)}")
             logger.error(traceback.format_exc())
